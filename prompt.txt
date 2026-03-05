@@ -1,0 +1,160 @@
+I'm thinking of some things i would like to add to the core package / visualizer:
+ - Clustering:
+	 - Implement hierarchical clusters, because it would be useful to render the graph structured like a filesystem, where nodes at the same depth in the file tree have the same rank. These cluster can be created automatically and are:
+		 - folder node and all its subnodes (sub folders, files, and class/function/etc)
+		 - file node and all its subnodes (classes,  functions, etc)
+		 - class node and all its subnodes (methods)
+	- In the above case clusters could also be ranked to help with the layout.
+	- Clusters can still be defined /changed manually.
+	- Ability to expand and collapse clusters into single nodes.
+	- When creating and modifying clusters its necessary to re-layout the graph.
+- Hierarchical rendering of the graph, by ranking nodes and clusters where nodes/clusters of the same rank should be drawn on the same line (either horizontally or vertically).
+- Filters:
+	- I'm unsure how to integrate filters applied with right click interactions when they're applied to cluster nodes, since cluster nodes are not part of the original graph.
+	- When filters are applied, nodes should simply be hidden/shown, and the layout should not have to be recomputed (at least for static layouts). This helps visually when applying filters. Edges might also need to be removed, so that there are no dangling edges.
+	- Applying filters should not change the graph layout if the nodes are static, it should only show or hide nodes and connected edges. If nodes are not static (force-directed graph with physics on)
+	- If filters are applied on cluster nodes, then when clusters are changed (folded, unfolded, nodes added or removed), the filters need to be reapplied first before computing the projected graph with cluster nodes.
+
+Right now I'm computing a projection graph from the base graph and the clusters, where the projection graph nodes are the nodes that will be rendered depending on the clusters and wheather they are expanded or collapsed.
+
+My cluster interface is
+
+export interface ClusterI {
+    id: string;
+    label: string;
+
+    parentId?: string; // undefined = root cluster
+
+    nodes: string[]; // only direct members
+    expanded?: boolean;
+}
+
+The projection graph is created with
+
+export function createProjectionGraph(graph: Graph, view: ViewI) {
+    const node_to_cluster_map = getNodeClusterMap(graph, view.clusters);
+    // find which nodes to render
+    const renderIds = new Set<string>();
+    graph.forEachNode((nodeId) => {
+        const render_id = node_to_cluster_map.get(nodeId);
+        if (render_id) renderIds.add(render_id);
+    });
+
+    const proj_graph = new DirectedGraph<NodeAttributesI>({});
+
+    // add base nodes
+    graph.forEachNode((node_id, attributes) => {
+        if (renderIds.has(node_id)) {
+            proj_graph.addNode(node_id, attributes);
+        }
+    });
+
+    // add cluster nodes
+    for (const cluster of view.clusters.values()) {
+        // expanded clusters not rendered
+        if (cluster.expanded) continue;
+
+        renderIds.add(cluster.id);
+
+        const attr: NodeAttributesI = {
+            id: cluster.id,
+            label: cluster.label,
+            type: "cluster",
+            full_path: "",
+            external: false,
+        };
+        proj_graph.addNode(cluster.id, attr);
+    }
+
+    graph.forEachEdge((edgeKey, attrs, source, target) => {
+        const from = node_to_cluster_map.get(source);
+        const to = node_to_cluster_map.get(target);
+
+        if (!proj_graph.hasEdge(from, to) && from !== to) {
+            proj_graph.addEdge(from, to);
+        }
+    });
+
+    return proj_graph;
+}
+
+Do you have a good idea for how to architecture the core code to implement these features?
+
+Also, right now I want to focus on the filters, and how to integrate them with the clusters and the layout.
+
+What happens if I create a filter that hides a cluster node (say its node 'c1'), and then I force a re-layout by expanding all clusters. 
+
+------------
+
+Ok I'm thinking of having a class to handle all cluster related functionality. I've created a interface:
+
+interface ClustersI {
+    addCluster(
+        label: string,
+        parent_id: string,
+        nodes: string[],
+        expanded: boolean,
+    ): ClusterI;
+    removeCluster(cluster_id: string): void;
+
+    hasCluster(cluster_id: string): boolean;
+    hasNode(node_id: string): boolean;
+    moveNode(source: string, target: string): boolean;
+
+    // maps graph nodes to the lowest rank parent cluster that is collapsed if any
+    // if not the node maps to itself
+    getNodeClusterMap(graph: Graph): Map<string, string>;
+
+    // nodes
+    getAllClusterNodesRecursive(): Set<String>;
+    findClusterWithNode(node_id: string): string | null;
+    getClusterNodes(cluster_id: string): Set<string>;
+
+    getSubclusters(cluster_id: string): string[];
+    getParentClusters(cluster_id: string): string[];
+
+    // expand and collapse
+    getExpandedClusters(): Set<string>;
+    getCollapsedClusters(): Set<string>;
+    expandAllClusters(): Set<string>; // returns the clusters that were changed
+    collapseAllClusters(): Set<string>; // returns the clusters that were changed
+
+    getClusterRank(cluster: ClusterI): number;
+}
+
+Can you implent the interface? Maybe add a tree (a graphology graph) to the class implementation to keep track of the cluster tree (easier to find children), and a counter to automatically keep track and automatically assign cluster id's.
+
+
+
+
+Right now, if I apply a context filter to the graph, the whole graph has to be rerendered, because the layout is handled by vis-network. This also has some issues when doing small updates to the graph. 
+
+
+For example, suppose I expand one cluster. This is cause the whole graph to be re-layedout from scratch, but one way to make it smooth for force-directed graphs would be to put all cluster subsnodes into the position of the expanded cluster node and let the physics stabilize to the new position.
+
+I would like to implement hierarquical layout. Right now, vis-network is handling all the layout, but vis-network's hierarquical layout is not ideal, because it cannot rank clusters.
+
+So I want to use graphviz to generate the hierarquical layout. I'd have to generate the dot programatically from the projection graph, and then get the layout from the dot. 
+ - How do I install the graphviz compiled to web assembly library?
+ - Maybe also add the ts-graphviz library to help creating the dot? Not sure if it is worth it
+ - Can you create a function to build the dot?
+ - How do I then plug in the resulting graphviz layout into the renderer? Can it be done with the vis-network renderer I already have or do I create a new one?
+
+
+Also it would be useful to add an event to the vis network renderer which triggers when nodes are moved to update the layout. I'm apprehensive about frequent layout updates freezing the ui, specially for interactive graphs.
+
+And also Force-Directed Placement layout since its a force directed graph that works well with clustering.
+
+I've got a few errors on the layout engine.
+
+On line
+    private graphviz: Graphviz | null = null;
+I get a 
+    Cannot use namespace 'Graphviz' as a type.
+
+On line
+    sub.set("rank", rank.toString());
+
+I get
+    Argument of type 'string' is not assignable to parameter of type 'values'.
+

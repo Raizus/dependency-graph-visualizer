@@ -1,0 +1,29 @@
+{
+    "name": "dependency-graph-visualizer",
+    "version": "1.0.0",
+    "description": "",
+    "author": "",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
+    "dependencies": {
+        "eslint": "^10.0.0",
+        "prettier": "^3.8.1",
+        "vis-network": "^10.0.2"
+    },
+    "devDependencies": {
+        "@types/node": "^25.2.3",
+        "ts-node": "^10.9.2",
+        "turbo": "^2.8.6",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.18"
+    },
+    "scripts": {
+        "dev": "turbo run dev",
+        "build": "turbo run build",
+        "test": "turbo run test",
+        "lint": "turbo run lint",
+        "clean": "turbo run clean && rm -rf node_modules packages/*/node_modules"
+    }
+}

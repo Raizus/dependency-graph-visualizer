@@ -1,0 +1,247 @@
+<script lang="ts">
+    import { searchGraphForNodes } from "@dep-graph-vis/core";
+    import { getContext } from "svelte";
+    import type { StateStore } from "../../StateStore";
+
+    // Define the props
+    export let placeholder: string = "Search...";
+    export let onCurrentItemChange:
+        | ((item: string | null) => void)
+        | undefined = undefined;
+
+    // Component state
+    let search_query: string = "";
+    let current_idx: number = 0;
+    let current_node: string | null = null;
+    let filtered_results: string[] = [];
+
+    const state_store = getContext<StateStore>("state_store");
+    let { projected_graph } = state_store;
+    $: graph = $projected_graph;
+
+    // update current item on current index update
+    $: current_node =
+        current_idx >= 0 && current_idx < filtered_results.length
+            ? filtered_results[current_idx]
+            : null;
+
+    // set selection to current node
+    $: if (current_node) {
+        state_store.setSelectedNodes([current_node]);
+    }
+
+    // Reactive statement to filter results whenever search_query changes
+    $: {
+        if (search_query.trim() === "") {
+            filtered_results = [];
+            current_idx = 0;
+        } else if (graph) {
+            filtered_results = searchGraphForNodes(graph, search_query.trim());
+            current_idx = filtered_results.length > 0 ? 0 : -1;
+        }
+    }
+
+    // Call the callback whenever the current item changes
+    $: {
+        if (current_node !== null && onCurrentItemChange) {
+            onCurrentItemChange(current_node);
+        }
+    }
+
+    // Navigation functions
+    function navigateNext(): void {
+        if (filtered_results.length > 0) {
+            current_idx = (current_idx + 1) % filtered_results.length;
+        }
+    }
+
+    function navigatePrevious(): void {
+        if (filtered_results.length > 0) {
+            current_idx =
+                current_idx === 0
+                    ? filtered_results.length - 1
+                    : current_idx - 1;
+        }
+    }
+
+    // Handle keyboard navigation
+    function handleKeydown(event: KeyboardEvent): void {
+        if (event.key === "Enter") {
+            if (event.shiftKey) {
+                navigatePrevious();
+            } else {
+                navigateNext();
+            }
+            event.preventDefault();
+        }
+    }
+</script>
+
+<div class="search-container">
+    <div class="search-bar">
+        <input
+            type="text"
+            bind:value={search_query}
+            on:keydown={handleKeydown}
+            {placeholder}
+            class="search-input"
+        />
+
+        <div class="search-controls">
+            <span class="result-counter">
+                {#if search_query.trim() === "" || filtered_results.length === 0}
+                    No results
+                {:else}
+                    {current_idx + 1} of {filtered_results.length}
+                {/if}
+            </span>
+
+            <button
+                class="nav-button"
+                on:click={navigatePrevious}
+                disabled={filtered_results.length === 0}
+                aria-label="Previous result"
+                title="Previous (Shift + Enter)"
+            >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                        d="M8 12L4 8L8 4"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M8 8L12 4"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M8 8L12 12"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            </button>
+
+            <button
+                class="nav-button"
+                on:click={navigateNext}
+                disabled={filtered_results.length === 0}
+                aria-label="Next result"
+                title="Next (Enter)"
+            >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                        d="M8 4L12 8L8 12"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M8 8L4 12"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M8 8L4 4"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style lang="scss">
+    .search-container {
+        max-width: 600px;
+        font-family:
+            -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+            Ubuntu, Cantarell, sans-serif;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 8px;
+        border: 2px solid #131313;
+        border-radius: 8px;
+        transition: border-color 0.2s;
+
+        &:focus-within {
+            border-color: var(--border-highlight-color);
+        }
+    }
+
+    .search-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        padding: 4px;
+        background: transparent;
+
+        &::placeholder {
+            color: #999;
+        }
+    }
+
+    .search-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .result-counter {
+        font-size: 14px;
+        color: #666;
+        white-space: nowrap;
+        padding: 0 4px;
+        min-width: 60px;
+        width: 6rem;
+        text-align: right;
+    }
+
+    .nav-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        color: #666;
+        transition: all 0.2s;
+        padding: 0;
+
+        &:hover:not(:disabled) {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        &:active:not(:disabled) {
+            background: #e0e0e0;
+        }
+
+        &:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+    }
+</style>

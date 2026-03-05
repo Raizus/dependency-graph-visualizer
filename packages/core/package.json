@@ -1,0 +1,36 @@
+{
+    "name": "@dep-graph-vis/core",
+    "version": "1.0.0",
+    "description": "",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc --watch",
+        "test": "vitest",
+        "lint": "tsc --noEmit",
+        "clean": "rm -rf dist"
+    },
+    "dependencies": {
+        "@hpcc-js/wasm": "^2.33.0",
+        "graphology": "^0.25.4",
+        "graphology-operators": "^1.6.1",
+        "graphology-traversal": "^0.3.1",
+        "graphology-types": "^0.24.8",
+        "ts-graphviz": "^3.0.7"
+    },
+    "devDependencies": {
+        "@types/node": "^25.3.2",
+        "eslint": "^10.0.0",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.18"
+    },
+    "author": ""
+}
