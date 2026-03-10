@@ -9,9 +9,9 @@
         ClusterManager,
         loadDirectedGraphFromJSON,
         newView,
+        ViewMap,
     } from "@dep-graph-vis/core";
     import Toolbar from "./lib/components/toolbar/Toolbar.svelte";
-    import { get } from "svelte/store";
 
     const state_store = new StateStore();
     setContext("state_store", state_store);
@@ -26,9 +26,12 @@
             assignNodeRanks(graph);
 
             const cluster_map = buildHierarquicalClusters(graph);
-            const view = newView("Hierarquical View");
+            const label = "Hierarquical View";
+            const view = newView(label);
+            const view_map = new ViewMap();
+            view_map.set(label, view);
             view.clusters = new ClusterManager([...cluster_map.values()]);
-            state_store.setState(graph, [view]);
+            state_store.setState(graph, view_map);
 
         } catch (error) {
             console.error("Failed to load example:", error);

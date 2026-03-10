@@ -1,28 +1,10 @@
 import type { ClustersI, Graph } from "@dep-graph-vis/core";
 import * as d3 from "d3";
-import type { GraphRendererEvent, GraphRendererEventMap } from "./GraphRendererEvents";
-
-
-// ─── Renderer Interface ───────────────────────────────────────────────────────
-
-export interface GraphRendererInterface {
-    initialize(container: HTMLElement): void;
-    setLayout(graph: Graph, clusters: ClustersI[], svg: string): void;
-
-    getSelectedNodes(): string[];
-    setSelection(nodes: string[]): void;
-
-    fitToView(): void;
-    fitToNodes(nodes: string[]): void;
-
-    hideNodes(nodes: string[]): void;
-    showNodes(nodes: string[]): void;
-
-    on<K extends GraphRendererEvent>(
-        event: K,
-        handler: (data: GraphRendererEventMap[K]) => void,
-    ): void;
-}
+import type {
+    GraphRendererEvent,
+    GraphRendererEventMap,
+} from "./GraphRendererEvents";
+import type { GraphRenderer } from "./GraphRenderer";
 
 // ─── CSS Classes & Constants ──────────────────────────────────────────────────
 
@@ -41,9 +23,18 @@ const CSS = {
 
 const TRANSITION_MS = 150;
 
+// ─── Utilities ───────────────────────────────────────────────────────────
+
+function split_edge_id(edge_id: string): null | [src: string, tgt: string] {
+    const parts = edge_id.split(/->|--/);
+    if (parts.length < 2) return null;
+    const [src, tgt] = parts.map((s) => s.trim());
+    return [src, tgt];
+}
+
 // ─── Implementation ───────────────────────────────────────────────────────────
 
-export class GraphRenderer implements GraphRendererInterface {
+export class D3GraphRenderer implements GraphRenderer {
     private container: HTMLElement | null = null;
     private svg: d3.Selection<SVGSVGElement, unknown, null, undefined> | null =
         null;
@@ -57,7 +48,7 @@ export class GraphRenderer implements GraphRendererInterface {
 
     // Graph data
     private graph: Graph | null = null;
-    private clusters: ClustersI[] = [];
+    private clusters: ClustersI | null = null;
 
     // Maps from graphviz <title> text → DOM group element
     private nodeGroupMap = new Map<string, SVGGElement>();
@@ -91,7 +82,26 @@ export class GraphRenderer implements GraphRendererInterface {
         this.createSvgShell();
     }
 
-    setLayout(graph: Graph, clusters: ClustersI[], svgString: string): void {
+    destroy(): void {
+        if (this.container) {
+            this.container.innerHTML = "";
+            this.container = null;
+        }
+        this.svg = null;
+        this.zoomGroup = null;
+        this.zoom = null;
+        this.graph = null;
+        this.clusters = null;
+        this.nodeGroupMap.clear();
+        this.edgeGroupMap.clear();
+        this.clusterGroupMap.clear();
+        this.nodeEdgeMap.clear();
+        this.selectedNodes.clear();
+        this.selectedEdges.clear();
+        this.handlers.clear();
+    }
+
+    setSvgLayout(graph: Graph, clusters: ClustersI, svgString: string): void {
         if (!this.container) throw new Error("GraphRenderer not initialized");
         const t0 = performance.now();
 
@@ -174,8 +184,18 @@ export class GraphRenderer implements GraphRendererInterface {
     fitToView(): void {
         if (!this.svg || !this.zoomGroup || !this.zoom || !this.container)
             return;
-        const bbox = (this.zoomGroup.node() as SVGGElement).getBBox();
-        this.zoomToBox(bbox);
+
+        this.svg.transition().duration(300).call(
+            this.zoom!.transform,
+            // d3.zoomIdentity.translate(tx, ty).scale(scale),
+            d3.zoomIdentity.translate(0, 0).scale(1),
+        );
+
+        // const bbox = (this.zoomGroup.node() as SVGGElement).getBBox();
+        // this.zoomToBox(bbox);
+
+        // const el = this.zoomGroup.node() as SVGGElement;
+        // this.zoomToScreenRect(el.getBoundingClientRect());
     }
 
     fitToNodes(nodes: string[]): void {
@@ -223,25 +243,27 @@ export class GraphRenderer implements GraphRendererInterface {
     }
 
     showNodes(nodes: string[]): void {
-        nodes.forEach((id) => {
+        nodes.forEach((node_id) => {
             // remove css hidden class from node group
-            const el = this.nodeGroupMap.get(id);
+            const el = this.nodeGroupMap.get(node_id);
             if (el) el.classList.remove(CSS.hidden);
 
-            this.nodeEdgeMap.get(id)?.forEach((edgeId) => {
-                // Only show the edge if BOTH endpoints are visible
-                const edge = this.edgeGroupMap.get(edgeId);
+            this.nodeEdgeMap.get(node_id)?.forEach((edge_id) => {
+                // check edge
+                const edge = this.edgeGroupMap.get(edge_id);
                 if (!edge) return;
 
-                // find edge in graph
-                const edgeData = this.graph?.edge(edgeId);
-                this.graph?.e
-                if (!edgeData) return;
+                // find source and target
+                const source = this.graph?.source(edge_id);
+                const target = this.graph?.target(edge_id);
+                if (!source || !target) return;
+
+                // Only show the edge if BOTH endpoints are visible
                 const srcHidden = this.nodeGroupMap
-                    .get(edgeData.source)
+                    .get(source)
                     ?.classList.contains(CSS.hidden);
                 const tgtHidden = this.nodeGroupMap
-                    .get(edgeData.target)
+                    .get(target)
                     ?.classList.contains(CSS.hidden);
                 if (!srcHidden && !tgtHidden) edge.classList.remove(CSS.hidden);
             });
@@ -295,9 +317,23 @@ export class GraphRenderer implements GraphRendererInterface {
             }
         });
 
+        // this.svg.on("contextmenu", (event: MouseEvent) => {
+        //     if ((event.target as SVGElement) === this.svg!.node()) {
+        //         event.preventDefault();
+        //         this.emit("backgroundRightClick", { event });
+        //     }
+        // });
+
         this.svg.on("contextmenu", (event: MouseEvent) => {
-            if ((event.target as SVGElement) === this.svg!.node()) {
-                event.preventDefault();
+            event.preventDefault();
+            const clusterId = this.hitTestClusters(
+                event.clientX,
+                event.clientY,
+            );
+            if (clusterId) {
+                this.emit("clusterBoxRightClick", { clusterId, event });
+                console.log("Cluster_id: ", clusterId);
+            } else {
                 this.emit("backgroundRightClick", { event });
             }
         });
@@ -350,9 +386,9 @@ export class GraphRenderer implements GraphRendererInterface {
      */
     private resolveEdgeId(title: string): string | null {
         if (!this.graph) return null;
-        const parts = title.split(/->|--/);
-        if (parts.length < 2) return null;
-        const [src, tgt] = parts.map((s) => s.trim());
+        const nodes = split_edge_id(title);
+        if (nodes === null) return null;
+        const [src, tgt] = nodes;
         const match = this.graph.edge(src, tgt);
         return match ?? null;
     }
@@ -421,6 +457,17 @@ export class GraphRenderer implements GraphRendererInterface {
                 event.preventDefault();
                 event.stopPropagation();
                 this.emit("nodeRightClick", { nodeId, event });
+                // Re-dispatch a synthetic event on the container so ancestor listeners
+                // (e.g. ContextMenu components) still see a contextmenu event, while
+                // stopPropagation above prevents the cluster hit-test from also firing.
+                this.container?.dispatchEvent(
+                    new MouseEvent("contextmenu", {
+                        bubbles: true,
+                        cancelable: true,
+                        clientX: event.clientX,
+                        clientY: event.clientY,
+                    }),
+                );
             });
         });
 
@@ -440,6 +487,33 @@ export class GraphRenderer implements GraphRendererInterface {
                 this.emit("clusterBoxRightClick", { clusterId, event });
             });
         });
+    }
+
+    /**
+     * Returns the id of the smallest (innermost) cluster whose bounding rect
+     * contains the given screen-space point, or null if none does.
+     */
+    private hitTestClusters(clientX: number, clientY: number): string | null {
+        let bestId: string | null = null;
+        let bestArea = Infinity;
+
+        this.clusterGroupMap.forEach((el, clusterId) => {
+            const rect = el.getBoundingClientRect();
+            if (
+                clientX >= rect.left &&
+                clientX <= rect.right &&
+                clientY >= rect.top &&
+                clientY <= rect.bottom
+            ) {
+                const area = rect.width * rect.height;
+                if (area < bestArea) {
+                    bestArea = area;
+                    bestId = clusterId;
+                }
+            }
+        });
+
+        return bestId;
     }
 
     // ── Visual Styling ──────────────────────────────────────────────────────────
@@ -473,12 +547,8 @@ export class GraphRenderer implements GraphRendererInterface {
             this.nodeEdgeMap.get(nodeId) ?? new Set<string>();
 
         // Gather the other endpoints
-        connectedEdges.forEach((edgeId) => {
-            const edge = this.graph?.edges.find((e) => e.id === edgeId);
-            if (edge) {
-                connectedNodes.add(edge.source);
-                connectedNodes.add(edge.target);
-            }
+        this.graph?.forEachNeighbor(nodeId, (neighbor_id) => {
+            connectedNodes.add(neighbor_id);
         });
 
         this.nodeGroupMap.forEach((el, id) => {
@@ -498,6 +568,48 @@ export class GraphRenderer implements GraphRendererInterface {
 
     // ── Zoom helpers ────────────────────────────────────────────────────────────
 
+    // ── Zoom helpers ────────────────────────────────────────────────────────────
+
+    /**
+     * Fit the viewport to a rect given in screen/client coordinates.
+     * We read the current D3 transform to convert screen coords back into
+     * the SVG's logical space, then compute the new transform from there.
+     */
+    private zoomToScreenRect(screenRect: DOMRect): void {
+        if (!this.svg || !this.zoom || !this.container) return;
+        const containerRect = this.container.getBoundingClientRect();
+        const { width: W, height: H } = containerRect;
+        if (!W || !H || !screenRect.width || !screenRect.height) return;
+
+        // Current transform so we can map screen → logical coords
+        const currentT = d3.zoomTransform(this.svg.node()!);
+
+        // Convert the screen-space rect corners into logical (pre-transform) SVG space
+        const logX =
+            (screenRect.left - containerRect.left - currentT.x) / currentT.k;
+        const logY =
+            (screenRect.top - containerRect.top - currentT.y) / currentT.k;
+        const logW = screenRect.width / currentT.k;
+        const logH = screenRect.height / currentT.k;
+
+        const padding = 40;
+        const scale = Math.min(
+            (W - padding * 2) / logW,
+            (H - padding * 2) / logH,
+            8,
+        );
+        const tx = W / 2 - scale * (logX + logW / 2);
+        const ty = H / 2 - scale * (logY + logH / 2);
+
+        this.svg
+            .transition()
+            .duration(300)
+            .call(
+                this.zoom!.transform,
+                d3.zoomIdentity.translate(tx, ty).scale(scale),
+            );
+    }
+
     private zoomToBox(bbox: {
         x: number;
         y: number;
@@ -508,6 +620,8 @@ export class GraphRenderer implements GraphRendererInterface {
         const { width: W, height: H } = this.container.getBoundingClientRect();
         if (!W || !H || !bbox.width || !bbox.height) return;
 
+        console.log(W, H);
+
         const padding = 40;
         const scale = Math.min(
             (W - padding * 2) / bbox.width,
@@ -517,13 +631,11 @@ export class GraphRenderer implements GraphRendererInterface {
         const tx = W / 2 - scale * (bbox.x + bbox.width / 2);
         const ty = H / 2 - scale * (bbox.y + bbox.height / 2);
 
-        this.svg
-            .transition()
-            .duration(400)
-            .call(
-                this.zoom!.transform,
-                d3.zoomIdentity.translate(tx, ty).scale(scale),
-            );
+        this.svg.transition().duration(400).call(
+            this.zoom!.transform,
+            // d3.zoomIdentity.translate(tx, ty).scale(scale),
+            d3.zoomIdentity.translate(0, 0).scale(1),
+        );
     }
 
     // ── Event Emitter ───────────────────────────────────────────────────────────
@@ -532,6 +644,7 @@ export class GraphRenderer implements GraphRendererInterface {
         event: K,
         data: GraphRendererEventMap[K],
     ): void {
+        console.log("Emited: ", event);
         this.handlers.get(event)?.forEach((h) => h(data));
     }
 
@@ -543,11 +656,21 @@ export class GraphRenderer implements GraphRendererInterface {
 
         const style = document.createElement("style");
         style.id = id;
+        // .${CSS.nodeSelected} * { filter: drop-shadow(0 0 6px rgba(60,130,255,0.9)); }
+        // .${CSS.nodeSelected} ellipse,
+        // .${CSS.nodeSelected} rect,
+        // .${CSS.nodeSelected} polygon,
+        // .${CSS.nodeSelected} path {
+        //     stroke: #2563eb !important;
+        //     stroke-width: 3px !important;
+        //     paint-order: stroke fill;
+        // }
         style.textContent = `
       /* Node states */
       .${CSS.node} { cursor: pointer; transition: opacity ${TRANSITION_MS}ms ease; }
       .${CSS.nodeHovered} * { filter: brightness(1.15) drop-shadow(0 0 4px rgba(100,160,255,0.6)); }
-      .${CSS.nodeSelected} * { filter: drop-shadow(0 0 6px rgba(60,130,255,0.9)); }
+      .${CSS.nodeSelected} * { filter: brightness(1.05) drop-shadow(0 0 8px rgba(0, 172, 6, 0.9)); }
+
       .${CSS.nodeDimmed} { opacity: 0.25; }
 
       /* Edge states */

@@ -1,25 +1,17 @@
 <script lang="ts">
-    import DropdownMenu from "../reusable_components/DropdownMenu.svelte";
     import FilterButton from "./FilterButton.svelte";
     import LoadButton from "./LoadButton.svelte";
     import SaveButton from "./SaveButton.svelte";
     import SearchNavigator from "./SearchNavigator.svelte";
+    import ViewDropdown from "../ViewDropdown/ViewDropdown.svelte";
 </script>
 
 <div id="toolbar">
     <LoadButton />
     <SaveButton />
     <FilterButton />
-    <DropdownMenu
-        items={[
-            { id: "option1", label: "Option 1" },
-            { id: "option2", label: "Option 2" },
-            { id: "option3", label: "Option 3" },
-        ]}
-        placeholder="Select an option..."
-    />
+    <ViewDropdown />
     <SearchNavigator />
-    <!-- dropdown menu: list of choices, plus a button at the bottom to create a new choice -->
 </div>
 
 <style>

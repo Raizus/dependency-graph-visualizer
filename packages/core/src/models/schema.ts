@@ -82,7 +82,7 @@ export interface NodeGroupI {
 }
 
 export interface LayoutI {
-    type: "auto" | "force" | "hierarchical" | "tree";
+    type: "dot" | "fdp";
 }
 
 export interface NodeAttributesI {
@@ -149,6 +149,7 @@ export interface ClustersI {
     getClusterNodes(cluster_id: string): Set<string>;
 
     getDirectSubclusters(cluster_id?: string): string[];
+    getSubclustersRecursive(cluster_id?: string): string[];
     getParentClusters(cluster_id: string): string[];
 
     // expand and collapse
@@ -181,5 +182,6 @@ export interface ViewJSON {
 
 export interface StateJSON {
     graph: GraphJSON;
-    views: ViewJSON[];
+    views: Record<string, ViewJSON>;
 }
+

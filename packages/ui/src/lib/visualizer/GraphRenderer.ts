@@ -1,4 +1,4 @@
-import type { Graph, LayoutResult, ViewI } from "@dep-graph-vis/core";
+import type { ClustersI, Graph } from "@dep-graph-vis/core";
 import type { GraphRendererEvent, GraphRendererEventMap } from "./GraphRendererEvents";
 
 
@@ -7,9 +7,9 @@ export interface GraphRenderer {
     destroy(): void;
 
     // Data
-    setGraph(graph: Graph): void;
-    setGraphWithLayout(graph: Graph, layout?: LayoutResult): void
+    // setGraph(graph: Graph): void;
     // setView(view: ViewI): void;
+    setSvgLayout(graph: Graph, clusters: ClustersI, svgString: string): void
 
     // Interaction
     getSelectedNodes(): string[];

@@ -8,9 +8,9 @@ import {
     NodeAttributesObject,
     GraphAttributesObject,
     EdgeAttributesObject,
+    SubgraphAttributesObject,
 } from "ts-graphviz";
-import { Graph, ClustersI, NodeAttributesI } from "./schema";
-import { buildNodeRankMap } from "./Graph";
+import { Graph, ClustersI, NodeAttributesI, LayoutI } from "./schema";
 
 export interface LayoutPosition {
     x: number;
@@ -39,7 +39,7 @@ export interface LayoutResult {
 
 function clusterNodeStyle(): NodeAttributesObject {
     return {
-        shape: "box",
+        shape: "cylinder",
         style: "filled,rounded",
         fillcolor: "#e8f4f8",
         color: "#3498db",
@@ -47,14 +47,23 @@ function clusterNodeStyle(): NodeAttributesObject {
     };
 }
 
+function clusterBoxStyle(): SubgraphAttributesObject {
+    return {
+        style: "rounded",
+        color: "#3498db",
+        fontcolor: "#cecece"
+    };
+}
+
 function getNodeShape(type: string): string {
     const shapes: Record<string, string> = {
-        file: "box",
+        file: "tab",
         folder: "folder",
+        root: "folder",
         class: "component",
         function: "ellipse",
         method: "ellipse",
-        cluster: "box",
+        cluster: "cylinder",
     };
 
     return shapes[type] || "ellipse";
@@ -81,6 +90,12 @@ function baseNodeStyle(attrs: NodeAttributesI): NodeAttributesObject {
     };
 }
 
+function getEdgeStyle(): EdgeAttributesObject { 
+    return {
+        color: "#bfbfbf",
+    };
+}
+
 interface GraphOptions {
     graphAttrs?: GraphAttributesObject;
     nodeAttrs?: NodeAttributesObject;
@@ -89,6 +104,7 @@ interface GraphOptions {
 
 const DEFAULT_DOT_OPTIONS: GraphOptions = {
     graphAttrs: {
+        bgcolor: "none",
         layout: "dot",
         rankdir: "TB",
         ranksep: 1.0,
@@ -97,10 +113,15 @@ const DEFAULT_DOT_OPTIONS: GraphOptions = {
         newrank: true,
         compound: true,
     },
+
+    edgeAttrs: {
+        color: "#949494",
+    },
 };
 
 const DEFAULT_FDP_OPTIONS: GraphOptions = {
     graphAttrs: {
+        bgcolor: "none",
         layout: "fdp",
         splines: "curved", // or 'polyline'; 'ortho' doesn't work well with fdp
         overlap: "prism", // or 'false' to remove node overlap (can be slow on large graphs)
@@ -111,6 +132,15 @@ const DEFAULT_FDP_OPTIONS: GraphOptions = {
     },
 };
 
+export function layoutToDotOptions(layout: LayoutI) {
+    if (layout.type === "fdp") return DEFAULT_FDP_OPTIONS;
+    return DEFAULT_DOT_OPTIONS;
+}
+
+/**
+ * Builds the RootGraphModel from the base graph and clusters
+ * to create the dot file
+ */
 class GraphvizGraphModelBuilder {
     static buildGraphvizGraphModel(
         graph: Graph,
@@ -150,8 +180,10 @@ class GraphvizGraphModelBuilder {
         // Create main digraph
         const g = digraph(
             "G",
-            { layout: "dot", ...options.graphAttrs },
+            { layout: "dot", ...options.graphAttrs,  },
             (g) => {
+                if (options.edgeAttrs) g.edge(options.edgeAttrs);
+
                 // Build cluster hierarchy
                 GraphvizGraphModelBuilder.addClustersToGraph(
                     g,
@@ -242,16 +274,17 @@ class GraphvizGraphModelBuilder {
 
             // Collapsed cluster: add a single node representing the cluster
             // add the cluster box too
+            const cluster_style = clusterBoxStyle();
             if (!cluster.expanded) {
-                g.subgraph(`cluster_${cluster.id}`, (sub) => {
+                g.subgraph(`cluster_${cluster.id}`, cluster_style, (sub) => {
                     sub.set(attr.label, cluster.label);
-                    sub.set("style", "rounded");
-                    sub.set("color", "#3498db");
 
                     const c_id = `${cluster.id}`;
+                    const node_attr = graph.getNodeAttributes(c_id);
                     sub.node(c_id, {
                         label: cluster.label,
                         ...clusterNodeStyle(),
+                        tooltip: `${c_id}; type: ${node_attr.type}`
                     });
                     collapsed_clusters.push(c_id);
                 });
@@ -260,10 +293,8 @@ class GraphvizGraphModelBuilder {
             }
 
             // Expanded cluster: create subgraph
-            g.subgraph(`cluster_${cluster.id}`, (sub) => {
+            g.subgraph(`cluster_${cluster.id}`, cluster_style, (sub) => {
                 sub.set(attr.label, cluster.label);
-                sub.set("style", "rounded");
-                sub.set("color", "#3498db");
 
                 // Add nodes directly in this cluster
                 for (const nodeId of cluster.nodes) {
@@ -330,7 +361,7 @@ class GraphvizGraphModelBuilder {
 
             // Don't create self-loops
             if (fromId !== toId) {
-                g.edge([fromId, toId]);
+                g.edge([fromId, toId], getEdgeStyle());
             }
         });
     }
@@ -383,7 +414,7 @@ export class GraphvizLayoutEngine {
     buildDot(
         graph: Graph,
         clusters: ClustersI,
-        options: GraphOptions = DEFAULT_FDP_OPTIONS,
+        options: GraphOptions = DEFAULT_DOT_OPTIONS,
     ): string {
         const g = GraphvizGraphModelBuilder.buildGraphvizGraphModel(
             graph,

@@ -14,6 +14,16 @@ import {
  *              SELECTION REDUCERS                                      *
  ************************************************************************/
 
+/**
+ * Given a graph, current selection of nodes and a function that returns a 
+ * graph filter parameters, it returns a new selection of nodes.
+ * The selection is additive, the selected nodes will be added to the new 
+ * filtered nodes.
+ * @param graph 
+ * @param selected 
+ * @param params_builder_func 
+ * @returns the new selection
+ */
 function generic_selection_func(
     graph: Graph | null,
     selected: string[],

@@ -458,6 +458,19 @@ export class ClusterManager implements ClustersI {
         return this.clusterTree.outNeighbors(cluster_id);
     }
 
+    getSubclustersRecursive(cluster_id?: string): string[] {
+        const clusters: string[] = [];
+        if (!cluster_id) return clusters;
+
+        for (const sub_cluster of this.getDirectSubclusters(cluster_id)) {
+            clusters.push(sub_cluster);
+            const other_sub_clusters = this.getSubclustersRecursive(sub_cluster);
+            other_sub_clusters.forEach(sub_sub_cluster => clusters.push(sub_sub_cluster));
+        }
+
+        return clusters;
+    }
+
     /**
      * Get all parent clusters up to root
      */

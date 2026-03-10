@@ -125,7 +125,7 @@
             "Segoe UI",
             sans-serif;
         font-size: 14px;
-        background: #ffffff;
+        background: var(--bg-color-2);
     }
 
     /* Header */
@@ -141,7 +141,6 @@
         flex: 1;
         font-size: 14px;
         font-weight: 600;
-        color: #111827;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

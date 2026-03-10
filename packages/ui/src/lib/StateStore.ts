@@ -1,4 +1,4 @@
-import { derived, get, writable } from "svelte/store";
+import { derived, get, writable, type Writable } from "svelte/store";
 import {
     type ViewI,
     type Graph,
@@ -6,23 +6,29 @@ import {
     newView,
     createProjectionGraph,
     GraphvizLayoutEngine,
+    ViewMap,
+    newViewMap,
+    type LayoutI,
+    searchGraphForNodes,
 } from "@dep-graph-vis/core";
 
 export class StateStore {
     layoutEngine: GraphvizLayoutEngine;
 
     private _graph = writable<Graph | null>(null);
-    private _views = writable<ViewI[]>([]);
+    private _views = writable<ViewMap>(newViewMap());
 
     private _selected_nodes = writable<string[]>([]);
     private _clicked_node = writable<string | null>(null);
 
-    private _current_view_idx = writable<number>(0);
+    private _current_view_label = writable<string | null>(null);
     private _projected_graph = writable<Graph | null>(null);
     private _current_view = derived(
-        [this._current_view_idx, this._views],
-        ([idx, views]) => {
-            return views[idx];
+        [this._current_view_label, this._views],
+        ([label, views]) => {
+            if (!label) return newView("View");
+            const view = views.get(label);
+            return view || newView();
         },
     );
 
@@ -39,6 +45,9 @@ export class StateStore {
     public graph = { subscribe: this._graph.subscribe };
     public views = { subscribe: this._views.subscribe };
 
+    public current_view_label = {
+        subscribe: this._current_view_label.subscribe,
+    };
     public current_view = { subscribe: this._current_view.subscribe };
     public selected_nodes = { subscribe: this._selected_nodes.subscribe };
     public clicked_node = { subscribe: this._clicked_node.subscribe };
@@ -58,41 +67,49 @@ export class StateStore {
         this._selected_nodes.set(nodes);
     }
 
-    setCurrentViewIdx(idx: number) {
-        this._current_view_idx.set(0);
+    setCurrentViewLabel(label: string) {
+        this._current_view_label.set(label);
+        this.updateProjection();
     }
 
-    setViews(views: ViewI[]) {
+    private setViews(views: ViewMap) {
         this._views.set(views);
     }
 
-    setProjectionGraph(graph: Graph) {
+    private setProjectionGraph(graph: Graph) {
         this._projected_graph.set(graph);
     }
 
-    setState(graph: Graph, views: ViewI[]) {
+    updateProjection() {
+        const graph = get(this._graph);
+        if (!graph) return;
+
+        const curr_view = get(this._current_view);
+        const proj_graph = createProjectionGraph(graph, curr_view.clusters);
+        this.setProjectionGraph(proj_graph);
+    }
+
+    setState(graph: Graph, views: ViewMap) {
         this.setGraph(graph);
         this.setSelectedNodes([]);
         this.setClickedNode(null);
 
-        // set view and current view
-        let new_view = newView();
-        if (views.length > 0) {
-            new_view = views[0];
-            this.setViews(views);
-            this.setCurrentViewIdx(0);
-        } else {
-            this.setViews([new_view]);
-            this.setCurrentViewIdx(0);
+        // If view map is empty add a new view
+        let label = views.getFirstKey() || "View";
+        const view = views.get(label) || newView(label);
+        if (views.size() === 0) {
+            views.set(label, view);
         }
 
-        const projected_graph = createProjectionGraph(graph, new_view.clusters);
-        this.setProjectionGraph(projected_graph);
+        this.setCurrentViewLabel(label);
+        this.setViews(views);
+
+        this.updateProjection();
     }
 
     addFilter(filter: FilterI, at_front: boolean = false) {
         const view = get(this._current_view);
-        const view_idx = get(this._current_view_idx);
+        const view_label = get(this._current_view_label);
         if (!view) return;
 
         const new_filters = at_front
@@ -105,7 +122,7 @@ export class StateStore {
         };
 
         this._views.update((views) => {
-            views[view_idx] = new_view;
+            views.set(view_label!, new_view);
             return views;
         });
 
@@ -114,7 +131,7 @@ export class StateStore {
 
     updateFilters(filters: FilterI[]) {
         const view = get(this._current_view);
-        const view_idx = get(this._current_view_idx);
+        const view_idx = get(this._current_view_label);
         if (!view) return;
 
         const curr_view = get(this._current_view);
@@ -124,18 +141,12 @@ export class StateStore {
     }
 
     addView(view: ViewI) {
-        this._views.update((views) => [...views, view]);
-        const l = get(this._views).length - 1;
-        this.setCurrentViewIdx(l);
-    }
-
-    updateProjection() {
-        const graph = get(this._graph);
-        if (!graph) return;
-
-        const curr_view = get(this._current_view);
-        const proj_graph = createProjectionGraph(graph, curr_view.clusters);
-        this.setProjectionGraph(proj_graph);
+        let label = "View";
+        this._views.update((views) => {
+            label = views.set(label, view);
+            return views;
+        });
+        this.setCurrentViewLabel(label);
     }
 
     // addCluster(cluster: ClusterI) {
@@ -195,4 +206,40 @@ export class StateStore {
 
         this.updateProjection();
     }
+
+    setViewLayout(view_id: string, layout: LayoutI) {
+        this._views.update((views) => {
+            const view = views.get(view_id);
+            if (!view) return views;
+
+            view.layout = layout;
+            return views;
+        });
+
+        // if it is the current view that was updated we need to update the rendered graph
+        const curr_view_label = get(this._current_view_label);
+        if (curr_view_label !== view_id) return;
+
+        // updating projected graph will trigger the re-render
+        this._projected_graph.update((graph) => graph);
+    }
+
+    searchProjectionGraphNodes(query: string): string[] {
+        if (query.trim() === "") return [];
+
+        const graph = get(this._projected_graph);
+        if (!graph) return [];
+
+        const filtered_results = searchGraphForNodes(graph, query.trim());
+        return filtered_results;
+    }
+
+    // async relayout(): Promise<string> {
+    //     this.updateProjection();
+    //     const graph = get(this.projected_graph);
+    //     const view = get(this._current_view);
+    //     const dot = this.layoutEngine.buildDot(graph, view.clusters);
+    //     const svg_str = await this.layoutEngine.computeSvg(dot);
+    //     return svg_str;
+    // }
 }

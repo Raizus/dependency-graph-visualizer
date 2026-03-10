@@ -26,6 +26,8 @@
     --font-color-1: rgba(255, 255, 255, 0.87);
     --border-highlight-color: #646cff;
 
+    --option-hover-color: #363636;
+
     --modal-bg: var(--bg-color-2);
     --modal-backdrop: rgba(10, 10, 18, 0.65);
     --modal-border: rgba(0, 0, 0, 0.8);
@@ -85,6 +87,8 @@ h1 {
 }
 
 button {
+    display: flex;
+    align-items: center;
     border-radius: 8px;
     border: 1px solid transparent;
     padding: 0.6em 1.2em;
@@ -97,6 +101,7 @@ button {
     transition:
         background-color 0.12s ease,
         border-color 0.12s ease,
+        box-shadow 0.15s ease,
         color 0.12s ease;
 
     &:hover:not(:disabled) {

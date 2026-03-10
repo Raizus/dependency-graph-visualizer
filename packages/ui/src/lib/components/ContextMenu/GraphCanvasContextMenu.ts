@@ -10,6 +10,7 @@ import {
     filter_targets_action,
     set_selection_to_intersection_of_reaching_reachables,
     set_selection_to_neighbours_of_node,
+    set_selection_to_nodes_of_cluster_action,
     set_selection_to_reachables_of_node,
     set_selection_to_reachables_of_selection,
     set_selection_to_reaching_of_node,
@@ -31,6 +32,10 @@ export interface NodeMenuContextI {
 export interface BackgroundMenuContextI {
     state_store: StateStore;
     renderer: GraphRenderer;
+}
+
+export interface ClusterBoxMenuContextI extends BackgroundMenuContextI {
+    cluster_id: string | null;
 }
 
 const node_remove_items: MenuItem<NodeMenuContextI>[] = [
@@ -310,8 +315,8 @@ const node_select_items: MenuItem<NodeMenuContextI>[] = [
         },
     },
     {
-        id: "Select Reaching Intersection Reachables",
-        label: "Reaching Intersection Reachables",
+        id: "Select Reaching And Reachables",
+        label: "Reaching and Reachables",
         type: "action",
         action: (context: NodeMenuContextI) => {
             console.log("Select Intersection of reaching and reachables");
@@ -452,29 +457,6 @@ export const filter_and_selection_menu: MenuItem<NodeMenuContextI>[] = [
     },
 ];
 
-export function build_node_click_context_menu(
-    node_attr: NodeAttributesI,
-    clusters: string[],
-): MenuItem<NodeMenuContextI>[] {
-    const items: MenuItem<NodeMenuContextI>[] = [...filter_and_selection_menu];
-
-    if (node_attr.type === "cluster") {
-        items.push({
-            type: "separator",
-            id: "Filter And Selection Menu Separator 2",
-        });
-
-        items.push({
-            id: "Cluster Menu",
-            label: "Cluster",
-            type: "group",
-            children: build_cluster_node_menu(node_attr, clusters),
-        });
-    }
-
-    return items;
-}
-
 export const background_menu: MenuItem<BackgroundMenuContextI>[] = [
     {
         id: "Show Cycles",
@@ -550,3 +532,61 @@ export const background_menu: MenuItem<BackgroundMenuContextI>[] = [
         action: (context: BackgroundMenuContextI) => {},
     },
 ];
+
+export function build_node_click_context_menu(
+    node_attr: NodeAttributesI,
+    clusters: string[],
+): MenuItem<NodeMenuContextI>[] {
+    const items: MenuItem<NodeMenuContextI>[] = [...filter_and_selection_menu];
+
+    if (node_attr.type === "cluster") {
+        items.push({
+            type: "separator",
+            id: "Filter And Selection Menu Separator 2",
+        });
+
+        items.push({
+            id: "Cluster Menu",
+            label: "Cluster",
+            type: "group",
+            children: build_cluster_node_menu(node_attr, clusters),
+        });
+    }
+
+    return items;
+}
+
+export function cluster_box_click_context_menu(): MenuItem<ClusterBoxMenuContextI>[] {
+    const items: MenuItem<ClusterBoxMenuContextI>[] = [...background_menu];
+
+    items.push({
+        id: "Cluster Box Separator 1",
+        type: "separator",
+    });
+
+    items.push({
+        id: "Select Cluster Nodes",
+        label: "Select cluster nodes",
+        type: "action",
+        action: (context: ClusterBoxMenuContextI) => {
+            console.log("Select cluster nodes");
+            const cluster_id = context.cluster_id;
+            if (!cluster_id) return;
+            set_selection_to_nodes_of_cluster_action(context.state_store, cluster_id);
+        },
+    });
+
+    items.push({
+        id: "Fold/Unfold This Cluster",
+        label: "Fold/Unfold this cluster",
+        type: "action",
+        action: (context: ClusterBoxMenuContextI) => {
+            console.log("Fold/Unfold this");
+            const cluster_id = context.cluster_id;
+            if (!cluster_id) return;
+            context.state_store.foldOrUnfoldCluster(cluster_id);
+        },
+    });
+
+    return items;
+}

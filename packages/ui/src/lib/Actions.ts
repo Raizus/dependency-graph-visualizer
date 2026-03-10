@@ -147,6 +147,16 @@ export function set_selection_to_intersection_of_reaching_reachables(
     );
 }
 
+export function set_selection_to_nodes_of_cluster_action(
+    state_store: StateStore,
+    cluster_id: string,
+) {
+    const view = get(state_store.current_view);
+    const nodes = view.clusters.getClusterNodes(cluster_id);
+    const sub_clusters = view.clusters.getSubclustersRecursive(cluster_id);
+    state_store.setSelectedNodes([...nodes, ...sub_clusters]);
+}
+
 /************************************************************************
  *                 FILTER ACTIONS                                       *
  ************************************************************************/

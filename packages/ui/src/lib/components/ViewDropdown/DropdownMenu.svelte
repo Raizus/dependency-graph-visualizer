@@ -1,21 +1,27 @@
 <script lang="ts">
+    import type { DropdownItem } from "../reusable_components/dropdown";
     import ConfigureWindow from "./DropdownConfigureWindow.svelte";
     import DropdownSearchBox from "./DropdownSearchBox.svelte";
+    import type { Snippet } from "svelte";
 
-    export let items: { id: string; label: string }[] = [];
+    export let items: DropdownItem[] = [];
     export let placeholder: string = "Select an item...";
     export let selected: string | null = null;
+    export let addNewCallback: (() => void) | null = null;
+    export let selectCallback: ((id: string) => void) | null = null;
+    export let title: string | undefined;
+    export let configure: Snippet<[DropdownItem]>;
 
     let isOpen: boolean = false;
     let searchQuery: string = "";
-    let configItem: { id: string; label: string } | null = null;
+    let configItem: DropdownItem | null = null;
 
     $: filteredItems = items.filter((item) =>
         item.label.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
     $: selectedLabel = selected
-        ? (items.find((i) => i.id === selected)?.label ?? placeholder)
+        ? (items.find((i) => i.value === selected)?.label ?? placeholder)
         : placeholder;
 
     function openDropdown(): void {
@@ -29,15 +35,13 @@
         configItem = null;
     }
 
-    function selectItem(item: { id: string; label: string }): void {
-        selected = item.id;
+    function selectItem(item: DropdownItem): void {
+        selected = item.value;
+        selectCallback?.(item.value);
         closeDropdown();
     }
 
-    function openConfig(
-        event: MouseEvent,
-        item: { id: string; label: string },
-    ): void {
+    function openConfig(event: MouseEvent, item: DropdownItem): void {
         event.stopPropagation();
         configItem = item;
     }
@@ -47,15 +51,12 @@
     }
 
     function addNewItem(): void {
-        items = [
-            ...items,
-            { id: crypto.randomUUID(), label: `New Item ${items.length + 1}` },
-        ];
+        addNewCallback?.();
     }
 </script>
 
 <div class="dropdown-wrapper">
-    <button class="trigger" on:click={openDropdown}>
+    <button class="trigger" on:click={openDropdown} {title}>
         <span class="trigger-label">{selectedLabel}</span>
         <span class="trigger-chevron">▾</span>
     </button>
@@ -75,11 +76,10 @@
                     on:back={backToDropdown}
                     on:close={closeDropdown}
                 >
-                    <slot name="configure" item={configItem}>
-                        <p class="default-config-content">
-                            Configure <strong>{configItem.label}</strong>
-                        </p>
-                    </slot>
+                    {#if configure}
+                        {@render configure(configItem)}
+                        <!-- configItem is guaranteed non-null here -->
+                    {/if}
                 </ConfigureWindow>
             {:else}
                 <!-- Search box -->
@@ -89,18 +89,18 @@
 
                 <!-- Item list -->
                 <ul class="list" role="listbox">
-                    {#each filteredItems as item (item.id)}
+                    {#each filteredItems as item (item.value)}
                         <li
                             class="list-item"
                             role="option"
-                            aria-selected={item.id === selected}
+                            aria-selected={item.value === selected}
                         >
                             <button
                                 class="item-select"
                                 on:click={() => selectItem(item)}
                             >
                                 {item.label}
-                                {#if item.id === selected}
+                                {#if item.value === selected}
                                     <span class="checkmark">✓</span>
                                 {/if}
                             </button>
@@ -133,7 +133,7 @@
                                 stroke-linecap="round"
                             />
                         </svg>
-                        Add new item
+                        Add new View
                     </button>
                 </div>
             {/if}
@@ -164,12 +164,8 @@
         background: var(--button-bg-color);
         border: 1px solid transparent;
         border-radius: 8px;
-        cursor: pointer;
         font-size: 14px;
         color: var(--font-color);
-        transition:
-            border-color 0.15s ease,
-            box-shadow 0.15s ease;
         user-select: none;
 
         &:hover {
@@ -210,7 +206,7 @@
         left: 0;
         z-index: 50;
         min-width: 280px;
-        background: var(--bg-color-1);
+        background: var(--bg-color-2);
         border: 1px solid #323232;
         border-radius: 10px;
         box-shadow:
@@ -229,23 +225,27 @@
     /* List */
     .list {
         list-style: none;
+        padding-bottom: 4px;
+        padding-top: 4px;
+        padding-left: 6px;
         margin: 0;
-        padding: 4px 0;
         max-height: 240px;
         overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: #e5e7eb transparent;
-    }
 
-    .list::-webkit-scrollbar {
-        width: 5px;
-    }
-    .list::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .list::-webkit-scrollbar-thumb {
-        background: #e5e7eb;
-        border-radius: 4px;
+        &::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 4px;
+        }
     }
 
     .list-item {
@@ -254,7 +254,7 @@
     }
 
     .list-item[aria-selected="true"] .item-select {
-        color: #6366f1;
+        color: var(--border-highlight-color);
         font-weight: 500;
     }
 
@@ -272,15 +272,15 @@
         font-size: 14px;
         color: var(--font-color);
         transition: background 0.1s ease;
-    }
 
-    .item-select:hover {
-        background: #f9fafb;
+        &:hover {
+            background: var(--option-hover-color);
+        }
     }
 
     .checkmark {
         font-size: 12px;
-        color: #6366f1;
+        color: var(--border-highlight-color);
     }
 
     .item-config-btn {
@@ -299,11 +299,11 @@
             background 0.1s ease;
         border-radius: 6px;
         margin-right: 4px;
-    }
 
-    .item-config-btn:hover {
-        color: #6366f1;
-        background: #f5f3ff;
+        &:hover {
+            color: var(--border-highlight-color);
+            background: var(--option-hover-color);
+        }
     }
 
     .config-chevron {
@@ -326,23 +326,18 @@
     }
 
     .add-btn {
-        display: flex;
-        align-items: center;
         gap: 7px;
         width: 100%;
         padding: 9px 10px;
         background: none;
-        border: none;
-        cursor: pointer;
         font-size: 14px;
-        color: #6366f1;
+        color: var(--font-color-1);
         font-weight: 500;
         border-radius: 6px;
-        transition: background 0.1s ease;
-    }
 
-    .add-btn:hover {
-        background: #f5f3ff;
+        // &:hover {
+        //     background: #f5f3ff;
+        // }
     }
 
     .add-icon {

@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { searchGraphForNodes } from "@dep-graph-vis/core";
     import { getContext } from "svelte";
     import type { StateStore } from "../../StateStore";
 
     // Define the props
-    export let placeholder: string = "Search...";
+    export let placeholder: string = "Search nodes...";
     export let onCurrentItemChange:
         | ((item: string | null) => void)
         | undefined = undefined;
@@ -16,8 +15,6 @@
     let filtered_results: string[] = [];
 
     const state_store = getContext<StateStore>("state_store");
-    let { projected_graph } = state_store;
-    $: graph = $projected_graph;
 
     // update current item on current index update
     $: current_node =
@@ -32,13 +29,8 @@
 
     // Reactive statement to filter results whenever search_query changes
     $: {
-        if (search_query.trim() === "") {
-            filtered_results = [];
-            current_idx = 0;
-        } else if (graph) {
-            filtered_results = searchGraphForNodes(graph, search_query.trim());
-            current_idx = filtered_results.length > 0 ? 0 : -1;
-        }
+        filtered_results = state_store.searchProjectionGraphNodes(search_query);
+        current_idx = filtered_results.length > 0 ? 0 : -1;
     }
 
     // Call the callback whenever the current item changes
@@ -171,6 +163,7 @@
             Ubuntu, Cantarell, sans-serif;
         display: flex;
         align-items: center;
+        background: var(--button-bg-color);
     }
 
     .search-bar {
