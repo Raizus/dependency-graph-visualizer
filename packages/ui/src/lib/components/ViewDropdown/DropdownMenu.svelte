@@ -345,11 +345,4 @@
         height: 16px;
         flex-shrink: 0;
     }
-
-    .default-config-content {
-        padding: 16px;
-        color: #6b7280;
-        font-size: 14px;
-        margin: 0;
-    }
 </style>
