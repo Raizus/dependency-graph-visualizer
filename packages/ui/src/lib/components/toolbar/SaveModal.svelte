@@ -3,6 +3,7 @@
     import { download } from "./utils";
     import type { StateStore } from "../../StateStore";
     import { get } from "svelte/store";
+    import { layoutToDotOptions } from "@dep-graph-vis/core";
 
     const state_store = getContext<StateStore>("state_store")
 
@@ -14,8 +15,10 @@
     const downloadDot = (file_base_name = "graph_vis") => {
         const proj_graph = get(state_store.projected_graph);
         if (!proj_graph) return;
-        const clusters = get(state_store.current_view).clusters;
-        const dot = state_store.layoutEngine.buildDot(proj_graph, clusters);
+        const view = get(state_store.current_view);
+        const clusters = view.clusters;
+        const dot_options = layoutToDotOptions(view.layout);
+        const dot = state_store.layoutEngine.buildDot(proj_graph, clusters, dot_options);
         download(dot, `${file_base_name}.dot`, "text/plain");
     };
 
