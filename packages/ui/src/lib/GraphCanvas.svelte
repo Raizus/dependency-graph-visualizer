@@ -51,15 +51,18 @@
         renderer = new D3GraphRenderer();
         renderer.initialize(container);
 
-        renderer.on("selectionChanged", (event) => {
-            const nodes = event.nodes;
-            state_store.setSelectedNodes(nodes);
-        });
-
         // Set initial graph
         if ($projected_graph) {
             updateLayout($projected_graph, $current_view);
         }
+
+        // Set up renderer events
+
+        // Listen for selection changes from the renderer
+        renderer.on("selectionChanged", (event) => {
+            const nodes = event.nodes;
+            state_store.setSelectedNodes(nodes);
+        });
 
         // Handle right-click on node
         renderer.on("nodeRightClick", (event) => {
@@ -99,6 +102,7 @@
             };
         });
 
+        // Handle cluster box right-click
         renderer.on("clusterBoxRightClick", (event) => {
             console.log("Cluster box right-clicked:", event.clusterId);
             event.event.preventDefault();
@@ -147,7 +151,7 @@
         width: 100%;
         height: 100%;
         position: relative;
-        border: 1px solid lightgray;
+        border: none;
     }
 
     .graph-canvas {
