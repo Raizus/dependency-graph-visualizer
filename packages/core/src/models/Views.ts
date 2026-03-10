@@ -1,5 +1,5 @@
 import { ClusterManager } from "./Clusters";
-import { ViewI } from "./schema";
+import { ViewI, ViewsJSON } from "./schema";
 
 export class ViewMap {
     private map: Map<string, ViewI> = new Map();
@@ -39,6 +39,21 @@ export class ViewMap {
             counter++;
         }
         return key;
+    }
+
+    static fromJSON(data: ViewsJSON): ViewMap {
+        const view_map = new ViewMap();
+        for (const [key, view_json] of Object.entries(data)) {
+            const clusters = ClusterManager.fromJSON(view_json.clusters);
+            const view: ViewI = {
+                label: view_json.label,
+                filters: view_json.filters,
+                clusters,
+                layout: view_json.layout,
+            };
+            view_map.set(key, view);
+        }
+        return view_map;
     }
 }
 

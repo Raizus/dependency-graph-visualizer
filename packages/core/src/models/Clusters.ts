@@ -464,8 +464,11 @@ export class ClusterManager implements ClustersI {
 
         for (const sub_cluster of this.getDirectSubclusters(cluster_id)) {
             clusters.push(sub_cluster);
-            const other_sub_clusters = this.getSubclustersRecursive(sub_cluster);
-            other_sub_clusters.forEach(sub_sub_cluster => clusters.push(sub_sub_cluster));
+            const other_sub_clusters =
+                this.getSubclustersRecursive(sub_cluster);
+            other_sub_clusters.forEach((sub_sub_cluster) =>
+                clusters.push(sub_sub_cluster),
+            );
         }
 
         return clusters;
@@ -566,6 +569,11 @@ export class ClusterManager implements ClustersI {
      */
     getAllClusters(): ClusterI[] {
         return Array.from(this._clusters.values());
+    }
+
+    static fromJSON(data: Record<string, ClusterI>): ClusterManager {
+        const clusters = Object.values(data);
+        return new ClusterManager(clusters);
     }
 }
 

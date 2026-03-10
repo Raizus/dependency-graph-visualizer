@@ -175,13 +175,14 @@ export interface ViewI {
 export interface ViewJSON {
     label: string;
     filters: FilterI[];
-    clusters: Map<string, ClusterI>;
+    clusters: Record<string, ClusterI>;
     layout: LayoutI;
 }
-    
+
+export type ViewsJSON = Record<string, ViewJSON>;
 
 export interface StateJSON {
     graph: GraphJSON;
-    views: Record<string, ViewJSON>;
+    views: ViewsJSON;
 }
 
