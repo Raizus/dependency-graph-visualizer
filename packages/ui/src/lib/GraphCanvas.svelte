@@ -6,14 +6,16 @@
         background_menu,
         build_node_click_context_menu,
         cluster_box_click_context_menu,
-        type BackgroundMenuContextI,
-        type ClusterBoxMenuContextI,
-        type NodeMenuContextI,
+        type MenuContextI,
     } from "./components/ContextMenu/GraphCanvasContextMenu";
     import ContextMenu from "./components/ContextMenu/ContextMenu.svelte";
     import { filter_and_selection_menu } from "./components/ContextMenu/GraphCanvasContextMenu";
     import type { MenuItem } from "./components/ContextMenu/ContextMenu";
-    import { layoutToDotOptions, type ClustersI, type Graph, type ViewI } from "@dep-graph-vis/core";
+    import {
+        layoutToDotOptions,
+        type Graph,
+        type ViewI,
+    } from "@dep-graph-vis/core";
     import { D3GraphRenderer } from "./visualizer/D3GraphRenderer";
 
     export let state_store: StateStore;
@@ -22,19 +24,20 @@
 
     let context_menu_items: MenuItem<any>[] = filter_and_selection_menu;
     let selected_node_id: string | null = null;
-    let menu_context:
-        | NodeMenuContextI
-        | BackgroundMenuContextI
-        | ClusterBoxMenuContextI = {
+    let menu_context: MenuContextI = {
         state_store,
         node: null, // Will be updated when menu opens
     };
 
-    let { graph, current_view, selected_nodes, projected_graph } = state_store;
+    let { current_view, selected_nodes, projected_graph } = state_store;
 
     async function updateLayout(graph: Graph, view: ViewI) {
         const dot_options = layoutToDotOptions(view.layout);
-        const dot = state_store.layoutEngine.buildDot(graph, view.clusters, dot_options);
+        const dot = state_store.layoutEngine.buildDot(
+            graph,
+            view.clusters,
+            dot_options,
+        );
         const svg_str = await state_store.layoutEngine.computeSvg(dot);
         renderer.setSvgLayout(graph, view.clusters, svg_str);
     }

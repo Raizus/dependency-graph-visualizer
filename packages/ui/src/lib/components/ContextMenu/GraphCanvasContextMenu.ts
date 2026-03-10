@@ -38,6 +38,8 @@ export interface ClusterBoxMenuContextI extends BackgroundMenuContextI {
     cluster_id: string | null;
 }
 
+export type MenuContextI = NodeMenuContextI | BackgroundMenuContextI | ClusterBoxMenuContextI;
+
 const node_remove_items: MenuItem<NodeMenuContextI>[] = [
     {
         id: "Remove This",
