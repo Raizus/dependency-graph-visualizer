@@ -3,7 +3,7 @@
     import { download } from "./utils";
     import type { StateStore } from "../../StateStore";
     import { get } from "svelte/store";
-    import { layoutToDotOptions } from "@dep-graph-vis/core";
+    import { layoutToDotOptions, layoutToExportDotOptions } from "@dep-graph-vis/core";
 
     const state_store = getContext<StateStore>("state_store")
 
@@ -12,21 +12,25 @@
         download(json_str, `${file_base_name}.json`, "text/plain");
     };
 
-    const downloadDot = (file_base_name = "graph_vis") => {
+    function getDot() {
         const proj_graph = get(state_store.projected_graph);
         if (!proj_graph) return;
         const view = get(state_store.current_view);
         const clusters = view.clusters;
-        const dot_options = layoutToDotOptions(view.layout);
+        const dot_options = layoutToExportDotOptions(view.layout);
         const dot = state_store.layoutEngine.buildDot(proj_graph, clusters, dot_options);
+        return dot;        
+    }
+
+    const downloadDot = (file_base_name = "graph_vis") => {
+        const dot = getDot();
+        if (!dot) return;
         download(dot, `${file_base_name}.dot`, "text/plain");
     };
 
     const downloadSvg = async (file_base_name = "graph_vis") => {
-        const proj_graph = get(state_store.projected_graph);
-        if (!proj_graph) return;
-        const clusters = get(state_store.current_view).clusters;
-        const dot = state_store.layoutEngine.buildDot(proj_graph, clusters);
+        const dot = getDot();
+        if (!dot) return;
         const svg = await state_store.layoutEngine.computeSvg(dot);
         download(svg, `${file_base_name}.svg`, "text/plain");
     };
