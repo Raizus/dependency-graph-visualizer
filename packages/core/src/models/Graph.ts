@@ -3,7 +3,7 @@ import { Graph, GraphJSON, NodeAttributesI } from "./schema";
 
 export function loadDirectedGraphFromJSON(
     data: GraphJSON,
-): DirectedGraph<NodeAttributesI> {
+): Graph {
     const graph = new DirectedGraph<NodeAttributesI>();
 
     // Add nodes
