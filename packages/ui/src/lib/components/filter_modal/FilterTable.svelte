@@ -188,7 +188,7 @@
     }
 
     td {
-        padding: 10px 14px;
+        padding: 5px 5px;
         color: #475467;
         border-bottom: 1px solid #eaecf0;
     }
@@ -198,6 +198,7 @@
     }
 
     .label-cell {
+        text-align: left;
         white-space: nowrap;
     }
 
