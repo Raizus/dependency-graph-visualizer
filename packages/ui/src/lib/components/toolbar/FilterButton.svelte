@@ -6,7 +6,7 @@
 </script>
 
 <button on:click={() => (basicOpen = true)}> Edit Filters </button>
-<Modal bind:open={basicOpen} title="Edit Filters" size="md">
+<Modal bind:open={basicOpen} title="Edit Filters" size="lg">
     <FilterTable/>
 </Modal>
 
