@@ -29,7 +29,7 @@
 
     // Reactive statement to filter results whenever search_query changes
     $: {
-        filtered_results = state_store.searchProjectionGraphNodes(search_query);
+        filtered_results = state_store.searchFilteredGraphNodes(search_query);
         current_idx = filtered_results.length > 0 ? 0 : -1;
     }
 

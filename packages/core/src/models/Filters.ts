@@ -217,7 +217,10 @@ export function filterFunctionFactory(params: FilterParamsI): FilterFunc {
     }
 }
 
-export function apply_filters(graph: Graph, filters: FilterI[]) {
+export function apply_filters(
+    graph: Graph,
+    filters: FilterI[],
+): [Set<string>, Set<string>] {
     let remaining_nodes = new Set(graph.nodes());
     let hidden_nodes: Set<string> = new Set();
     let shown_nodes: Set<string> = new Set();
@@ -238,7 +241,7 @@ export function apply_filters(graph: Graph, filters: FilterI[]) {
     }
 
     shown_nodes = shown_nodes.union(remaining_nodes);
-    return shown_nodes;
+    return [shown_nodes, hidden_nodes];
 }
 
 export function filtered_subgraph(graph: Graph, shown_nodes: Set<string>) {

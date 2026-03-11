@@ -26,10 +26,10 @@
     let selected_node_id: string | null = null;
     let menu_context: MenuContextI = {
         state_store,
-        node: null, // Will be updated when menu opens
+        node: null,
     };
 
-    let { current_view, selected_nodes, projected_graph } = state_store;
+    let { current_view, selected_nodes, filtered_clustered_graph } = state_store;
 
     async function updateLayout(graph: Graph, view: ViewI) {
         const dot_options = layoutToDotOptions(view.layout);
@@ -52,8 +52,8 @@
         renderer.initialize(container);
 
         // Set initial graph
-        if ($projected_graph) {
-            updateLayout($projected_graph, $current_view);
+        if ($filtered_clustered_graph) {
+            updateLayout($filtered_clustered_graph, $current_view);
         }
 
         // Set up renderer events
@@ -76,7 +76,7 @@
             };
 
             // // Get node details from graph
-            const node_attr = $projected_graph?.getNodeAttributes(event.nodeId);
+            const node_attr = $filtered_clustered_graph?.getNodeAttributes(event.nodeId);
             if (!node_attr) return;
 
             context_menu_items = build_node_click_context_menu(node_attr, []);
@@ -135,8 +135,8 @@
         renderer.setSelection($selected_nodes);
     }
 
-    $: if (renderer && $projected_graph) {
-        updateLayout($projected_graph, $current_view);
+    $: if (renderer && $filtered_clustered_graph) {
+        updateLayout($filtered_clustered_graph, $current_view);
     }
 </script>
 

@@ -3,13 +3,18 @@ import {
     type ViewI,
     type Graph,
     type FilterI,
-    newView,
-    createProjectionGraph,
+    newBlanckView,
+    createClusteredGraph,
     GraphvizLayoutEngine,
     ViewMap,
     newViewMap,
     type LayoutI,
     searchGraphForNodes,
+    layoutToDotOptions,
+    type StateJSON,
+    apply_filters,
+    filtered_subgraph,
+    View,
 } from "@dep-graph-vis/core";
 
 export class StateStore {
@@ -19,18 +24,21 @@ export class StateStore {
     private _views = writable<ViewMap>(newViewMap());
 
     private _selected_nodes = writable<string[]>([]);
-    private _clicked_node = writable<string | null>(null);
 
     private _current_view_label = writable<string | null>(null);
-    private _projected_graph = writable<Graph | null>(null);
     private _current_view = derived(
         [this._current_view_label, this._views],
         ([label, views]) => {
-            if (!label) return newView("View");
+            if (!label) return newBlanckView("View");
             const view = views.get(label);
-            return view || newView();
+            return view || newBlanckView("View");
         },
     );
+
+    private _clustered_graph = writable<Graph | null>(null);
+    private _filtered_clustered_graph = writable<Graph | null>(null);
+    private _hidden_nodes = writable<Set<string>>(new Set());
+    private _shown_nodes = writable<Set<string>>(new Set());
 
     constructor() {
         // ... existing initialization
@@ -50,26 +58,26 @@ export class StateStore {
     };
     public current_view = { subscribe: this._current_view.subscribe };
     public selected_nodes = { subscribe: this._selected_nodes.subscribe };
-    public clicked_node = { subscribe: this._clicked_node.subscribe };
+    public hidden_nodes = { subscribe: this._hidden_nodes.subscribe };
+    public shown_nodes = { subscribe: this._shown_nodes.subscribe };
 
-    public projected_graph = { subscribe: this._projected_graph.subscribe };
+    public clustered_graph = { subscribe: this._clustered_graph.subscribe };
+    public filtered_clustered_graph = {
+        subscribe: this._filtered_clustered_graph.subscribe,
+    };
 
     // Actions
     setGraph(graph: Graph) {
         this._graph.set(graph);
     }
 
-    setClickedNode(node: string | null) {
-        this._clicked_node.set(node);
-    }
-
     setSelectedNodes(nodes: string[]) {
         this._selected_nodes.set(nodes);
     }
 
-    setCurrentViewLabel(label: string) {
+    setCurrentViewLabel(label: string | null) {
         this._current_view_label.set(label);
-        this.updateProjection();
+        this.updateClusteredGraph();
     }
 
     private setViews(views: ViewMap) {
@@ -77,26 +85,40 @@ export class StateStore {
     }
 
     private setProjectionGraph(graph: Graph) {
-        this._projected_graph.set(graph);
+        this._clustered_graph.set(graph);
     }
 
-    updateProjection() {
+    updateFilteredClusteredGraph() {
+        const clustered_graph = get(this._clustered_graph);
+        if (!clustered_graph) return;
+
+        const curr_view = get(this._current_view);
+        const [shown_nodes, hidden_nodes] = apply_filters(
+            clustered_graph,
+            curr_view.filters,
+        );
+        // TODO: filter by considering the clusters
+        const filtered_graph = filtered_subgraph(clustered_graph, shown_nodes);
+        this._filtered_clustered_graph.set(filtered_graph);
+    }
+
+    updateClusteredGraph() {
         const graph = get(this._graph);
         if (!graph) return;
 
         const curr_view = get(this._current_view);
-        const proj_graph = createProjectionGraph(graph, curr_view.clusters);
+        const proj_graph = createClusteredGraph(graph, curr_view.clusters);
         this.setProjectionGraph(proj_graph);
+        this.updateFilteredClusteredGraph();
     }
 
     setState(graph: Graph, views: ViewMap) {
         this.setGraph(graph);
         this.setSelectedNodes([]);
-        this.setClickedNode(null);
 
         // If view map is empty add a new view
         let label = views.getFirstKey() || "View";
-        const view = views.get(label) || newView(label);
+        const view = views.get(label) || newBlanckView(label);
         if (views.size() === 0) {
             views.set(label, view);
         }
@@ -104,29 +126,30 @@ export class StateStore {
         this.setCurrentViewLabel(label);
         this.setViews(views);
 
-        this.updateProjection();
+        this.updateClusteredGraph();
     }
 
+    /**
+     * Adds a filter to the current view
+     * @param filter
+     * @param at_front If true, inserts at the front of the filter stack,
+     *  else inserts at the end
+     * @returns
+     */
     addFilter(filter: FilterI, at_front: boolean = false) {
         const view = get(this._current_view);
         const view_label = get(this._current_view_label);
-        if (!view) return;
+        if (!view || !view_label) return;
 
-        const new_filters = at_front
-            ? [filter, ...view.filters]
-            : [...view.filters, filter];
-
-        const new_view = {
-            ...view,
-            filters: new_filters,
-        };
+        view.addFilter(filter, at_front);
 
         this._views.update((views) => {
-            views.set(view_label!, new_view);
+            views.set(view_label, view);
             return views;
         });
 
         // TODO: update projection (or some posterior structure)
+        this.updateFilteredClusteredGraph();
     }
 
     updateFilters(filters: FilterI[]) {
@@ -140,7 +163,7 @@ export class StateStore {
         // TODO: update projection (or some posterior structure)
     }
 
-    addView(view: ViewI) {
+    addView(view: View) {
         let label = "View";
         this._views.update((views) => {
             label = views.set(label, view);
@@ -165,7 +188,7 @@ export class StateStore {
         const expanded = curr_view.clusters.expandAllClusters();
         if (expanded.size === 0) return;
 
-        this.updateProjection();
+        this.updateClusteredGraph();
     }
 
     foldAllClusters() {
@@ -173,7 +196,7 @@ export class StateStore {
         const collapsed = curr_view.clusters.collapseAllClusters();
         if (collapsed.size === 0) return;
 
-        this.updateProjection();
+        this.updateClusteredGraph();
     }
 
     foldOrUnfoldCluster(cluster_id: string) {
@@ -188,7 +211,7 @@ export class StateStore {
             this.unfoldCluster(cluster_id);
         }
 
-        this.updateProjection();
+        this.updateClusteredGraph();
     }
 
     foldCluster(cluster_id: string) {
@@ -196,7 +219,7 @@ export class StateStore {
         const success = curr_view.clusters.collapseCluster(cluster_id);
         if (!success) return;
 
-        this.updateProjection();
+        this.updateClusteredGraph();
     }
 
     unfoldCluster(cluster_id: string) {
@@ -204,7 +227,7 @@ export class StateStore {
         const success = curr_view.clusters.expandCluster(cluster_id);
         if (!success) return;
 
-        this.updateProjection();
+        this.updateClusteredGraph();
     }
 
     setViewLayout(view_id: string, layout: LayoutI) {
@@ -221,18 +244,74 @@ export class StateStore {
         if (curr_view_label !== view_id) return;
 
         // updating projected graph will trigger the re-render
-        this._projected_graph.update((graph) => graph);
+        this._clustered_graph.update((graph) => graph);
     }
 
-    searchProjectionGraphNodes(query: string): string[] {
+    deleteView(view_id: string) {
+        const views = get(this._views);
+        const current_view_label = get(this._current_view_label);
+
+        const deleted = views.delete(view_id);
+        if (!deleted) return;
+
+        // update views
+        this.setViews(views);
+
+        if (view_id != current_view_label) return;
+
+        // set new view
+        const new_current_label = views.getFirstKey();
+        this.setCurrentViewLabel(new_current_label);
+    }
+
+    duplicateView(view_id: string) {
+        const views = get(this._views);
+
+        const new_view_id = views.duplicate(view_id);
+        if (!new_view_id) return; // duplication failed
+
+        // update views
+        this.setViews(views);
+        this.setCurrentViewLabel(new_view_id);
+    }
+
+    searchFilteredGraphNodes(query: string): string[] {
         if (query.trim() === "") return [];
 
-        const graph = get(this._projected_graph);
+        const graph = get(this._filtered_clustered_graph);
         if (!graph) return [];
 
         const filtered_results = searchGraphForNodes(graph, query.trim());
         return filtered_results;
     }
+
+    getDotForCurrentView(): string | null {
+        const graph = get(this._filtered_clustered_graph);
+        if (!graph) return null;
+
+        const view = get(this._current_view);
+        const dot_options = layoutToDotOptions(view.layout);
+        const dot = this.layoutEngine.buildDot(
+            graph,
+            view.clusters,
+            dot_options,
+        );
+        return dot;
+    }
+
+    // toJSON(): StateJSON {
+    //     const graph = get(this._graph);
+    //     const views = get(this._views);
+
+    //     if (!graph) {
+    //         throw new Error("Graph is not set");
+    //     }
+
+    //     return {
+    //         graph: graph.export(),
+    //         views: views.toJSON(),
+    //     };
+    // }
 
     // async relayout(): Promise<string> {
     //     this.updateProjection();

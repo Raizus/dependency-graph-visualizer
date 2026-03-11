@@ -1,7 +1,8 @@
 import { DirectedGraph } from "graphology";
 import { ClustersI, Graph, NodeAttributesI } from "./schema";
 
-export function createProjectionGraph(graph: Graph, clusters: ClustersI) {
+
+export function createClusteredGraph(graph: Graph, clusters: ClustersI): Graph {
     const node_id_to_render_id_map = clusters.getIdToRendedIdMap(graph);
     const render_ids = new Set<string>();
 
@@ -31,7 +32,7 @@ export function createProjectionGraph(graph: Graph, clusters: ClustersI) {
         if (!render_ids.has(cluster.id)) continue;
 
         const attr: NodeAttributesI = {
-            id: cluster.id,
+            key: cluster.id,
             label: cluster.label,
             type: "cluster",
             full_path: "",

@@ -125,7 +125,7 @@ function nodeMatch(node_attr: NodeAttributesI, query: string): boolean {
         regex = new RegExp(escaped, "i");
     }
     return (
-        regex.test(node_attr.id) ||
+        regex.test(node_attr.key) ||
         regex.test(node_attr.label) ||
         regex.test(node_attr.full_path)
     );
@@ -135,7 +135,7 @@ export function searchGraphForNodes(graph: Graph, query: string): string[] {
     const results: string[] = [];
     graph.forEachNode((node, attributes) => {
         if (nodeMatch(attributes, query)) {
-            results.push(attributes.id);
+            results.push(attributes.key);
         }
     });
     return results;

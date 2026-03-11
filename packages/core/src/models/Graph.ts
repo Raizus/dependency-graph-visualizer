@@ -8,12 +8,12 @@ export function loadDirectedGraphFromJSON(
 
     // Add nodes
     for (const node of data.nodes) {
-        if (graph.hasNode(node.id)) {
-            throw new Error(`Duplicate node id: ${node.id}`);
+        if (graph.hasNode(node.key)) {
+            throw new Error(`Duplicate node key: ${node.key}`);
         }
 
-        graph.addNode(node.id, {
-            id: node.id,
+        graph.addNode(node.key, {
+            key: node.key,
             label: node.label,
             full_path: node.full_path,
             type: node.type,

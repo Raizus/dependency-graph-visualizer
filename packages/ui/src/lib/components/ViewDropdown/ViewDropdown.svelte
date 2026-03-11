@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getContext } from "svelte";
     import type { StateStore } from "../../StateStore";
-    import { newView, ViewMap } from "@dep-graph-vis/core";
+    import { newBlanckView, ViewMap } from "@dep-graph-vis/core";
     import DropdownMenu from "./DropdownMenu.svelte";
     import LayoutEditor from "./LayoutEditor.svelte";
     import type { DropdownItem } from "../reusable_components/dropdown";
@@ -14,7 +14,7 @@
     $: selected = $current_view_label_store;
 
     function addNewView() {
-        const new_view = newView("View");
+        const new_view = newBlanckView("View");
         state_store.addView(new_view);
     }
 

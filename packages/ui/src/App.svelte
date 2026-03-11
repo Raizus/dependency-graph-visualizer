@@ -8,7 +8,7 @@
         buildHierarquicalClusters,
         ClusterManager,
         loadDirectedGraphFromJSON,
-        newView,
+        newBlanckView,
         ViewMap,
     } from "@dep-graph-vis/core";
     import Toolbar from "./lib/components/toolbar/Toolbar.svelte";
@@ -26,8 +26,8 @@
             assignNodeRanks(graph);
 
             const cluster_map = buildHierarquicalClusters(graph);
-            const label = "Hierarquical View";
-            const view = newView(label);
+            const label = "Hierarchical View";
+            const view = newBlanckView(label);
             const view_map = new ViewMap();
             view_map.set(label, view);
             view.clusters = new ClusterManager([...cluster_map.values()]);

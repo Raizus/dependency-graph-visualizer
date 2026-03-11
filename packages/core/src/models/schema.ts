@@ -86,7 +86,7 @@ export interface LayoutI {
 }
 
 export interface NodeAttributesI {
-    id: string;
+    key: string;
     label: string;
     full_path: string;
     type: string;
@@ -163,6 +163,8 @@ export interface ClustersI {
     getClusterRank(cluster: ClusterI): number;
     getCluster(cluster_id: string): ClusterI | undefined;
     getAllClusters(): ClusterI[];
+
+    toJSON(): Record<string, ClusterI>;
 }
 
 export interface ViewI {

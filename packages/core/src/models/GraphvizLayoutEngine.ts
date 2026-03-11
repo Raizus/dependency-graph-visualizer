@@ -319,10 +319,13 @@ class GraphvizGraphModelBuilder {
             // add the cluster box too
             const cluster_style = clusterBoxStyle();
             if (!cluster.expanded) {
+                // make sure the filtered graph has the node
+                const c_id = `${cluster.id}`;
+                if (!graph.hasNode(c_id)) continue;
+
                 g.subgraph(`cluster_${cluster.id}`, cluster_style, (sub) => {
                     sub.set(attr.label, cluster.label);
 
-                    const c_id = `${cluster.id}`;
                     const node_attr = graph.getNodeAttributes(c_id);
                     sub.node(c_id, {
                         label: cluster.label,
@@ -345,8 +348,9 @@ class GraphvizGraphModelBuilder {
 
                     const attrs = graph.getNodeAttributes(nodeId);
                     sub.node(nodeId, {
-                        label: attrs.label || attrs.id,
+                        label: attrs.label || attrs.key,
                         ...baseNodeStyle(attrs),
+                        tooltip: `${nodeId}; path: ${attrs.full_path}`,
                     });
                 }
 
@@ -384,7 +388,7 @@ class GraphvizGraphModelBuilder {
         graph.forEachNode((nodeId, attrs) => {
             if (!clustered_nodes.has(nodeId)) {
                 g.node(nodeId, {
-                    label: attrs.label || attrs.id,
+                    label: attrs.label || attrs.key,
                     ...baseNodeStyle(attrs),
                 });
             }
