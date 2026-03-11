@@ -70,7 +70,6 @@
     $: selectedIndex = getSelectedIndex(selectedId);
     $: canMoveUp = selectedIndex > 0;
     $: canMoveDown = selectedIndex >= 0 && selectedIndex < filters.length - 1;
-
 </script>
 
 <div class="container">
@@ -139,9 +138,13 @@
         font-size: 14px;
     }
 
+    table, th, td {
+        border: 1px solid black;
+    }
+
     .table-wrapper {
-        border: 1px solid #d0d5dd;
-        border-radius: 8px;
+        border: none;
+        border-radius: 4px;
         overflow: hidden;
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
         min-width: 320px;
@@ -162,7 +165,6 @@
         text-align: left;
         font-weight: 600;
         color: #344054;
-        border-bottom: 1px solid #d0d5dd;
         user-select: none;
 
         &:not(:first-child) {
