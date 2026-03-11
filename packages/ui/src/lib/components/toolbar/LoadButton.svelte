@@ -1,6 +1,12 @@
 <script lang="ts">
+    import { getContext } from "svelte";
+    import { loadStateJson, StateStore } from "../../StateStore";
+    import type { StateJSON } from "@dep-graph-vis/core";
+
     let inputRef: HTMLInputElement | null = null;
     let files: FileList | null = null;
+
+    const state_store = getContext<StateStore>("state_store");
 
     $: if (files && files.length) {
         const file = files[0];
@@ -16,7 +22,11 @@
                 if (typeof result !== "string") return;
                 const obj = JSON.parse(result);
 
+                // TODO: validate json
+                
                 // state from json
+                const { graph, views } = loadStateJson(obj as StateJSON);
+                state_store.setState(graph, views);
             }
         };
 
