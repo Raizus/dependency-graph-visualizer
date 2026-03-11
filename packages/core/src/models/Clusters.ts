@@ -575,6 +575,28 @@ export class ClusterManager implements ClustersI {
         const clusters = Object.values(data);
         return new ClusterManager(clusters);
     }
+
+    toJSON(): Record<string, ClusterI> {
+        const json: Record<string, ClusterI> = {};
+        this._clusters.forEach((cluster, id) => {
+            json[id] = cluster;
+        });
+        return json;
+    }
+
+    copy(): ClusterManager {
+        const new_manager = new ClusterManager();
+        this._clusters.forEach((cluster) => {
+            new_manager._addExistingCluster({
+                id: cluster.id,
+                label: cluster.label,
+                parent_id: cluster.parent_id,
+                nodes: [...cluster.nodes],
+                expanded: cluster.expanded,
+            });
+        });
+        return new_manager;
+    }
 }
 
 export function generateClusterBoxes(clusters: ClustersI): ClusterBox[] {
