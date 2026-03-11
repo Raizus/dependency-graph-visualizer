@@ -71,8 +71,6 @@
     $: canMoveUp = selectedIndex > 0;
     $: canMoveDown = selectedIndex >= 0 && selectedIndex < filters.length - 1;
 
-    $: console.log(canMoveUp);
-    $: console.log(canMoveDown);
 </script>
 
 <div class="container">
