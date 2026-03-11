@@ -119,6 +119,23 @@ const DEFAULT_DOT_OPTIONS: GraphOptions = {
     },
 };
 
+const DEFAULT_EXPORT_DOT_OPTIONS: GraphOptions = {
+    graphAttrs: {
+        bgcolor: "#ffffff",
+        layout: "dot",
+        rankdir: "TB",
+        ranksep: 1.0,
+        nodesep: 0.5,
+        splines: "spline",
+        newrank: true,
+        compound: true,
+    },
+
+    edgeAttrs: {
+        color: "#000000",
+    },
+};
+
 const DEFAULT_FDP_OPTIONS: GraphOptions = {
     graphAttrs: {
         bgcolor: "none",
@@ -130,11 +147,37 @@ const DEFAULT_FDP_OPTIONS: GraphOptions = {
         maxiter: 1000, // max iterations for layout
         start: "", // or a seed number like 3 for reproducible layouts
     },
+
+    edgeAttrs: {
+        color: "#949494",
+    },
+};
+
+const DEFAULT_EXPORT_FDP_OPTIONS: GraphOptions = {
+    graphAttrs: {
+        bgcolor: "white",
+        layout: "fdp",
+        splines: "curved", // or 'polyline'; 'ortho' doesn't work well with fdp
+        overlap: "prism", // or 'false' to remove node overlap (can be slow on large graphs)
+        sep: "+8", // extra space between nodes after overlap removal
+        K: 0.6, // ideal edge length (spring constant) — lower = tighter
+        maxiter: 1000, // max iterations for layout
+        start: "", // or a seed number like 3 for reproducible layouts
+    },
+
+    edgeAttrs: {
+        color: "#000000",
+    },
 };
 
 export function layoutToDotOptions(layout: LayoutI) {
     if (layout.type === "fdp") return DEFAULT_FDP_OPTIONS;
     return DEFAULT_DOT_OPTIONS;
+}
+
+export function layoutToExportDotOptions(layout: LayoutI) {
+    if (layout.type === "fdp") return DEFAULT_EXPORT_FDP_OPTIONS;
+    return DEFAULT_EXPORT_DOT_OPTIONS;
 }
 
 /**

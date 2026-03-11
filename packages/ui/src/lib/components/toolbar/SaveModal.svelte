@@ -3,17 +3,18 @@
     import { download } from "./utils";
     import type { StateStore } from "../../StateStore";
     import { get } from "svelte/store";
-    import { layoutToDotOptions, layoutToExportDotOptions } from "@dep-graph-vis/core";
+    import { layoutToExportDotOptions } from "@dep-graph-vis/core";
 
     const state_store = getContext<StateStore>("state_store")
 
     const downloadJson = (file_base_name = "graph_vis") => {
-        const json_str = "{}";
+        const graph = get(state_store.graph);
+        const json_str = JSON.stringify(graph, null, 2);
         download(json_str, `${file_base_name}.json`, "text/plain");
     };
 
     function getDot() {
-        const proj_graph = get(state_store.projected_graph);
+        const proj_graph = get(state_store.clustered_graph);
         if (!proj_graph) return;
         const view = get(state_store.current_view);
         const clusters = view.clusters;
