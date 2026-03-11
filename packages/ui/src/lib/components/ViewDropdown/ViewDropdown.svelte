@@ -32,7 +32,7 @@
 </script>
 
 {#snippet configureSnippet(item: DropdownItem)}
-  <LayoutEditor {item} />
+    <LayoutEditor {item} />
 {/snippet}
 
 <DropdownMenu
@@ -43,11 +43,7 @@
     addNewCallback={addNewView}
     selectCallback={selectView}
     configure={configureSnippet}
->
-    <!-- <svelte:fragment slot="configure" let:item>
-        <LayoutEditor {item} />
-    </svelte:fragment> -->
-</DropdownMenu>
+></DropdownMenu>
 
 <style>
 </style>

@@ -1,33 +1,9 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import ViewMenu from "./ViewMenu.svelte";
 
     export let title: string = "Configure";
-    export let menuOptions: string[] = ["Rename", "Duplicate", "Delete"];
-
-    const dispatch = createEventDispatcher<{
-        back: void;
-        close: void;
-        menuSelect: string;
-    }>();
-
-    let menuOpen: boolean = false;
-
-    function back(): void {
-        dispatch("back");
-    }
-
-    function close(): void {
-        dispatch("close");
-    }
-
-    function toggleMenu(): void {
-        menuOpen = !menuOpen;
-    }
-
-    function selectOption(option: string): void {
-        dispatch("menuSelect", option);
-        menuOpen = false;
-    }
+    export let back: () => void;
+    export let close: () => void;
 </script>
 
 <div class="configure-window">
@@ -49,48 +25,7 @@
 
         <div class="header-actions">
             <!-- Vertical dots menu -->
-            <div class="menu-wrapper">
-                <button
-                    class="header-btn dots-btn"
-                    title="Options"
-                    on:click={toggleMenu}
-                >
-                    <svg
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        width="16"
-                        height="16"
-                    >
-                        <circle cx="10" cy="4" r="1.5" />
-                        <circle cx="10" cy="10" r="1.5" />
-                        <circle cx="10" cy="16" r="1.5" />
-                    </svg>
-                </button>
-
-                {#if menuOpen}
-                    <div
-                        class="menu-backdrop"
-                        role="none"
-                        on:click={() => (menuOpen = false)}
-                        on:keydown={() => {}}
-                    ></div>
-                    <ul class="menu-dropdown" role="menu">
-                        {#each menuOptions as option}
-                            <li role="none">
-                                <button
-                                    class="menu-option"
-                                    class:menu-option--danger={option.toLowerCase() ===
-                                        "delete"}
-                                    role="menuitem"
-                                    on:click={() => selectOption(option)}
-                                >
-                                    {option}
-                                </button>
-                            </li>
-                        {/each}
-                    </ul>
-                {/if}
-            </div>
+            <slot name="menu"></slot>
 
             <!-- Close -->
             <button class="header-btn close-btn" title="Close" on:click={close}>
@@ -110,7 +45,7 @@
 
     <!-- Slot content -->
     <div class="content">
-        <slot />
+        <slot name="content" />
     </div>
 </div>
 
@@ -156,87 +91,29 @@
 
     /* Header buttons */
     .header-btn {
-        display: flex;
-        align-items: center;
         justify-content: center;
         width: 32px;
         height: 32px;
         padding: 0;
         background: none;
-        border: none;
         border-radius: 6px;
-        cursor: pointer;
         color: #6b7280;
-        transition:
-            background 0.1s ease,
-            color 0.1s ease;
         flex-shrink: 0;
     }
 
     .header-btn:hover {
-        background: #f3f4f6;
+        /* background: #f3f4f6; */
         color: #111827;
     }
 
     .back-btn:hover {
-        background: #f3f4f6;
+        /* background: #f3f4f6; */
         color: #6366f1;
     }
 
     .close-btn:hover {
-        background: #fef2f2;
+        /* background: #fef2f2; */
         color: #ef4444;
-    }
-
-    /* Dots menu */
-    .menu-wrapper {
-        position: relative;
-    }
-
-    .menu-backdrop {
-        position: fixed;
-        inset: 0;
-        z-index: 10;
-    }
-
-    .menu-dropdown {
-        position: absolute;
-        top: calc(100% + 4px);
-        right: 0;
-        z-index: 11;
-        list-style: none;
-        margin: 0;
-        padding: 4px 0;
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        min-width: 140px;
-    }
-
-    .menu-option {
-        display: block;
-        width: 100%;
-        padding: 8px 14px;
-        background: none;
-        border: none;
-        text-align: left;
-        cursor: pointer;
-        font-size: 14px;
-        color: #374151;
-        transition: background 0.1s ease;
-    }
-
-    .menu-option:hover {
-        background: #f9fafb;
-    }
-
-    .menu-option--danger {
-        color: #ef4444;
-    }
-
-    .menu-option--danger:hover {
-        background: #fef2f2;
     }
 
     /* Divider */

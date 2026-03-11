@@ -1,8 +1,9 @@
 <script lang="ts">
     import type { DropdownItem } from "../reusable_components/dropdown";
-    import ConfigureWindow from "./DropdownConfigureWindow.svelte";
+    import DropdownConfigureWindow from "./DropdownConfigureWindow.svelte";
     import DropdownSearchBox from "./DropdownSearchBox.svelte";
     import type { Snippet } from "svelte";
+    import ViewMenu from "./ViewMenu.svelte";
 
     export let items: DropdownItem[] = [];
     export let placeholder: string = "Select an item...";
@@ -71,16 +72,19 @@
 
         <div class="panel">
             {#if configItem !== null}
-                <ConfigureWindow
+                <DropdownConfigureWindow
                     title={configItem.label}
-                    on:back={backToDropdown}
-                    on:close={closeDropdown}
+                    back={backToDropdown}
+                    close={closeDropdown}
                 >
-                    {#if configure}
-                        {@render configure(configItem)}
-                        <!-- configItem is guaranteed non-null here -->
-                    {/if}
-                </ConfigureWindow>
+                    <ViewMenu slot="menu" view_id={configItem.value}/>
+                    <svelte:fragment slot="content">
+                        {#if configure}
+                            {@render configure(configItem)}
+                            <!-- configItem is guaranteed non-null here -->
+                        {/if}
+                    </svelte:fragment>
+                </DropdownConfigureWindow>
             {:else}
                 <!-- Search box -->
                 <DropdownSearchBox bind:searchQuery />
