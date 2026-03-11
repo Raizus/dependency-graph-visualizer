@@ -191,8 +191,6 @@ class GraphvizGraphModelBuilder {
         options: GraphOptions,
     ): RootGraphModel {
         const layout = options.graphAttrs?.layout || "dot";
-        console.log(layout);
-        console.log(options.graphAttrs);
 
         switch (layout) {
             case "fdp": {
@@ -449,7 +447,6 @@ export class GraphvizLayoutEngine {
 
         // Run Graphviz layout
         const svg = await this.computeSvg(dot);
-        console.log(svg);
 
         // Parse SVG to extract positions
         return this.parseSvgLayout(svg, projection_graph, clusters);
