@@ -185,6 +185,6 @@ export type ViewsJSON = Record<string, ViewJSON>;
 
 export interface StateJSON {
     graph: GraphJSON;
-    views: ViewsJSON;
+    views?: ViewsJSON;
 }
 

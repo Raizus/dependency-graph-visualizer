@@ -15,7 +15,36 @@ import {
     apply_filters,
     filtered_subgraph,
     View,
+    loadDirectedGraphFromJSON,
+    ClusterManager,
+    buildHierarquicalClusters,
+    assignNodeRanks,
 } from "@dep-graph-vis/core";
+
+export function loadStateJson(data: StateJSON): {graph: Graph, views: ViewMap} {
+    const graph = loadDirectedGraphFromJSON(data.graph);
+    assignNodeRanks(graph);
+
+    const create_hierarchical_view = !data.views; // if views are not provided we create a default hierarchical view
+
+    if (!create_hierarchical_view) {
+        const views = data.views ? ViewMap.fromJSON(data.views) : newViewMap();
+        return { graph, views };
+    }
+
+    const label = "Hierarchical View";
+    const view = newBlanckView(label);
+    const cluster_map = buildHierarquicalClusters(graph);
+    view.clusters = new ClusterManager([...cluster_map.values()]);
+    const view_map = new ViewMap();
+    view_map.set(label, view);
+    // const views = data.views ? ViewMap.fromJSON(data.views) : newViewMap();
+
+    return {
+        graph,
+        views: view_map
+    }
+}
 
 export class StateStore {
     layoutEngine: GraphvizLayoutEngine;

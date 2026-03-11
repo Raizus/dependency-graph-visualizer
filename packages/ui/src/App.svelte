@@ -1,13 +1,12 @@
 <script lang="ts">
     import { onMount, setContext } from "svelte";
     import GraphCanvas from "./lib/GraphCanvas.svelte";
-    import { StateStore } from "./lib/StateStore";
+    import { loadStateJson, StateStore } from "./lib/StateStore";
     import { loadPublicJson } from "./lib/load_graph";
     import {
-    assignNodeRanks,
+        assignNodeRanks,
         buildHierarquicalClusters,
         ClusterManager,
-        loadDirectedGraphFromJSON,
         newBlanckView,
         ViewMap,
     } from "@dep-graph-vis/core";
@@ -20,19 +19,12 @@
     onMount(async () => {
         try {
             // Load default example
-            await state_store.initialize()
-            const graph_json = await loadPublicJson("/examples/graph.json");
-            const graph = loadDirectedGraphFromJSON(graph_json);
-            assignNodeRanks(graph);
+            await state_store.initialize();
 
-            const cluster_map = buildHierarquicalClusters(graph);
-            const label = "Hierarchical View";
-            const view = newBlanckView(label);
-            const view_map = new ViewMap();
-            view_map.set(label, view);
-            view.clusters = new ClusterManager([...cluster_map.values()]);
-            state_store.setState(graph, view_map);
+            const state_json = await loadPublicJson("/examples/example1.json");
+            const { graph, views } = loadStateJson(state_json);
 
+            state_store.setState(graph, views);
         } catch (error) {
             console.error("Failed to load example:", error);
         } finally {
@@ -45,7 +37,7 @@
     {#if loading}
         <div class="loading">Loading graph...</div>
     {:else}
-        <GraphCanvas state_store={state_store} />
+        <GraphCanvas {state_store} />
         <Toolbar />
     {/if}
 </main>
