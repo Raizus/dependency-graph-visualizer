@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher, onMount, onDestroy } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { fade, scale } from "svelte/transition";
     import { quintOut } from "svelte/easing";
 
