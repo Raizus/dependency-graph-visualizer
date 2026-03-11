@@ -9,7 +9,7 @@ export interface GraphRenderer {
     // Data
     // setGraph(graph: Graph): void;
     // setView(view: ViewI): void;
-    setSvgLayout(graph: Graph, clusters: ClustersI, svgString: string): void
+    setSvgLayout(graph: Graph, clusters: ClustersI, svgString: string): void;
 
     // Interaction
     getSelectedNodes(): string[];
@@ -18,6 +18,9 @@ export interface GraphRenderer {
     // Clusters
     // collapseCluster(clusterId: string): void;
     // expandCluster(clusterId: string): void;
+
+    hideNodes(nodes: Set<string>): void;
+    showNodes(nodes: Set<string>): void;
 
     // fit view
     fitToView(): void;

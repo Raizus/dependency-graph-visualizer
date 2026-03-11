@@ -229,7 +229,7 @@ export class D3GraphRenderer implements GraphRenderer {
         });
     }
 
-    hideNodes(nodes: string[]): void {
+    hideNodes(nodes: Set<string>): void {
         nodes.forEach((id) => {
             const el = this.nodeGroupMap.get(id);
             if (el) el.classList.add(CSS.hidden);
@@ -242,7 +242,7 @@ export class D3GraphRenderer implements GraphRenderer {
         });
     }
 
-    showNodes(nodes: string[]): void {
+    showNodes(nodes: Set<string>): void {
         nodes.forEach((node_id) => {
             // remove css hidden class from node group
             const el = this.nodeGroupMap.get(node_id);
