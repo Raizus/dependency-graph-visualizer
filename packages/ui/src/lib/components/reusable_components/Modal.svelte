@@ -12,12 +12,6 @@
     export let showCloseButton: boolean = true;
     export let preventBodyScroll: boolean = true;
 
-    // ── Events ─────────────────────────────────────────────────────────────────
-    const dispatch = createEventDispatcher<{
-        close: void;
-        open: void;
-    }>();
-
     // ── Lifecycle ──────────────────────────────────────────────────────────────
     function handleKeydown(e: KeyboardEvent) {
         if (closeOnEsc && e.key === "Escape" && open) close();
@@ -25,7 +19,6 @@
 
     $: if (open && preventBodyScroll) {
         document.body.style.overflow = "hidden";
-        dispatch("open");
     } else {
         document.body.style.overflow = "";
     }
@@ -39,7 +32,6 @@
     // ── Methods ────────────────────────────────────────────────────────────────
     function close() {
         open = false;
-        dispatch("close");
     }
 
     function handleBackdropClick() {
