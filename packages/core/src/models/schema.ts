@@ -1,4 +1,5 @@
 import { DirectedGraph } from "graphology";
+import { Attributes } from "graphology-types";
 
 export type RegexFilterParamsI = {
     type: "regex";
@@ -85,6 +86,10 @@ export interface LayoutI {
     type: "dot" | "fdp";
 }
 
+export interface GraphAttributesI { 
+    name?: string;
+}
+
 export interface NodeAttributesI {
     key: string;
     label: string;
@@ -102,9 +107,10 @@ export interface EdgeJSON {
 export interface GraphJSON {
     nodes: NodeAttributesI[];
     edges: EdgeJSON[];
+    attributes?: GraphAttributesI;
 }
 
-export type Graph = DirectedGraph<NodeAttributesI>;
+export type Graph = DirectedGraph<NodeAttributesI, Attributes, GraphAttributesI>;
 
 export interface ClusterI {
     id: string;

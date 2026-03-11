@@ -1,10 +1,17 @@
 import DirectedGraph from "graphology";
-import { Graph, GraphJSON, NodeAttributesI } from "./schema";
+import { Graph, GraphAttributesI, GraphJSON, NodeAttributesI } from "./schema";
 
 export function loadDirectedGraphFromJSON(
     data: GraphJSON,
 ): Graph {
     const graph = new DirectedGraph<NodeAttributesI>();
+
+    // Set graph attributes
+    if (data.attributes) {
+        for (const [attrKey, attrValue] of Object.entries(data.attributes)) {
+            graph.setAttribute(attrKey, attrValue);
+        }
+    }
 
     // Add nodes
     for (const node of data.nodes) {
@@ -34,6 +41,22 @@ export function loadDirectedGraphFromJSON(
     }
 
     return graph;
+}
+
+export function graphToJSON(graph: Graph): GraphJSON {
+    const nodes: NodeAttributesI[] = [];
+    graph.forEachNode((nodeId, attributes) => {
+        nodes.push(attributes);
+    });
+
+    const edges: GraphJSON["edges"] = [];
+    graph.forEachEdge((edgeKey, attributes, source, target) => {
+        edges.push({ source, target });
+    });
+
+    const attributes: GraphAttributesI = graph.getAttributes();
+
+    return { nodes, edges, attributes };
 }
 
 export function getPathRank(path: string): number {
