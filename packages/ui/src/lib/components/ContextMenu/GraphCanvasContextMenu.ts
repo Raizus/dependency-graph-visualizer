@@ -8,6 +8,8 @@ import {
     filter_siblings_action,
     filter_sources_action,
     filter_targets_action,
+} from "../../actions/FilterActions";
+import {
     set_selection_to_intersection_of_reaching_reachables,
     set_selection_to_neighbours_of_node,
     set_selection_to_nodes_of_cluster_action,
@@ -17,8 +19,8 @@ import {
     set_selection_to_reaching_of_selection,
     set_selection_to_sources_of_node,
     set_selection_to_targets_of_node,
-    set_selection_to_this_node,
-} from "../../Actions";
+    set_selection_to_this_node
+} from "../../actions/SelectionActions";
 import type { StateStore } from "../../StateStore";
 import type { GraphRenderer } from "../../visualizer/GraphRenderer";
 import type { MenuItem } from "./ContextMenu";
@@ -465,7 +467,7 @@ export const background_menu: MenuItem<BackgroundMenuContextI>[] = [
         label: "Show Cycles",
         type: "action",
         action: (context: BackgroundMenuContextI) => {
-            const graph = get(context.state_store.projected_graph);
+            const graph = get(context.state_store.clustered_graph);
             if (!graph) return;
             const nodes = findNodesInCyles(graph);
             context.state_store.setSelectedNodes([...nodes]);
