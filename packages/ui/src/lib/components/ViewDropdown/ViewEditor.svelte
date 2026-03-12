@@ -20,7 +20,15 @@
         (option) => option.value === view?.layout.type,
     );
 
-    function onChange(selected_option: DropdownItem): void {
+    let text_str: string = item.value;
+
+    function onInputChange(e: Event) {
+        const value = (e.target as HTMLInputElement).value;
+
+        // rename view
+    }
+
+    function dropdownChangeCb(selected_option: DropdownItem): void {
         const layout = view?.layout;
         if (!layout) return;
 
@@ -32,18 +40,40 @@
 </script>
 
 <div class="editor-group">
+    <div class="input-container">
+        <input bind:value={text_str} on:change={onInputChange}/>
+    </div>
     {#if selected_layout_type}
         <h3 class="layout">Layout</h3>
         <SimpleDropdown
             selected={selected_layout_type}
             placeholder="Select layout..."
             options={layout_options}
-            {onChange}
+            onChange={dropdownChangeCb}
         ></SimpleDropdown>
     {/if}
 </div>
 
-<style>
+<style lang="scss">
+    .input-container{
+        display: flex;
+    }
+
+    input{
+        padding-left: 5px;
+        height: 32px;
+        border: 1px solid rgb(47, 47, 47);
+        background-color: var(--button-bg-color);
+        border-radius: 6px;
+        box-shadow: none;
+        flex-grow: 1;
+
+        &:focus-within {
+            outline: none;
+            border-color: var(--border-highlight-color);
+        }
+    }
+
     .layout {
         color: var(--font-color-1);
         text-align: left;

@@ -3,7 +3,7 @@
     import type { StateStore } from "../../StateStore";
     import { newBlanckView, ViewMap } from "@dep-graph-vis/core";
     import DropdownMenu from "./DropdownMenu.svelte";
-    import LayoutEditor from "./LayoutEditor.svelte";
+    import LayoutEditor from "./ViewEditor.svelte";
     import type { DropdownItem } from "../reusable_components/dropdown";
 
     const state_store = getContext<StateStore>("state_store");
