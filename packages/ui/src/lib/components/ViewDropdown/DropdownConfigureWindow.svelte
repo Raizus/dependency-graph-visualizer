@@ -9,7 +9,7 @@
 <div class="configure-window">
     <!-- Header -->
     <div class="header">
-        <button class="header-btn back-btn" title="Back" on:click={back}>
+        <button class="back-btn" title="Back" on:click={back}>
             <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
                 <path
                     d="M12 15l-5-5 5-5"
@@ -19,9 +19,8 @@
                     stroke-linejoin="round"
                 />
             </svg>
+            <span class="header-title" {title}>{title}</span>
         </button>
-
-        <span class="header-title" {title}>{title}</span>
 
         <div class="header-actions">
             <!-- Vertical dots menu -->
@@ -106,6 +105,13 @@
         color: #111827;
     }
 
+    .back-btn{
+        padding: 0;
+        background: none;
+        height: 32px;
+        color: #6b7280;
+        flex-grow: 1;
+    }
     .back-btn:hover {
         /* background: #f3f4f6; */
         color: #6366f1;
