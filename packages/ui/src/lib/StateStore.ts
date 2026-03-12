@@ -311,6 +311,24 @@ export class StateStore {
         this.updateClusteredGraph();
     }
 
+    foldDirectChildClusters(cluster_id: string) {
+        const curr_view = get(this._current_view);
+        const child_clusters =
+            curr_view.clusters.getDirectSubclusters(cluster_id);
+        curr_view.clusters.collapseClusters(child_clusters);
+
+        this.updateClusteredGraph();
+    }
+
+    unfoldDirectChildClusters(cluster_id: string) {
+        const curr_view = get(this._current_view);
+        const child_clusters =
+            curr_view.clusters.getDirectSubclusters(cluster_id);
+        curr_view.clusters.expandClusters(child_clusters);
+
+        this.updateClusteredGraph();
+    }
+
     setViewLayout(view_id: string, layout: LayoutI) {
         this._views.update((views) => {
             const view = views.get(view_id);

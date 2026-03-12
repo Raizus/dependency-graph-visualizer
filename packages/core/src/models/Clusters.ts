@@ -541,6 +541,18 @@ export class ClusterManager implements ClustersI {
         return false;
     }
 
+    collapseClusters(cluster_ids: string[]) {
+        for (const cluster_id of cluster_ids) {
+            this.collapseCluster(cluster_id);
+        }
+    }
+
+    expandClusters(cluster_ids: string[]) {
+        for (const cluster_id of cluster_ids) {
+            this.expandCluster(cluster_id);
+        }
+    }
+
     /**
      * Get cluster rank (depth in cluster tree)
      */
