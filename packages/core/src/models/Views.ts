@@ -46,6 +46,13 @@ export class View implements ViewI {
         this.filters = filters;
     }
 
+    getFilter(idx: number): FilterI | undefined {
+        if (idx < 0 || idx >= this.filters.length) {
+            return undefined;
+        }
+        return this.filters[idx];
+    }
+
     setLayout(layout: LayoutI) {
         this.layout = layout;
     }

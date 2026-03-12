@@ -5,28 +5,32 @@
     import type { StateStore } from "../../StateStore";
 
     const state_store = getContext<StateStore>("state_store");
-    let { current_view } = state_store;
-    $: filters = $current_view.filters;
+    let { current_view: current_view_store } = state_store;
+    $: filters = $current_view_store.filters;
 
-    let selectedId: string | number | null = null;
+    let selected_id: string | null = null;
+    let selectedIdx: number | null = null;
+    // $: console.log("Selected filter index:", selectedIdx);
 
-    function selectRow(id: string | number) {
-        selectedId = selectedId === id ? null : id;
+    function getSelectedIdx(selected_id: string | null) {
+        if (!selected_id) return null;
+        const idx = filters.findIndex(filter => filter.id === selected_id);
+        return idx;
     }
 
-    function getSelectedIndex(selected: string | number | null): number {
-        return filters.findIndex((item) => item.id === selected);
+    function selectRow(filter_id: string) {
+        selected_id = filter_id;
+        selectedIdx = getSelectedIdx(selected_id);
     }
 
     // Placeholder global state functions
-    function onReorder(newItems: FilterI[]) {
-        console.log("Global state: items reordered", newItems);
-        // TODO: dispatch to global store
+    function onReorder() {
+        selectedIdx = getSelectedIdx(selected_id);
     }
 
-    function onToggleApplied(id: string | number, value: boolean) {
-        console.log("Global state: toggled applied", { id, value });
-        // TODO: dispatch to global store
+    function onToggleApplied(idx: number, value: boolean) {
+        console.log("Global state: toggled applied", { idx, value });
+        state_store.filterSetApplied(idx, value);
     }
 
     function onToggleShow(id: string | number, value: boolean) {
@@ -35,30 +39,19 @@
     }
 
     function moveUp() {
-        const idx = getSelectedIndex(selectedId);
-        if (idx <= 0) return;
-        const newFilters = [...filters];
-        [newFilters[idx - 1], newFilters[idx]] = [
-            newFilters[idx],
-            newFilters[idx - 1],
-        ];
-        filters = newFilters;
-        onReorder(filters);
+        if (selectedIdx === null) return
+        state_store.filterMoveUp(selectedIdx);
+        onReorder();
     }
 
     function moveDown() {
-        const idx = getSelectedIndex(selectedId);
-        if (idx < 0 || idx >= filters.length - 1) return;
-        const newItems = [...filters];
-        [newItems[idx], newItems[idx + 1]] = [newItems[idx + 1], newItems[idx]];
-        filters = newItems;
-        onReorder(filters);
+        if (selectedIdx === null) return
+        state_store.filterMoveDown(selectedIdx);
+        onReorder();
     }
 
-    function handleAppliedChange(item: FilterI, value: boolean) {
-        item.applied = value;
-        filters = [...filters];
-        onToggleApplied(item.id, value);
+    function handleAppliedChange(idx: number, value: boolean) {
+        onToggleApplied(idx, value);
     }
 
     function handleShowChange(item: FilterI, value: boolean) {
@@ -67,9 +60,8 @@
         onToggleShow(item.id, value);
     }
 
-    $: selectedIndex = getSelectedIndex(selectedId);
-    $: canMoveUp = selectedIndex > 0;
-    $: canMoveDown = selectedIndex >= 0 && selectedIndex < filters.length - 1;
+    $: canMoveUp = selectedIdx !== null && selectedIdx > 0;
+    $: canMoveDown = selectedIdx !== null && selectedIdx >= 0 && selectedIdx < filters.length - 1;
 </script>
 
 <div class="container">
@@ -83,17 +75,17 @@
                 </tr>
             </thead>
             <tbody>
-                {#each filters as filter (filter.id)}
+                {#each filters as filter, idx (filter.id)}
                     <tr
                         class="row"
-                        class:selected={filter.id === selectedId}
+                        class:selected={filter.id === selected_id}
                         on:click={() => selectRow(filter.id)}
                     >
                         <td class="label-cell">{filter.label}</td>
                         <td class="checkbox-cell">
                             <TableCheckbox
                                 checked={filter.applied}
-                                onChange={(v) => handleAppliedChange(filter, v)}
+                                onChange={(v) => handleAppliedChange(idx, v)}
                             />
                         </td>
                         <td class="checkbox-cell">

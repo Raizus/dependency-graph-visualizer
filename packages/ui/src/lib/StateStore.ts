@@ -192,6 +192,53 @@ export class StateStore {
         // TODO: update projection (or some posterior structure)
     }
 
+    filterSetApplied(filter_idx: number, value: boolean) {
+        const view = get(this._current_view);
+        if (!view) return;
+
+        const filter = view.getFilter(filter_idx);
+        if (!filter) return;
+        filter.applied = value;
+
+        this.updateFilteredClusteredGraph();
+    }
+
+    filterMoveUp(filter_idx: number) {
+        const view = get(this._current_view);
+        if (!view) return;
+
+        const filters = view.filters;
+        if (filter_idx <= 0 || filter_idx >= filters.length) {
+            return;
+        }
+        [filters[filter_idx - 1], filters[filter_idx]] = [
+            filters[filter_idx],
+            filters[filter_idx - 1],
+        ];
+        view.filters = filters;
+
+        this.updateCurrentView(view);
+        this.updateFilteredClusteredGraph();
+    }
+
+    filterMoveDown(filter_idx: number) {
+        const view = get(this._current_view);
+        if (!view) return;
+
+        const filters = view.filters;
+        if (filter_idx < 0 || filter_idx >= filters.length) {
+            return;
+        }
+        [filters[filter_idx + 1], filters[filter_idx]] = [
+            filters[filter_idx],
+            filters[filter_idx + 1],
+        ];
+        view.filters = filters;
+
+        this.updateCurrentView(view);
+        this.updateFilteredClusteredGraph();
+    }
+
     addView(view: View) {
         let label = "View";
         this._views.update((views) => {
@@ -274,6 +321,16 @@ export class StateStore {
 
         // updating projected graph will trigger the re-render
         this._clustered_graph.update((graph) => graph);
+    }
+
+    updateCurrentView(view: View) {
+        const current_view_label = get(this._current_view_label);
+        if (!current_view_label) return;
+
+        this._views.update((views) => {
+            views.set(current_view_label, view);
+            return views;
+        });
     }
 
     deleteView(view_id: string) {
