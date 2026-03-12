@@ -1,4 +1,3 @@
-
 type MenuItemBase = {
     id: string;
     label: string;
@@ -24,3 +23,10 @@ export type MenuGroup<T> = MenuItemBase & {
 };
 
 export type MenuItem<T> = MenuAction<T> | MenuSeparator | MenuGroup<T>;
+
+export function separator(id: string): MenuSeparator {
+    return {
+        id,
+        type: "separator",
+    };
+}
