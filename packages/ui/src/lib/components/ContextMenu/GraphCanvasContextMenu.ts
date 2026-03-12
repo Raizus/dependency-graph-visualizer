@@ -104,6 +104,36 @@ namespace NodeFilterActionItems {
         },
     };
 
+    export const REMOVE_NODES_NOT_REACHABLE_FROM_OUTSIDE: MenuAction<ClusterBoxMenuContextI> =
+        {
+            id: "Remove Nodes Not Reachable From Outside",
+            label: "Nodes not reachable from outside",
+            type: "action",
+            action: () => {
+                console.log("Remove nodes not reachable from outside");
+            },
+        };
+
+    export const REMOVE_NODES_NOT_REACHING_OUTSIDE: MenuAction<ClusterBoxMenuContextI> =
+        {
+            id: "Remove Nodes Not Reaching Outside",
+            label: "Nodes not reaching outside",
+            type: "action",
+            action: () => {
+                console.log("Remove nodes not reaching outside");
+            },
+        };
+
+    export const REMOVE_NODES_NOT_CONNECTED_WITH_OUTSIDE: MenuAction<ClusterBoxMenuContextI> =
+        {
+            id: "Remove Nodes Not Connected With Outside",
+            label: "Nodes not connected with outside",
+            type: "action",
+            action: () => {
+                console.log("Remove nodes not connected with outside");
+            },
+        };
+
     export const SHOW_NODE: MenuAction<NodeMenuContextI> = {
         id: "Show This",
         label: "This",
@@ -510,7 +540,7 @@ const node_show_items: MenuItem<NodeMenuContextI>[] = [
     FilterSelectionActionItems.SHOW_ALL_BUT_SELECTED,
     separator("Show Separator 1"),
     NodeFilterActionItems.SHOW_SOURCES,
-    NodeFilterActionItems.SHOW_SOURCES,
+    NodeFilterActionItems.SHOW_TARGETS,
     NodeFilterActionItems.SHOW_SIBLINGS,
     separator("Show Separator 2"),
     NodeFilterActionItems.SHOW_REACHABLES,
@@ -659,7 +689,17 @@ export const filter_and_selection_menu: MenuItem<NodeMenuContextI>[] = [
 ];
 
 export const background_menu: MenuItem<BackgroundMenuContextI>[] = [
-    SelectionActionItems.SELECT_CYCLES,
+    {
+        id: "Selection Menu",
+        label: "Selection",
+        type: "group",
+        children: [
+            SelectionActionItems.SELECT_CYCLES,
+            separator("Selection Separator 1"),
+            SelectionActionItems.INVERT_SELECTION,
+            SelectionActionItems.CLEAR_SELECTION,
+        ],
+    },
     separator("Background Menu Separator 1"),
     // {
     //     id: "Remove Nodes Without Edges",
@@ -673,11 +713,16 @@ export const background_menu: MenuItem<BackgroundMenuContextI>[] = [
     //     type: "action",
     //     action: (context: BackgroundMenuContextI) => {},
     // },
-    separator("Background Menu Separator 2"),
-    FoldUnfoldClusterActionItems.FOLD_ALL_CLUSTERS,
-    FoldUnfoldClusterActionItems.UNFOLD_ALL_CLUSTERS,
+    {
+        id: "Cluster Menu",
+        label: "Clusters",
+        type: "group",
+        children: [
+            FoldUnfoldClusterActionItems.FOLD_ALL_CLUSTERS,
+            FoldUnfoldClusterActionItems.UNFOLD_ALL_CLUSTERS,
+        ],
+    },
     separator("Background Menu Separator 3"),
-    SelectionActionItems.CLEAR_SELECTION,
     OtherActionItems.HOME,
     OtherActionItems.RELAYOUT,
 ];
@@ -706,7 +751,7 @@ export function cluster_box_click_context_menu(): MenuItem<ClusterBoxMenuContext
     const items: MenuItem<ClusterBoxMenuContextI>[] = [
         {
             id: "Cluster Menu",
-            label: "Cluster",
+            label: "Clusters",
             type: "group",
             children: [
                 FoldUnfoldClusterActionItems.FOLD_UNFOLD_CLUSTER,
