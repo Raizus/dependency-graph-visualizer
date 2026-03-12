@@ -483,7 +483,7 @@ export class D3GraphRenderer implements GraphRenderer {
         this.clusterGroupMap.forEach((el, clusterId) => {
             d3.select(el).on("contextmenu", (event: MouseEvent) => {
                 event.preventDefault();
-                event.stopPropagation();
+                // event.stopPropagation();
                 this.emit("clusterBoxRightClick", { clusterId, event });
             });
         });
