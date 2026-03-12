@@ -2,7 +2,6 @@
     import type { DropdownItem } from "../reusable_components/dropdown";
     import DropdownConfigureWindow from "./DropdownConfigureWindow.svelte";
     import DropdownSearchBox from "./DropdownSearchBox.svelte";
-    import type { Snippet } from "svelte";
     import ViewMenu from "./ViewMenu.svelte";
     import ViewEditor from "./ViewEditor.svelte";
 
@@ -12,7 +11,6 @@
     export let addNewCallback: (() => void) | null = null;
     export let selectCallback: ((id: string) => void) | null = null;
     export let title: string | undefined;
-    export let configure: Snippet<[DropdownItem]>;
 
     let isOpen: boolean = false;
     let searchQuery: string = "";
@@ -55,6 +53,8 @@
     function addNewItem(): void {
         addNewCallback?.();
     }
+
+    $: console.log("configItem: ", configItem);
 </script>
 
 <div class="dropdown-wrapper">
@@ -79,12 +79,7 @@
                     close={closeDropdown}
                 >
                     <ViewMenu slot="menu" view_id={configItem.value}/>
-                    <svelte:fragment slot="content">
-                        <ViewEditor item={configItem} />
-                        <!-- {#if configure}
-                            {@render configure(configItem)}
-                        {/if} -->
-                    </svelte:fragment>
+                    <ViewEditor item={configItem} slot="content"/>
                 </DropdownConfigureWindow>
             {:else}
                 <!-- Search box -->

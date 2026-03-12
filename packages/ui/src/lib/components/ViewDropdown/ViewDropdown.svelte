@@ -3,7 +3,6 @@
     import type { StateStore } from "../../StateStore";
     import { newBlanckView, ViewMap } from "@dep-graph-vis/core";
     import DropdownMenu from "./DropdownMenu.svelte";
-    import LayoutEditor from "./ViewEditor.svelte";
     import type { DropdownItem } from "../reusable_components/dropdown";
 
     const state_store = getContext<StateStore>("state_store");
@@ -27,13 +26,10 @@
         for (const label of views.keys()) {
             items.push({ value: label, label });
         }
+        console.log("buildItems: ", items);
         return items;
     }
 </script>
-
-{#snippet configureSnippet(item: DropdownItem)}
-    <LayoutEditor {item} />
-{/snippet}
 
 <DropdownMenu
     items={buildItems(views)}
@@ -42,7 +38,6 @@
     placeholder="Select or create view..."
     addNewCallback={addNewView}
     selectCallback={selectView}
-    configure={configureSnippet}
 ></DropdownMenu>
 
 <style>
