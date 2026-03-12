@@ -140,3 +140,21 @@ export function searchGraphForNodes(graph: Graph, query: string): string[] {
     });
     return results;
 }
+
+export function topNodesByInDegree(graph: Graph, n: number): string[] {
+    const nodesWithInDegree: { node: string; inDegree: number }[] = [];
+    graph.forEachNode((node) => {
+        nodesWithInDegree.push({ node, inDegree: graph.inDegree(node) });
+    });
+    nodesWithInDegree.sort((a, b) => b.inDegree - a.inDegree);
+    return nodesWithInDegree.slice(0, n).map((entry) => entry.node);
+}
+
+export function topNodesByOutDegree(graph: Graph, n: number): string[] {
+    const nodesWithOutDegree: { node: string; outDegree: number }[] = [];
+    graph.forEachNode((node) => {
+        nodesWithOutDegree.push({ node, outDegree: graph.outDegree(node) });
+    });
+    nodesWithOutDegree.sort((a, b) => b.outDegree - a.outDegree);
+    return nodesWithOutDegree.slice(0, n).map((entry) => entry.node);
+}
