@@ -1,4 +1,9 @@
-import { findNodesInCyles, type NodeAttributesI } from "@dep-graph-vis/core";
+import {
+    findNodesInCyles,
+    topNodesByInDegree,
+    topNodesByOutDegree,
+    type NodeAttributesI,
+} from "@dep-graph-vis/core";
 import {
     filter_all_but_selected_action,
     filter_node_action,
@@ -10,6 +15,7 @@ import {
     filter_targets_action,
 } from "../../actions/FilterActions";
 import {
+    invert_selection_action,
     set_selection_to_intersection_of_reaching_reachables,
     set_selection_to_neighbours_of_node,
     set_selection_to_nodes_of_cluster_action,
@@ -48,14 +54,117 @@ export type MenuContextI =
     | BackgroundMenuContextI
     | ClusterBoxMenuContextI;
 
+namespace NodeFilterActionItems {
+    export const REMOVE_NODE: MenuAction<NodeMenuContextI> = {
+        id: "Remove This",
+        label: "This",
+        type: "action",
+        action: (context: NodeMenuContextI) => {
+            console.log("Remove this");
+            filter_node_action(context.state_store, context.node, false);
+        },
+    };
 
+    export const REMOVE_SOURCES: MenuAction<NodeMenuContextI> = {
+        id: "Remove Sources",
+        label: "Sources",
+        type: "action",
+        action: (context: NodeMenuContextI) => {
+            filter_sources_action(context.state_store, context.node, false);
+            console.log("Remove sources");
+        },
+    };
+
+    export const REMOVE_TARGETS: MenuAction<NodeMenuContextI> = {
+        id: "Remove Targets",
+        label: "Targets",
+        type: "action",
+        action: (context: NodeMenuContextI) => {
+            filter_targets_action(context.state_store, context.node, false);
+            console.log("Remove targets");
+        },
+    };
+
+    export const REMOVE_SIBLINGS: MenuAction<NodeMenuContextI> = {
+        id: "Remove Siblings",
+        label: "Siblings",
+        type: "action",
+        action: (context: NodeMenuContextI) => {
+            filter_siblings_action(context.state_store, context.node, false);
+            console.log("Remove siblings");
+        },
+    };
+
+    export const REMOVE_NOT_REACHABLES: MenuAction<NodeMenuContextI> = {
+        id: "Remove Nodes Not Reachables",
+        label: "Nodes not reachable",
+        type: "action",
+        action: () => {
+            console.log("Remove nodes not reachable");
+        },
+    };
+
+    export const SHOW_NODE: MenuAction<NodeMenuContextI> = {
+        id: "Show This",
+        label: "This",
+        type: "action",
+        action: (context: NodeMenuContextI) => {
+            filter_node_action(context.state_store, context.node, true);
+            console.log("Show this");
+        },
+    };
+
+    export const SHOW_SOURCES: MenuAction<NodeMenuContextI> = {
+        id: "Show Sources",
+        label: "Sources",
+        type: "action",
+        action: (context: NodeMenuContextI) => {
+            filter_sources_action(context.state_store, context.node, true);
+            console.log("Show sources");
+        },
+    };
+
+    export const SHOW_TARGETS: MenuAction<NodeMenuContextI> = {
+        id: "Show Targets",
+        label: "Targets",
+        type: "action",
+        action: (context: NodeMenuContextI) => {
+            filter_targets_action(context.state_store, context.node, true);
+            console.log("Show targets");
+        },
+    };
+
+    export const SHOW_SIBLINGS: MenuAction<NodeMenuContextI> = {
+        id: "Show Siblings",
+        label: "Siblings",
+        type: "action",
+        action: (context: NodeMenuContextI) => {
+            filter_siblings_action(context.state_store, context.node, true);
+            console.log("Show siblings");
+        },
+    };
+
+    export const SHOW_REACHABLES: MenuAction<NodeMenuContextI> = {
+        id: "Show Reachables",
+        label: "Reachables",
+        type: "action",
+        action: (context: NodeMenuContextI) => {
+            filter_reachables_of_node_action(
+                context.state_store,
+                context.node,
+                true,
+            );
+            console.log("Show reachable nodes");
+        },
+    };
+}
 
 namespace FilterSelectionActionItems {
-    export const REMOVE_SELECTED: MenuAction<NodeMenuContextI> = {
+    export const REMOVE_SELECTED: MenuAction<BaseMenuContextI> = {
         id: "Remove Selected",
         label: "Selected",
         type: "action",
-        action: (context: NodeMenuContextI) => {
+        action: (context: BaseMenuContextI) => {
             filter_selection_action(context.state_store, false);
             console.log("Remove selected");
         },
@@ -250,8 +359,8 @@ namespace SelectionActionItems {
     };
 
     export const SELECT_CYCLES: MenuAction<BackgroundMenuContextI> = {
-        id: "Show Cycles",
-        label: "Show Cycles",
+        id: "Select Cycles",
+        label: "Select Cycles",
         type: "action",
         action: (context: BackgroundMenuContextI) => {
             const graph = get(context.state_store.clustered_graph);
@@ -261,14 +370,49 @@ namespace SelectionActionItems {
         },
     };
 
-    export const DESELECT_ALL: MenuAction<BackgroundMenuContextI> = {
-        id: "Deselect All",
-        label: "Deselect all",
+    export const CLEAR_SELECTION: MenuAction<BaseMenuContextI> = {
+        id: "Clear Selection",
+        label: "Clear selection",
         type: "action",
-        action: (context: BackgroundMenuContextI) => {
+        action: (context: BaseMenuContextI) => {
             context.state_store.setSelectedNodes([]);
         },
     };
+
+    export const INVERT_SELECTION: MenuAction<BaseMenuContextI> = {
+        id: "Invert Selection",
+        label: "Invert selection",
+        type: "action",
+        action: (context: BaseMenuContextI) => {
+            invert_selection_action(context.state_store);
+        },
+    };
+
+    export const SELECT_TOP_5_MOST_INCOMING: MenuAction<BackgroundMenuContextI> =
+        {
+            id: "Select Top 5 Most Incoming",
+            label: "Select top 5 most incoming",
+            type: "action",
+            action: (context: BackgroundMenuContextI) => {
+                const graph = get(context.state_store.clustered_graph);
+                if (!graph) return;
+                const nodes = topNodesByInDegree(graph, 5);
+                context.state_store.setSelectedNodes([...nodes]);
+            },
+        };
+
+    export const SELECT_TOP_5_MOST_OUTGOING: MenuAction<BackgroundMenuContextI> =
+        {
+            id: "Select Top 5 Most Outgoing",
+            label: "Select top 5 most outgoing",
+            type: "action",
+            action: (context: BackgroundMenuContextI) => {
+                const graph = get(context.state_store.clustered_graph);
+                if (!graph) return;
+                const nodes = topNodesByOutDegree(graph, 5);
+                context.state_store.setSelectedNodes([...nodes]);
+            },
+        };
 }
 
 namespace FoldUnfoldClusterActionItems {
@@ -309,6 +453,9 @@ namespace FoldUnfoldClusterActionItems {
             type: "action",
             action: (context: ClusterBoxMenuContextI) => {
                 console.log("Fold direct child clusters");
+                const cluster_id = context.cluster_id;
+                if (!cluster_id) return;
+                context.state_store.foldDirectChildClusters(cluster_id);
             },
         };
 
@@ -319,6 +466,9 @@ namespace FoldUnfoldClusterActionItems {
             type: "action",
             action: (context: ClusterBoxMenuContextI) => {
                 console.log("Unfold direct child clusters");
+                const cluster_id = context.cluster_id;
+                if (!cluster_id) return;
+                context.state_store.unfoldDirectChildClusters(cluster_id);
             },
         };
 }
@@ -342,120 +492,28 @@ namespace OtherActionItems {
 }
 
 const node_remove_items: MenuItem<NodeMenuContextI>[] = [
-    {
-        id: "Remove This",
-        label: "This",
-        type: "action",
-        action: (context: NodeMenuContextI) => {
-            console.log("Remove this");
-            filter_node_action(context.state_store, context.node, false);
-        },
-    },
-    {
-        id: "Remove Selected",
-        label: "Selected",
-        type: "action",
-        action: (context: NodeMenuContextI) => {
-            filter_selection_action(context.state_store, false);
-            console.log("Remove selected");
-        },
-    },
+    NodeFilterActionItems.REMOVE_NODE,
     FilterSelectionActionItems.REMOVE_SELECTED,
     FilterSelectionActionItems.REMOVE_ALL_BUT_SELECTED,
     separator("Remove Separator 1"),
-    {
-        id: "Remove Sources",
-        label: "Sources",
-        type: "action",
-        action: (context: NodeMenuContextI) => {
-            filter_sources_action(context.state_store, context.node, false);
-            console.log("Remove sources");
-        },
-    },
-    {
-        id: "Remove Targets",
-        label: "Targets",
-        type: "action",
-        action: (context: NodeMenuContextI) => {
-            filter_targets_action(context.state_store, context.node, false);
-            console.log("Remove targets");
-        },
-    },
-    {
-        id: "Remove Siblings",
-        label: "Siblings",
-        type: "action",
-        action: (context: NodeMenuContextI) => {
-            filter_siblings_action(context.state_store, context.node, false);
-            console.log("Remove siblings");
-        },
-    },
+    NodeFilterActionItems.REMOVE_SOURCES,
+    NodeFilterActionItems.REMOVE_TARGETS,
+    NodeFilterActionItems.REMOVE_SIBLINGS,
     separator("Remove Separator 2"),
-    {
-        id: "Remove Nodes Not Reachables",
-        label: "Nodes not reachable",
-        type: "action",
-        action: () => {
-            console.log("Remove nodes not reachable");
-        },
-    },
+    NodeFilterActionItems.REMOVE_NOT_REACHABLES,
     FilterSelectionActionItems.REMOVE_REACHABLES_OF_SELECTION,
 ];
 
 const node_show_items: MenuItem<NodeMenuContextI>[] = [
-    {
-        id: "Show This",
-        label: "This",
-        type: "action",
-        action: (context: NodeMenuContextI) => {
-            filter_node_action(context.state_store, context.node, true);
-            console.log("Show this");
-        },
-    },
+    NodeFilterActionItems.SHOW_NODE,
     FilterSelectionActionItems.SHOW_SELECTED,
     FilterSelectionActionItems.SHOW_ALL_BUT_SELECTED,
     separator("Show Separator 1"),
-    {
-        id: "Show Sources",
-        label: "Sources",
-        type: "action",
-        action: (context: NodeMenuContextI) => {
-            filter_sources_action(context.state_store, context.node, true);
-            console.log("Show sources");
-        },
-    },
-    {
-        id: "Show Targets",
-        label: "Targets",
-        type: "action",
-        action: (context: NodeMenuContextI) => {
-            filter_targets_action(context.state_store, context.node, true);
-            console.log("Show targets");
-        },
-    },
-    {
-        id: "Show Siblings",
-        label: "Siblings",
-        type: "action",
-        action: (context: NodeMenuContextI) => {
-            filter_siblings_action(context.state_store, context.node, true);
-            console.log("Show siblings");
-        },
-    },
+    NodeFilterActionItems.SHOW_SOURCES,
+    NodeFilterActionItems.SHOW_SOURCES,
+    NodeFilterActionItems.SHOW_SIBLINGS,
     separator("Show Separator 2"),
-    {
-        id: "Show Reachables",
-        label: "Reachables",
-        type: "action",
-        action: (context: NodeMenuContextI) => {
-            filter_reachables_of_node_action(
-                context.state_store,
-                context.node,
-                true,
-            );
-            console.log("Show reachable nodes");
-        },
-    },
+    NodeFilterActionItems.SHOW_REACHABLES,
     FilterSelectionActionItems.SHOW_REACHABLES_OF_SELECTION,
 ];
 
@@ -603,23 +661,23 @@ export const filter_and_selection_menu: MenuItem<NodeMenuContextI>[] = [
 export const background_menu: MenuItem<BackgroundMenuContextI>[] = [
     SelectionActionItems.SELECT_CYCLES,
     separator("Background Menu Separator 1"),
-    {
-        id: "Remove Nodes Without Edges",
-        label: "Remove nodes without edges",
-        type: "action",
-        action: (context: BackgroundMenuContextI) => {},
-    },
-    {
-        id: "Remove Nodes Reachable From Multiple Clusters",
-        label: "Remove nodes reachable from multiple clusters",
-        type: "action",
-        action: (context: BackgroundMenuContextI) => {},
-    },
+    // {
+    //     id: "Remove Nodes Without Edges",
+    //     label: "Remove nodes without edges",
+    //     type: "action",
+    //     action: (context: BackgroundMenuContextI) => {},
+    // },
+    // {
+    //     id: "Remove Nodes Reachable From Multiple Clusters",
+    //     label: "Remove nodes reachable from multiple clusters",
+    //     type: "action",
+    //     action: (context: BackgroundMenuContextI) => {},
+    // },
     separator("Background Menu Separator 2"),
     FoldUnfoldClusterActionItems.FOLD_ALL_CLUSTERS,
     FoldUnfoldClusterActionItems.UNFOLD_ALL_CLUSTERS,
     separator("Background Menu Separator 3"),
-    SelectionActionItems.DESELECT_ALL,
+    SelectionActionItems.CLEAR_SELECTION,
     OtherActionItems.HOME,
     OtherActionItems.RELAYOUT,
 ];
@@ -652,20 +710,29 @@ export function cluster_box_click_context_menu(): MenuItem<ClusterBoxMenuContext
             type: "group",
             children: [
                 FoldUnfoldClusterActionItems.FOLD_UNFOLD_CLUSTER,
-                FoldUnfoldClusterActionItems.FOLD_DIRECT_CHILD_CLUSTERS,
                 separator("Cluster Separator 1"),
+                FoldUnfoldClusterActionItems.FOLD_DIRECT_CHILD_CLUSTERS,
                 FoldUnfoldClusterActionItems.UNFOLD_DIRECT_CHILD_CLUSTERS,
-                FoldUnfoldClusterActionItems.FOLD_ALL_CLUSTERS,
                 separator("Cluster Separator 2"),
+                FoldUnfoldClusterActionItems.FOLD_ALL_CLUSTERS,
                 FoldUnfoldClusterActionItems.UNFOLD_ALL_CLUSTERS,
             ],
         },
         separator("Cluster Box Separator 1"),
         {
             id: "Selection Menu",
-            label: "Seletionc",
+            label: "Selection",
             type: "group",
-            children: [SelectionActionItems.SELECT_CLUSTER_NODES],
+            children: [
+                SelectionActionItems.SELECT_CLUSTER_NODES,
+                separator("Selection Separator 1"),
+                SelectionActionItems.SELECT_CYCLES,
+                SelectionActionItems.SELECT_TOP_5_MOST_INCOMING,
+                SelectionActionItems.SELECT_TOP_5_MOST_OUTGOING,
+                separator("Selection Separator 2"),
+                SelectionActionItems.INVERT_SELECTION,
+                SelectionActionItems.CLEAR_SELECTION,
+            ],
         },
         separator("Cluster Box Separator 2"),
         OtherActionItems.HOME,
