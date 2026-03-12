@@ -131,8 +131,9 @@ export function set_selection_to_intersection_of_reaching_reachables(
 
 export function set_selection_to_nodes_of_cluster_action(
     state_store: StateStore,
-    cluster_id: string
+    cluster_id: string | null
 ) {
+    if (!cluster_id) return;
     const view = get(state_store.current_view);
     const nodes = view.clusters.getClusterNodes(cluster_id);
     const sub_clusters = view.clusters.getSubclustersRecursive(cluster_id);
