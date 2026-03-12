@@ -366,18 +366,20 @@ export class StateStore {
         this.setCurrentViewLabel(new_view_id);
     }
 
-    renameView(old_name: string, new_name: string) {
-        if (new_name === old_name) return;
+    renameView(old_name: string, new_name: string): boolean {
+        if (new_name === old_name) return false;
         const views = get(this._views);
 
         const success = views.rename(old_name, new_name);
-        if (!success) return;
+        if (!success) return false;
 
         console.log(old_name, new_name);
         this.setViews(views);
         const current_view_label = get(this._current_view_label);
-        if (old_name !== current_view_label) return;
+        if (old_name !== current_view_label) return true;
         this.setCurrentViewLabel(new_name);
+
+        return true;
     }
 
     searchFilteredGraphNodes(query: string): string[] {

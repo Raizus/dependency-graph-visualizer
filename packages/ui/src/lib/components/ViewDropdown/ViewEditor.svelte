@@ -15,7 +15,8 @@
     const views_store = state_store.views;
 
     $: views = $views_store;
-    $: view = views.get(item.value);
+    $: view_name = item.value;
+    $: view = views.get(view_name);
     $: selected_layout_type = layout_options.find(
         (option) => option.value === view?.layout.type,
     );
@@ -23,9 +24,9 @@
     let text_str: string = item.value;
 
     function onInputChange(e: Event) {
-        const value = (e.target as HTMLInputElement).value;
-
-        state_store.renameView(item.value, value);
+        const new_name = (e.target as HTMLInputElement).value;
+        const success = state_store.renameView(item.value, new_name);
+        if (success) view_name = new_name;
     }
 
     function dropdownChangeCb(selected_option: DropdownItem): void {
@@ -41,7 +42,7 @@
 
 <div class="editor-group">
     <div class="input-container">
-        <input bind:value={text_str} on:change={onInputChange}/>
+        <input bind:value={text_str} on:change={onInputChange} />
     </div>
     {#if selected_layout_type}
         <h3 class="layout">Layout</h3>
@@ -55,11 +56,11 @@
 </div>
 
 <style lang="scss">
-    .input-container{
+    .input-container {
         display: flex;
     }
 
-    input{
+    input {
         padding-left: 5px;
         height: 32px;
         border: 1px solid rgb(47, 47, 47);
