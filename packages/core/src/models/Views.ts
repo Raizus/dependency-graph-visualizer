@@ -70,6 +70,7 @@ export class View implements ViewI {
 
 export class ViewMap {
     private map: Map<string, View> = new Map();
+    private order: string[] = [];
 
     has(key: string): boolean {
         return this.map.has(key);
@@ -77,6 +78,23 @@ export class ViewMap {
 
     get(key: string): View | undefined {
         return this.map.get(key);
+    }
+
+    set(key: string, value: View, idx: number | null = null): string {
+        // if key already exists no need to add it to the order
+        if (this.has(key)) {
+            this.map.set(key, value);
+            return key;
+        }
+
+        this.map.set(key, value);
+        // insert at position given by idx if not null, else push into the array
+        if (idx !== null) {
+            this.order.splice(idx, 0, key);
+        } else {
+            this.order.push(key);
+        }
+        return key;
     }
 
     /**
@@ -87,31 +105,35 @@ export class ViewMap {
      */
     add(key: string, value: View): string {
         key = this.generateUniqueKey(key);
-        this.map.set(key, value);
+        this.set(key, value);
         return key;
     }
 
-    set(key: string, value: View): string {
-        this.map.set(key, value);
-        return key;
-    }
-
+    /**
+     * Returns an iterator over the keys in the order they were added.
+     * @returns 
+     */
     keys(): MapIterator<string> {
-        return this.map.keys();
+        return this.order.values();
     }
 
     size(): number {
         return this.map.size;
     }
 
+    getIndex(key: string): number {
+        return this.order.indexOf(key);
+    }
+
     getFirstKey(): string | null {
-        const firstKey = this.map.keys().next().value;
+        const firstKey = this.order[0];
         return firstKey || null;
     }
 
     delete(key: string): ViewI | undefined {
         const view = this.map.get(key);
         this.map.delete(key);
+        this.order = this.order.filter((k) => k !== key);
         return view;
     }
 
@@ -120,8 +142,10 @@ export class ViewMap {
             return false; // old key must exist and new key must not exist
         }
         const view = this.map.get(old_key)!;
+        // keep the order
+        const idx = this.getIndex(old_key);
         this.map.delete(old_key);
-        this.map.set(new_key, view);
+        this.set(new_key, view, idx);
         return true;
     }
 
