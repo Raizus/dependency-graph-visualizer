@@ -8,8 +8,9 @@
     const state_store = getContext<StateStore>("state_store")
 
     const downloadJson = (file_base_name = "graph_vis") => {
-        const graph = get(state_store.graph);
-        const json_str = JSON.stringify(graph, null, 2);
+        // const graph = get(state_store.graph);
+        const out = state_store.toJSON();
+        const json_str = JSON.stringify(out, null, 2);
         download(json_str, `${file_base_name}.json`, "text/plain");
     };
 

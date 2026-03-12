@@ -19,9 +19,13 @@ import {
     ClusterManager,
     buildHierarquicalClusters,
     assignNodeRanks,
+    graphToJSON,
 } from "@dep-graph-vis/core";
 
-export function loadStateJson(data: StateJSON): {graph: Graph, views: ViewMap} {
+export function loadStateJson(data: StateJSON): {
+    graph: Graph;
+    views: ViewMap;
+} {
     const graph = loadDirectedGraphFromJSON(data.graph);
     assignNodeRanks(graph);
 
@@ -42,8 +46,8 @@ export function loadStateJson(data: StateJSON): {graph: Graph, views: ViewMap} {
 
     return {
         graph,
-        views: view_map
-    }
+        views: view_map,
+    };
 }
 
 export class StateStore {
@@ -385,19 +389,19 @@ export class StateStore {
         return dot;
     }
 
-    // toJSON(): StateJSON {
-    //     const graph = get(this._graph);
-    //     const views = get(this._views);
+    toJSON(): StateJSON {
+        const graph = get(this._graph);
+        const views = get(this._views);
 
-    //     if (!graph) {
-    //         throw new Error("Graph is not set");
-    //     }
+        if (!graph) {
+            throw new Error("Graph is not set");
+        }
 
-    //     return {
-    //         graph: graph.export(),
-    //         views: views.toJSON(),
-    //     };
-    // }
+        return {
+            graph: graphToJSON(graph),
+            views: views.toJSON(),
+        };
+    }
 
     // async relayout(): Promise<string> {
     //     this.updateProjection();
