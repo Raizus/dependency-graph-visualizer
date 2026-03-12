@@ -25,7 +25,7 @@
     function onInputChange(e: Event) {
         const value = (e.target as HTMLInputElement).value;
 
-        // rename view
+        state_store.renameView(item.value, value);
     }
 
     function dropdownChangeCb(selected_option: DropdownItem): void {

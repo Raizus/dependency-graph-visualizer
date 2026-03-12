@@ -62,6 +62,7 @@ export class StateStore {
     private _current_view = derived(
         [this._current_view_label, this._views],
         ([label, views]) => {
+            console.log("Update current view");
             if (!label) return newBlanckView("View");
             const view = views.get(label);
             return view || newBlanckView("View");
@@ -363,6 +364,20 @@ export class StateStore {
         // update views
         this.setViews(views);
         this.setCurrentViewLabel(new_view_id);
+    }
+
+    renameView(old_name: string, new_name: string) {
+        if (new_name === old_name) return;
+        const views = get(this._views);
+
+        const success = views.rename(old_name, new_name);
+        if (!success) return;
+
+        console.log(old_name, new_name);
+        this.setViews(views);
+        const current_view_label = get(this._current_view_label);
+        if (old_name !== current_view_label) return;
+        this.setCurrentViewLabel(new_name);
     }
 
     searchFilteredGraphNodes(query: string): string[] {

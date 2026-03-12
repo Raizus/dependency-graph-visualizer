@@ -115,6 +115,16 @@ export class ViewMap {
         return view;
     }
 
+    rename(old_key: string, new_key: string): boolean {
+        if (!this.map.has(old_key) || this.map.has(new_key)) {
+            return false; // old key must exist and new key must not exist
+        }
+        const view = this.map.get(old_key)!;
+        this.map.delete(old_key);
+        this.map.set(new_key, view);
+        return true;
+    }
+
     duplicate(key: string) {
         const view = this.map.get(key);
         if (!view) return;

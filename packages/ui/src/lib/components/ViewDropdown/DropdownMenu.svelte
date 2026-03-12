@@ -4,6 +4,7 @@
     import DropdownSearchBox from "./DropdownSearchBox.svelte";
     import type { Snippet } from "svelte";
     import ViewMenu from "./ViewMenu.svelte";
+    import ViewEditor from "./ViewEditor.svelte";
 
     export let items: DropdownItem[] = [];
     export let placeholder: string = "Select an item...";
@@ -73,16 +74,16 @@
         <div class="panel">
             {#if configItem !== null}
                 <DropdownConfigureWindow
-                    title={configItem.label}
+                    title="Configure View"
                     back={backToDropdown}
                     close={closeDropdown}
                 >
                     <ViewMenu slot="menu" view_id={configItem.value}/>
                     <svelte:fragment slot="content">
-                        {#if configure}
+                        <ViewEditor item={configItem} />
+                        <!-- {#if configure}
                             {@render configure(configItem)}
-                            <!-- configItem is guaranteed non-null here -->
-                        {/if}
+                        {/if} -->
                     </svelte:fragment>
                 </DropdownConfigureWindow>
             {:else}
