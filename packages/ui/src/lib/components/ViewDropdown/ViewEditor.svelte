@@ -9,6 +9,7 @@
     const layout_options = [
         { value: "dot", label: "Hierarquical Layout" },
         { value: "fdp", label: "Force-Directed Placement" },
+        { value: "sfdp", label: "Scalable Force-Directed Placement" },
     ];
 
     const state_store = getContext<StateStore>("state_store");
@@ -33,8 +34,8 @@
         const layout = view?.layout;
         if (!layout) return;
 
-        const layoutType = selected_option.value as "dot" | "fdp";
-        if (!["dot", "fdp"].includes(layoutType)) return;
+        const layoutType = selected_option.value as "dot" | "fdp" | "sfdp";
+        if (!["dot", "fdp", "sfdp"].includes(layoutType)) return;
         layout.type = layoutType;
         state_store.setViewLayout(item.value, layout);
     }

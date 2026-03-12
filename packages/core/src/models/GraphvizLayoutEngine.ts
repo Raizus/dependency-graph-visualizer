@@ -119,23 +119,6 @@ const DEFAULT_DOT_OPTIONS: GraphOptions = {
     },
 };
 
-const DEFAULT_EXPORT_DOT_OPTIONS: GraphOptions = {
-    graphAttrs: {
-        bgcolor: "#ffffff",
-        layout: "dot",
-        rankdir: "TB",
-        ranksep: 1.0,
-        nodesep: 0.5,
-        splines: "spline",
-        newrank: true,
-        compound: true,
-    },
-
-    edgeAttrs: {
-        color: "#000000",
-    },
-};
-
 const DEFAULT_FDP_OPTIONS: GraphOptions = {
     graphAttrs: {
         bgcolor: "none",
@@ -150,6 +133,43 @@ const DEFAULT_FDP_OPTIONS: GraphOptions = {
 
     edgeAttrs: {
         color: "#949494",
+    },
+};
+
+const DEFAULT_SFDP_OPTIONS: GraphOptions = {
+    graphAttrs: {
+        bgcolor: "none",
+        layout: "sfdp",
+
+        // Graph-level
+        splines: "curved",
+        overlap: "prism", // sfdp has its own overlap handling, prism cleans it up after
+        sep: "+8",
+        K: 0.6, // spring constant, same as fdp
+        repulsiveforce: 1.0, // increase to push nodes apart more (default is 1.0)
+        smoothing: "triangle", // improves layout quality: 'none' | 'avg_dist' | 'graph_dist' | 'power_dist' | 'rng' | 'spring' | 'triangle'
+        maxiter: 200,
+    },
+
+    edgeAttrs: {
+        color: "#949494",
+    },
+};
+
+const DEFAULT_EXPORT_DOT_OPTIONS: GraphOptions = {
+    graphAttrs: {
+        bgcolor: "#ffffff",
+        layout: "dot",
+        rankdir: "TB",
+        ranksep: 1.0,
+        nodesep: 0.5,
+        splines: "spline",
+        newrank: true,
+        compound: true,
+    },
+
+    edgeAttrs: {
+        color: "#000000",
     },
 };
 
@@ -170,13 +190,35 @@ const DEFAULT_EXPORT_FDP_OPTIONS: GraphOptions = {
     },
 };
 
+const DEFAULT_EXPORT_SFDP_OPTIONS: GraphOptions = {
+    graphAttrs: {
+        bgcolor: "white",
+        layout: "sfdp",
+
+        // Graph-level
+        splines: "curved",
+        overlap: "prism", // sfdp has its own overlap handling, prism cleans it up after
+        sep: "+8",
+        K: 0.6, // spring constant, same as fdp
+        repulsiveforce: 1.0, // increase to push nodes apart more (default is 1.0)
+        smoothing: "triangle", // improves layout quality: 'none' | 'avg_dist' | 'graph_dist' | 'power_dist' | 'rng' | 'spring' | 'triangle'
+        maxiter: 200,
+    },
+
+    edgeAttrs: {
+        color: "#000000",
+    },
+};
+
 export function layoutToDotOptions(layout: LayoutI) {
     if (layout.type === "fdp") return DEFAULT_FDP_OPTIONS;
+    if (layout.type === "sfdp") return DEFAULT_SFDP_OPTIONS;
     return DEFAULT_DOT_OPTIONS;
 }
 
 export function layoutToExportDotOptions(layout: LayoutI) {
     if (layout.type === "fdp") return DEFAULT_EXPORT_FDP_OPTIONS;
+    if (layout.type === "sfdp") return DEFAULT_EXPORT_SFDP_OPTIONS;    
     return DEFAULT_EXPORT_DOT_OPTIONS;
 }
 
@@ -195,6 +237,14 @@ class GraphvizGraphModelBuilder {
         switch (layout) {
             case "fdp": {
                 const g = GraphvizGraphModelBuilder.buildFdpLayoutGraphModel(
+                    graph,
+                    clusters,
+                    options,
+                );
+                return g;
+            }
+            case "sfdp": {
+                const g = GraphvizGraphModelBuilder.buildSfdpLayoutGraphModel(
                     graph,
                     clusters,
                     options,
@@ -221,7 +271,7 @@ class GraphvizGraphModelBuilder {
         // Create main digraph
         const g = digraph(
             "G",
-            { layout: "dot", ...options.graphAttrs,  },
+            { layout: "dot", ...options.graphAttrs },
             (g) => {
                 if (options.edgeAttrs) g.edge(options.edgeAttrs);
 
@@ -296,6 +346,40 @@ class GraphvizGraphModelBuilder {
         return g;
     }
 
+    private static buildSfdpLayoutGraphModel(
+        graph: Graph,
+        clusters: ClustersI,
+        options: GraphOptions,
+    ) {
+        // Create main digraph
+        const g = digraph(
+            "G",
+            { layout: "sfdp", ...options.graphAttrs },
+            (g) => {
+                // Build cluster hierarchy
+                GraphvizGraphModelBuilder.addClustersToGraph(
+                    g,
+                    clusters,
+                    graph,
+                    undefined,
+                    false,
+                );
+
+                // Add nodes that aren't in any cluster
+                GraphvizGraphModelBuilder.addUnclusteredNodes(
+                    g,
+                    graph,
+                    clusters,
+                );
+
+                // Add edges
+                GraphvizGraphModelBuilder.addEdgesToGraph(g, graph, clusters);
+            },
+        );
+
+        return g;
+    }
+
     private static addClustersToGraph(
         g: RootGraphModel | SubgraphModel,
         clusters: ClustersI,
@@ -328,7 +412,7 @@ class GraphvizGraphModelBuilder {
                     sub.node(c_id, {
                         label: cluster.label,
                         ...clusterNodeStyle(),
-                        tooltip: `${c_id}; type: ${node_attr.type}`
+                        tooltip: `${c_id}; type: ${node_attr.type}`,
                     });
                     collapsed_clusters.push(c_id);
                 });

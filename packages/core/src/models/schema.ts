@@ -83,7 +83,7 @@ export interface NodeGroupI {
 }
 
 export interface LayoutI {
-    type: "dot" | "fdp";
+    type: "dot" | "fdp" | "sfdp";
 }
 
 export interface GraphAttributesI { 
