@@ -1,4 +1,4 @@
-import type { Graph } from "@dep-graph-vis/core";
+import { filterFunctionFactory, inverse_node_selection_filter_params, type Graph } from "@dep-graph-vis/core";
 import { get } from "svelte/store";
 import { select_sources_of_node, select_targets_of_node, select_siblings_of_node, select_neighbours_of_node, select_reachables, select_reaching, select_reaching_intersection_reachables } from "../Reducers";
 import type { StateStore } from "../StateStore";
@@ -138,4 +138,17 @@ export function set_selection_to_nodes_of_cluster_action(
     const nodes = view.clusters.getClusterNodes(cluster_id);
     const sub_clusters = view.clusters.getSubclustersRecursive(cluster_id);
     state_store.setSelectedNodes([...nodes, ...sub_clusters]);
+}
+
+export function invert_selection_action(
+    state_store: StateStore,
+) {
+    const selection = get(state_store.selected_nodes);
+    const graph = get(state_store.clustered_graph);
+    if (!graph) return;
+
+    const filter_params = inverse_node_selection_filter_params(selection);
+    const filter_func = filterFunctionFactory(filter_params);
+    const inverse = filter_func(graph);
+    state_store.setSelectedNodes(inverse);
 }
