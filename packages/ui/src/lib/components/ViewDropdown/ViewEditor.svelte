@@ -3,10 +3,11 @@
     import SimpleDropdown from "../reusable_components/SimpleDropdown.svelte";
     import { StateStore } from "../../StateStore";
     import type { DropdownItem } from "../reusable_components/dropdown";
+    import type { LayoutType } from "@dep-graph-vis/core";
 
     export let item: DropdownItem;
 
-    const layout_options = [
+    const layout_options: {value: LayoutType, label: string}[] = [
         { value: "dot", label: "Hierarquical Layout" },
         { value: "fdp", label: "Force-Directed Placement" },
         { value: "sfdp", label: "Scalable Force-Directed Placement" },
@@ -34,8 +35,7 @@
         const layout = view?.layout;
         if (!layout) return;
 
-        const layoutType = selected_option.value as "dot" | "fdp" | "sfdp";
-        if (!["dot", "fdp", "sfdp"].includes(layoutType)) return;
+        const layoutType = selected_option.value as LayoutType;
         layout.type = layoutType;
         state_store.setViewLayout(item.value, layout);
     }

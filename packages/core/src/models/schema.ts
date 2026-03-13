@@ -82,8 +82,10 @@ export interface NodeGroupI {
     text_color: string;
 }
 
+export type LayoutType = "dot" | "fdp" | "sfdp" | "twopi";
+
 export interface LayoutI {
-    type: "dot" | "fdp" | "sfdp";
+    type: LayoutType;
 }
 
 export interface GraphAttributesI { 
