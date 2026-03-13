@@ -208,6 +208,17 @@ export class StateStore {
         this.updateFilteredClusteredGraph();
     }
 
+    filterSetShow(filter_idx: number, value: boolean) {
+        const view = get(this._current_view);
+        if (!view) return;
+
+        const filter = view.getFilter(filter_idx);
+        if (!filter) return;
+        filter.show = value;
+
+        this.updateFilteredClusteredGraph();
+    }
+
     filterMoveUp(filter_idx: number) {
         const view = get(this._current_view);
         if (!view) return;
@@ -239,6 +250,18 @@ export class StateStore {
             filters[filter_idx + 1],
         ];
         view.filters = filters;
+
+        this.updateCurrentView(view);
+        this.updateFilteredClusteredGraph();
+    }
+
+    deleteFilter(filter_idx: number) {
+        const view = get(this._current_view);
+        if (!view) return;
+
+        console.log("deleting filter");
+        const filters = view.filters;
+        filters.splice(filter_idx, 1);
 
         this.updateCurrentView(view);
         this.updateFilteredClusteredGraph();

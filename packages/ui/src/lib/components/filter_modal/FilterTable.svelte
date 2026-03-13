@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { FilterI } from "@dep-graph-vis/core";
     import TableCheckbox from "./TableCheckbox..svelte";
-    import { getContext } from "svelte";
+    import { getContext, onDestroy, onMount } from "svelte";
     import type { StateStore } from "../../StateStore";
 
     const state_store = getContext<StateStore>("state_store");
@@ -29,13 +29,11 @@
     }
 
     function onToggleApplied(idx: number, value: boolean) {
-        console.log("Global state: toggled applied", { idx, value });
         state_store.filterSetApplied(idx, value);
     }
 
-    function onToggleShow(id: string | number, value: boolean) {
-        console.log("Global state: toggled show", { id, value });
-        // TODO: dispatch to global store
+    function onToggleShow(idx: number, value: boolean) {
+        state_store.filterSetShow(idx, value);
     }
 
     function moveUp() {
@@ -54,14 +52,28 @@
         onToggleApplied(idx, value);
     }
 
-    function handleShowChange(item: FilterI, value: boolean) {
-        item.show = value;
-        filters = [...filters];
-        onToggleShow(item.id, value);
+    function deleteFilter() {
+        if (selectedIdx === null) return;
+        state_store.deleteFilter(selectedIdx);        
+    }
+
+    function handleKeydown(event: KeyboardEvent) {
+        // console.log("selectedIdx: ", selectedIdx);
+        if(event.key !== "Delete") return;
+        deleteFilter();
+    } 
+
+    function handleShowChange(idx: number, value: boolean) {
+        onToggleShow(idx, value);
     }
 
     $: canMoveUp = selectedIdx !== null && selectedIdx > 0;
     $: canMoveDown = selectedIdx !== null && selectedIdx >= 0 && selectedIdx < filters.length - 1;
+
+    onMount(() => window.addEventListener("keydown", handleKeydown));
+    onDestroy(() => {
+        window.removeEventListener("keydown", handleKeydown);
+    });
 </script>
 
 <div class="container">
@@ -91,7 +103,7 @@
                         <td class="checkbox-cell">
                             <TableCheckbox
                                 checked={filter.show}
-                                onChange={(v) => handleShowChange(filter, v)}
+                                onChange={(v) => handleShowChange(idx, v)}
                             />
                         </td>
                     </tr>
@@ -117,6 +129,14 @@
         >
             ▼ Down
         </button>
+        <button
+            class="order-btn"
+            on:click={deleteFilter}
+            disabled={selectedIdx === null}
+            title="Delete"
+        >
+            Delete
+        </button>
     </div>
 </div>
 
@@ -140,23 +160,23 @@
         overflow: hidden;
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
         min-width: 320px;
+        flex-grow: 1;
     }
 
     table {
         border-collapse: collapse;
         width: 100%;
-        background-color: #ffffff;
+        background-color: var(--bg-color-2);
     }
 
     thead tr {
-        background-color: #f2f4f7;
+        background-color: var(--bg-color-1);
     }
 
     th {
         padding: 10px 14px;
         text-align: left;
         font-weight: 600;
-        color: #344054;
         user-select: none;
 
         &:not(:first-child) {
@@ -169,22 +189,21 @@
         transition: background-color 0.12s ease;
 
         &:hover {
-            background-color: #f9fafb;
+            background-color: #a6a6a6;
         }
 
         &.selected {
-            background-color: #eff4ff;
+            background-color: #767676;
         }
 
         &.selected td {
-            color: #3538cd;
+            color: #a8aafd;
         }
     }
 
     td {
         padding: 5px 5px;
-        color: #475467;
-        border-bottom: 1px solid #eaecf0;
+        border-bottom: 1px solid black;
     }
 
     .row:last-child td {
@@ -201,6 +220,7 @@
     }
 
     .button-panel {
+        align-self: center;
         display: flex;
         flex-direction: column;
         gap: 8px;
