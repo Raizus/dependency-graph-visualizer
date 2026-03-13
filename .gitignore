@@ -20,3 +20,6 @@ out/
 # IDE
 .vscode/
 .idea/
+
+# Other
+prompt.txt
