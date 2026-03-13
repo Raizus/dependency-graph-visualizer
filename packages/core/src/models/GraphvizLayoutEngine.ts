@@ -156,6 +156,24 @@ const DEFAULT_SFDP_OPTIONS: GraphOptions = {
     },
 };
 
+const DEFAULT_TWOPI_OPTIONS: GraphOptions = {
+    graphAttrs: {
+        bgcolor: "none",
+        layout: "twopi",
+
+        // Graph-level
+        splines: "curved",
+        overlap: "false", // twopi often needs this since rings can get crowded
+        sep: "+8",
+        ranksep: 2.0, // distance between concentric rings — main tuning knob
+        root: "1", // which node to place at the center (defaults to arbitrary if omitted)
+    },
+
+    edgeAttrs: {
+        color: "#949494",
+    },
+};
+
 const DEFAULT_EXPORT_DOT_OPTIONS: GraphOptions = {
     graphAttrs: {
         bgcolor: "#ffffff",
@@ -213,6 +231,7 @@ const DEFAULT_EXPORT_SFDP_OPTIONS: GraphOptions = {
 export function layoutToDotOptions(layout: LayoutI) {
     if (layout.type === "fdp") return DEFAULT_FDP_OPTIONS;
     if (layout.type === "sfdp") return DEFAULT_SFDP_OPTIONS;
+    if (layout.type === "twopi") return DEFAULT_TWOPI_OPTIONS;
     return DEFAULT_DOT_OPTIONS;
 }
 
@@ -244,7 +263,15 @@ class GraphvizGraphModelBuilder {
                 return g;
             }
             case "sfdp": {
-                const g = GraphvizGraphModelBuilder.buildSfdpLayoutGraphModel(
+                const g = GraphvizGraphModelBuilder.buildFdpLayoutGraphModel(
+                    graph,
+                    clusters,
+                    options,
+                );
+                return g;
+            }
+            case "twopi": {
+                const g = GraphvizGraphModelBuilder.buildFdpLayoutGraphModel(
                     graph,
                     clusters,
                     options,
@@ -271,7 +298,7 @@ class GraphvizGraphModelBuilder {
         // Create main digraph
         const g = digraph(
             "G",
-            { layout: "dot", ...options.graphAttrs },
+            { ...options.graphAttrs },
             (g) => {
                 if (options.edgeAttrs) g.edge(options.edgeAttrs);
 
@@ -322,40 +349,8 @@ class GraphvizGraphModelBuilder {
             "G",
             { layout: "fdp", ...options.graphAttrs },
             (g) => {
-                // Build cluster hierarchy
-                GraphvizGraphModelBuilder.addClustersToGraph(
-                    g,
-                    clusters,
-                    graph,
-                    undefined,
-                    false,
-                );
+                if (options.edgeAttrs) g.edge(options.edgeAttrs);
 
-                // Add nodes that aren't in any cluster
-                GraphvizGraphModelBuilder.addUnclusteredNodes(
-                    g,
-                    graph,
-                    clusters,
-                );
-
-                // Add edges
-                GraphvizGraphModelBuilder.addEdgesToGraph(g, graph, clusters);
-            },
-        );
-
-        return g;
-    }
-
-    private static buildSfdpLayoutGraphModel(
-        graph: Graph,
-        clusters: ClustersI,
-        options: GraphOptions,
-    ) {
-        // Create main digraph
-        const g = digraph(
-            "G",
-            { layout: "sfdp", ...options.graphAttrs },
-            (g) => {
                 // Build cluster hierarchy
                 GraphvizGraphModelBuilder.addClustersToGraph(
                     g,

@@ -11,6 +11,7 @@
         { value: "dot", label: "Hierarquical Layout" },
         { value: "fdp", label: "Force-Directed Placement" },
         { value: "sfdp", label: "Scalable Force-Directed Placement" },
+        { value: "twopi", label: "Radial Layout" },
     ];
 
     const state_store = getContext<StateStore>("state_store");
