@@ -395,47 +395,59 @@ export class D3GraphRenderer implements GraphRenderer {
         });
     }
 
+    private onNodeMouseEnter(node_id: string) {
+        if (!this.selectedNodes.has(node_id))
+            this.applyNodeStyle(node_id, "hovered");
+        // Highlight connected edges
+        this.nodeEdgeMap.get(node_id)?.forEach((edge_id) => {
+            if (!this.selectedEdges.has(edge_id))
+                this.applyEdgeStyle(edge_id, "hovered");
+        });
+        // Dim unconnected nodes
+        this.dimUnconnected(node_id, true);
+    }
+
+    private onNodeMouseLeave(node_id: string) {
+        if (!this.selectedNodes.has(node_id))
+            this.applyNodeStyle(node_id, "normal");
+        this.nodeEdgeMap.get(node_id)?.forEach((edgeId) => {
+            if (!this.selectedEdges.has(edgeId))
+                this.applyEdgeStyle(edgeId, "normal");
+        });
+        this.dimUnconnected(node_id, false);
+    }
+
+    private onNodeClick(event: MouseEvent, node_id: string) {
+        event.stopPropagation();
+
+        if (event.shiftKey || event.metaKey || event.ctrlKey) {
+            // Multi-select toggle
+            const newSet = new Set(this.selectedNodes);
+            if (newSet.has(node_id)) newSet.delete(node_id);
+            else newSet.add(node_id);
+            this.setSelection([...newSet]);
+        } else {
+            this.setSelection([node_id]);
+        }
+
+        this.emit("nodeClick", { nodeId: node_id, event });
+    }
+
     private attachListeners(): void {
         // ── Node interactions ──
         this.nodeGroupMap.forEach((el, nodeId) => {
             const sel = d3.select(el);
 
             sel.on("mouseenter", () => {
-                if (!this.selectedNodes.has(nodeId))
-                    this.applyNodeStyle(nodeId, "hovered");
-                // Highlight connected edges
-                this.nodeEdgeMap.get(nodeId)?.forEach((edgeId) => {
-                    if (!this.selectedEdges.has(edgeId))
-                        this.applyEdgeStyle(edgeId, "hovered");
-                });
-                // Dim unconnected nodes
-                this.dimUnconnected(nodeId, true);
+                this.onNodeMouseEnter(nodeId);
             });
 
             sel.on("mouseleave", () => {
-                if (!this.selectedNodes.has(nodeId))
-                    this.applyNodeStyle(nodeId, "normal");
-                this.nodeEdgeMap.get(nodeId)?.forEach((edgeId) => {
-                    if (!this.selectedEdges.has(edgeId))
-                        this.applyEdgeStyle(edgeId, "normal");
-                });
-                this.dimUnconnected(nodeId, false);
+                this.onNodeMouseLeave(nodeId);
             });
 
             sel.on("click", (event: MouseEvent) => {
-                event.stopPropagation();
-
-                if (event.shiftKey || event.metaKey || event.ctrlKey) {
-                    // Multi-select toggle
-                    const newSet = new Set(this.selectedNodes);
-                    if (newSet.has(nodeId)) newSet.delete(nodeId);
-                    else newSet.add(nodeId);
-                    this.setSelection([...newSet]);
-                } else {
-                    this.setSelection([nodeId]);
-                }
-
-                this.emit("nodeClick", { nodeId, event });
+                this.onNodeClick(event, nodeId);
             });
 
             sel.on("dblclick", (event: MouseEvent) => {
