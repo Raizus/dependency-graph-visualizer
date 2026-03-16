@@ -3,13 +3,6 @@
     import GraphCanvas from "./lib/GraphCanvas.svelte";
     import { loadStateJson, StateStore } from "./lib/StateStore";
     import { loadPublicJson } from "./lib/load_graph";
-    import {
-        assignNodeRanks,
-        buildHierarquicalClusters,
-        ClusterManager,
-        newBlanckView,
-        ViewMap,
-    } from "@dep-graph-vis/core";
     import Toolbar from "./lib/components/toolbar/Toolbar.svelte";
 
     const state_store = new StateStore();
@@ -18,7 +11,6 @@
 
     onMount(async () => {
         try {
-            // Load default example
             await state_store.initialize();
 
             const state_json = await loadPublicJson("/examples/example1.json");
