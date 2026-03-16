@@ -92,12 +92,7 @@ export class D3GraphRenderer implements GraphRenderer {
         this.zoom = null;
         this.graph = null;
         this.clusters = null;
-        this.nodeGroupMap.clear();
-        this.edgeGroupMap.clear();
-        this.clusterGroupMap.clear();
-        this.nodeEdgeMap.clear();
-        this.selectedNodes.clear();
-        this.selectedEdges.clear();
+        this.clearState();
         this.handlers.clear();
     }
 
@@ -109,14 +104,9 @@ export class D3GraphRenderer implements GraphRenderer {
         this.clusters = clusters;
 
         // Clear old state
-        this.nodeGroupMap.clear();
-        this.edgeGroupMap.clear();
-        this.clusterGroupMap.clear();
-        this.nodeEdgeMap.clear();
-        this.selectedNodes.clear();
-        this.selectedEdges.clear();
+        this.clearState();
 
-        // Parse the Graphviz SVG
+        // Parse the SVG
         const parser = new DOMParser();
         const doc = parser.parseFromString(svgString, "image/svg+xml");
         const rawSvg = doc.querySelector("svg");
@@ -631,11 +621,22 @@ export class D3GraphRenderer implements GraphRenderer {
         const tx = W / 2 - scale * (bbox.x + bbox.width / 2);
         const ty = H / 2 - scale * (bbox.y + bbox.height / 2);
 
-        this.svg.transition().duration(400).call(
-            this.zoom!.transform,
-            // d3.zoomIdentity.translate(tx, ty).scale(scale),
-            d3.zoomIdentity.translate(0, 0).scale(1),
-        );
+        this.svg
+            .transition()
+            .duration(400)
+            .call(
+                this.zoom!.transform,
+                d3.zoomIdentity.translate(tx, ty).scale(scale),
+            );
+    }
+
+    private clearState() {
+        this.nodeGroupMap.clear();
+        this.edgeGroupMap.clear();
+        this.clusterGroupMap.clear();
+        this.nodeEdgeMap.clear();
+        this.selectedNodes.clear();
+        this.selectedEdges.clear();
     }
 
     // ── Event Emitter ───────────────────────────────────────────────────────────
