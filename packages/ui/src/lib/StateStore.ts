@@ -21,6 +21,7 @@ import {
     assignNodeRanks,
     graphToJSON,
 } from "@dep-graph-vis/core";
+import type { GraphRenderer } from "./visualizer/GraphRenderer";
 
 export function loadStateJson(data: StateJSON): {
     graph: Graph;
@@ -73,6 +74,7 @@ export class StateStore {
     private _filtered_clustered_graph = writable<Graph | null>(null);
     private _hidden_nodes = writable<Set<string>>(new Set());
     private _shown_nodes = writable<Set<string>>(new Set());
+    private _renderer = writable<GraphRenderer | null>(null);
 
     constructor() {
         // ... existing initialization
@@ -99,6 +101,15 @@ export class StateStore {
     public filtered_clustered_graph = {
         subscribe: this._filtered_clustered_graph.subscribe,
     };
+    public renderer = { subscribe: this._renderer.subscribe };
+
+    setRenderer(renderer: GraphRenderer | null) {
+        this._renderer.set(renderer);
+    }
+
+    getRenderer(): GraphRenderer | null {
+        return get(this._renderer);
+    }
 
     // Actions
     setGraph(graph: Graph) {

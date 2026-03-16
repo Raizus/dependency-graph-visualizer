@@ -50,6 +50,7 @@
 
         renderer = new D3GraphRenderer();
         renderer.initialize(container);
+        state_store.setRenderer(renderer);
 
         // Set initial graph
         if ($filtered_clustered_graph) {
@@ -124,6 +125,7 @@
     onDestroy(() => {
         if (renderer) {
             renderer.destroy();
+            state_store.setRenderer(null); 
         }
         container.removeEventListener("contextmenu", (e) => {
             e.preventDefault();
