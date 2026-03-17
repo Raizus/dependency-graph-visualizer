@@ -6,6 +6,13 @@ import type {
 } from "./GraphRendererEvents";
 import type { GraphRenderer } from "./GraphRenderer";
 
+interface BoundingBox {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 // ─── CSS Classes & Constants ──────────────────────────────────────────────────
 
 const CSS = {
@@ -30,6 +37,19 @@ function split_edge_id(edge_id: string): null | [src: string, tgt: string] {
     if (parts.length < 2) return null;
     const [src, tgt] = parts.map((s) => s.trim());
     return [src, tgt];
+}
+
+function padBox(bbox: BoundingBox, pad_x: number, pad_y?: number): BoundingBox {
+    const new_box: BoundingBox = {
+        x: bbox.x - pad_x,
+        y: pad_y === undefined ? bbox.y - pad_x : bbox.y - pad_y,
+        width: bbox.width + 2 * pad_x,
+        height:
+            pad_y === undefined
+                ? bbox.height + 2 * pad_x
+                : bbox.height + 2 * pad_y,
+    };
+    return new_box;
 }
 
 // ─── Implementation ───────────────────────────────────────────────────────────
@@ -118,7 +138,7 @@ export class D3GraphRenderer implements GraphRenderer {
 
         if (!this.svg || !this.zoomGroup) return;
 
-        // Move all graphviz children into the zoom group
+        // Move all children into the zoom group
         Array.from(rawSvg.children).forEach((child) => {
             this.zoomGroup!.node()!.appendChild(document.adoptNode(child));
         });
@@ -126,6 +146,7 @@ export class D3GraphRenderer implements GraphRenderer {
         // Copy viewBox / dimensions for initial fit
         const vb = rawSvg.getAttribute("viewBox");
         if (vb) this.svg.attr("viewBox", vb);
+        // this.svg.attr("viewBox", null);
 
         // Index groups by their <title> text
         this.indexGroups();
@@ -175,48 +196,60 @@ export class D3GraphRenderer implements GraphRenderer {
         if (!this.svg || !this.zoomGroup || !this.zoom || !this.container)
             return;
 
-        this.svg.transition().duration(300).call(
-            this.zoom!.transform,
-            // d3.zoomIdentity.translate(tx, ty).scale(scale),
-            d3.zoomIdentity.translate(0, 0).scale(1),
-        );
+        const svgEl = this.svg.node()!;
+        const viewBox = svgEl.viewBox.baseVal;
+
+        const bbox = {
+            x: viewBox.x,
+            y: viewBox.y,
+            width: viewBox.width,
+            height: viewBox.height,
+        };
 
         // const bbox = (this.zoomGroup.node() as SVGGElement).getBBox();
-        // this.zoomToBox(bbox);
-
-        // const el = this.zoomGroup.node() as SVGGElement;
-        // this.zoomToScreenRect(el.getBoundingClientRect());
+        this.zoomToBoxSvgCoords(bbox);
     }
 
     fitToNodes(nodes: string[]): void {
         if (!this.svg || !this.zoomGroup || !this.zoom || !this.container)
             return;
 
-        // Union bounding boxes of all requested nodes
+        // Use getBoundingClientRect (screen space) then invert the current
+        // D3 transform — this sidesteps the intermediate translate(4 1568) entirely
         let minX = Infinity,
             minY = Infinity,
             maxX = -Infinity,
             maxY = -Infinity;
         let found = false;
 
+        const svgEl = this.svg.node()!;
+
+        const { tx, ty } = this.getGraphvizGroupTransform();
         nodes.forEach((id) => {
             const el = this.nodeGroupMap.get(id);
             if (!el) return;
-            const bb = el.getBBox();
-            minX = Math.min(minX, bb.x);
-            minY = Math.min(minY, bb.y);
-            maxX = Math.max(maxX, bb.x + bb.width);
-            maxY = Math.max(maxY, bb.y + bb.height);
+
+            const bbox = el.getBBox();
+
+            // Manually apply the Graphviz group's static translate to get SVG base coords
+            minX = Math.min(minX, bbox.x + tx);
+            minY = Math.min(minY, bbox.y + ty);
+            maxX = Math.max(maxX, bbox.x + bbox.width + tx);
+            maxY = Math.max(maxY, bbox.y + bbox.height + ty);
             found = true;
         });
 
-        if (!found) return;
-        this.zoomToBox({
+        const bbox: BoundingBox = {
             x: minX,
             y: minY,
             width: maxX - minX,
             height: maxY - minY,
-        });
+        };
+
+        if (!found) return;
+
+        const padding = 40;
+        this.zoomToBoxSvgCoords(padBox(bbox, padding));
     }
 
     hideNodes(nodes: Set<string>): void {
@@ -327,6 +360,15 @@ export class D3GraphRenderer implements GraphRenderer {
                 this.emit("backgroundRightClick", { event });
             }
         });
+    }
+
+    private clearState() {
+        this.nodeGroupMap.clear();
+        this.edgeGroupMap.clear();
+        this.clusterGroupMap.clear();
+        this.nodeEdgeMap.clear();
+        this.selectedNodes.clear();
+        this.selectedEdges.clear();
     }
 
     /**
@@ -570,85 +612,73 @@ export class D3GraphRenderer implements GraphRenderer {
 
     // ── Zoom helpers ────────────────────────────────────────────────────────────
 
-    // ── Zoom helpers ────────────────────────────────────────────────────────────
+    private getGraphvizGroupTransform(): { tx: number; ty: number } {
+        if (!this.zoomGroup) return { tx: 0, ty: 0 };
+        const graphvizGroup = (
+            this.zoomGroup.node() as SVGGElement
+        ).querySelector("g.graph");
+        if (!graphvizGroup) return { tx: 0, ty: 0 };
 
-    /**
-     * Fit the viewport to a rect given in screen/client coordinates.
-     * We read the current D3 transform to convert screen coords back into
-     * the SVG's logical space, then compute the new transform from there.
-     */
-    private zoomToScreenRect(screenRect: DOMRect): void {
-        if (!this.svg || !this.zoom || !this.container) return;
-        const containerRect = this.container.getBoundingClientRect();
-        const { width: W, height: H } = containerRect;
-        if (!W || !H || !screenRect.width || !screenRect.height) return;
-
-        // Current transform so we can map screen → logical coords
-        const currentT = d3.zoomTransform(this.svg.node()!);
-
-        // Convert the screen-space rect corners into logical (pre-transform) SVG space
-        const logX =
-            (screenRect.left - containerRect.left - currentT.x) / currentT.k;
-        const logY =
-            (screenRect.top - containerRect.top - currentT.y) / currentT.k;
-        const logW = screenRect.width / currentT.k;
-        const logH = screenRect.height / currentT.k;
-
-        const padding = 40;
-        const scale = Math.min(
-            (W - padding * 2) / logW,
-            (H - padding * 2) / logH,
-            8,
-        );
-        const tx = W / 2 - scale * (logX + logW / 2);
-        const ty = H / 2 - scale * (logY + logH / 2);
-
-        this.svg
-            .transition()
-            .duration(300)
-            .call(
-                this.zoom!.transform,
-                d3.zoomIdentity.translate(tx, ty).scale(scale),
-            );
+        const transform = graphvizGroup.getAttribute("transform") ?? "";
+        const match = transform.match(/translate\(([\d.-]+)[,\s]+([\d.-]+)\)/);
+        if (!match) return { tx: 0, ty: 0 };
+        return { tx: parseFloat(match[1]), ty: parseFloat(match[2]) };
     }
 
-    private zoomToBox(bbox: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    }): void {
+    private debugBbox(bbox: BoundingBox) {
+        this.zoomGroup?.select("#debug-bbox").remove();
+        this.zoomGroup
+            ?.append("rect")
+            .attr("id", "debug-bbox")
+            .attr("x", bbox.x)
+            .attr("y", bbox.y)
+            .attr("width", bbox.width)
+            .attr("height", bbox.height)
+            .attr("fill", "none")
+            .attr("stroke", "red")
+            .attr("stroke-width", "10")
+            .attr("stroke-dasharray", "20,10");
+    }
+
+    private zoomToBoxSvgCoords(bbox: BoundingBox): void {
         if (!this.svg || !this.zoom || !this.container) return;
         const { width: W, height: H } = this.container.getBoundingClientRect();
         if (!W || !H || !bbox.width || !bbox.height) return;
 
-        console.log(W, H);
+        // console.log("Zooming to box: ", bbox);
+        // console.log("Container size: ", W, H);
 
-        const padding = 40;
+        // this.debugBbox(bbox);
+
+        // Get the SVG viewBox dimensions
+        const svgEl = this.svg.node()!;
+        const viewBox = svgEl.viewBox.baseVal;
+
+        // // SVG uses uniform scaling (meet), so one axis will letterbox
+        const uniformScale = Math.min(W / viewBox.width, H / viewBox.height);
+
         const scale = Math.min(
-            (W - padding * 2) / bbox.width,
-            (H - padding * 2) / bbox.height,
+            W / (bbox.width * uniformScale),
+            H / (bbox.height * uniformScale),
             8,
         );
-        const tx = W / 2 - scale * (bbox.x + bbox.width / 2);
-        const ty = H / 2 - scale * (bbox.y + bbox.height / 2);
+
+        const transform = d3.zoomIdentity
+            .translate(viewBox.width / 2, viewBox.height / 2)
+            .scale(Math.min(8, scale))
+            .translate(-(bbox.x + bbox.width / 2), -(bbox.y + bbox.height / 2));
 
         this.svg
             .transition()
             .duration(400)
-            .call(
-                this.zoom!.transform,
-                d3.zoomIdentity.translate(tx, ty).scale(scale),
-            );
-    }
+            .call(this.zoom!.transform, transform);
 
-    private clearState() {
-        this.nodeGroupMap.clear();
-        this.edgeGroupMap.clear();
-        this.clusterGroupMap.clear();
-        this.nodeEdgeMap.clear();
-        this.selectedNodes.clear();
-        this.selectedEdges.clear();
+        setTimeout(() => {
+            console.log(
+                "applied transform:",
+                d3.zoomTransform(this.svg!.node()!),
+            );
+        }, 800);
     }
 
     // ── Event Emitter ───────────────────────────────────────────────────────────
