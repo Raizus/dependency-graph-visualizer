@@ -513,6 +513,18 @@ namespace OtherActionItems {
         },
     };
 
+    export const ZOOM_TO_SELECTION: MenuItem<BaseMenuContextI> = {
+        id: "Zoom To Selection",
+        label: "Zoom to selection",
+        type: "action",
+        action: (context: BaseMenuContextI) => {
+            const selection = get(context.state_store.selected_nodes);
+            const renderer = get(context.state_store.renderer);
+            renderer?.fitToNodes(selection);
+        },
+    };
+
+
     export const RELAYOUT: MenuItem<BackgroundMenuContextI> = {
         id: "Relayout",
         label: "Relayout",
@@ -724,6 +736,7 @@ export const background_menu: MenuItem<BackgroundMenuContextI>[] = [
     },
     separator("Background Menu Separator 3"),
     OtherActionItems.HOME,
+    OtherActionItems.ZOOM_TO_SELECTION,
     OtherActionItems.RELAYOUT,
 ];
 
