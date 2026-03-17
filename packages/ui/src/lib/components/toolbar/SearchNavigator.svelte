@@ -1,6 +1,7 @@
 <script lang="ts">
     import { getContext } from "svelte";
     import type { StateStore } from "../../StateStore";
+    import { get } from "svelte/store";
 
     // Define the props
     export let placeholder: string = "Search nodes...";
@@ -25,6 +26,8 @@
     // set selection to current node
     $: if (current_node) {
         state_store.setSelectedNodes([current_node]);
+        const renderer = get(state_store.renderer);
+        renderer?.fitToNodes([current_node]);
     }
 
     // Reactive statement to filter results whenever search_query changes
