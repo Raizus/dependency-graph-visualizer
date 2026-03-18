@@ -14,8 +14,22 @@
     let current_idx: number = 0;
     let current_node: string | null = null;
     let filtered_results: string[] = [];
+    let is_focused: boolean = false;
+    let suggestion_highlighted_idx: number = -1;
+
+    interface Suggestion {
+        id: string;
+        label: string;
+    }
 
     const state_store = getContext<StateStore>("state_store");
+
+    // Top 10 suggestions derived from filtered results
+    $: suggestions = buildSuggestions(filtered_results);
+
+    // Show suggestion box only when focused and query is non-empty
+    $: show_suggestions =
+        is_focused && search_query.trim() !== "" && suggestions.length > 0;
 
     // update current item on current index update
     $: current_node =
@@ -34,6 +48,7 @@
     $: {
         filtered_results = state_store.searchFilteredGraphNodes(search_query);
         current_idx = filtered_results.length > 0 ? 0 : -1;
+        suggestion_highlighted_idx = -1;
     }
 
     // Call the callback whenever the current item changes
@@ -41,6 +56,25 @@
         if (current_node !== null && onCurrentItemChange) {
             onCurrentItemChange(current_node);
         }
+    }
+
+    function buildSuggestions(filter_results: string[]): Suggestion[] {
+        const suggestions: Suggestion[] = [];
+
+        const graph = get(state_store.filtered_clustered_graph);
+        if (!graph) return suggestions;
+
+        for (const node_id of filter_results) {
+            const node_label = graph?.getNodeAttribute(node_id, "label");
+            if (!node_label) continue;
+
+            suggestions.push({
+                id: node_id,
+                label: node_label,
+            });
+        }
+
+        return suggestions;
     }
 
     // Navigation functions
@@ -59,8 +93,46 @@
         }
     }
 
+    function selectSuggestion(suggestion: Suggestion): void {
+        const idx = filtered_results.indexOf(suggestion.id);
+        if (idx !== -1) {
+            current_idx = idx;
+            search_query = suggestion.label;
+        }
+        is_focused = false;
+    }
+
     // Handle keyboard navigation
     function handleKeydown(event: KeyboardEvent): void {
+        if (show_suggestions) {
+            if (event.key === "ArrowDown") {
+                suggestion_highlighted_idx = Math.min(
+                    suggestion_highlighted_idx + 1,
+                    suggestions.length - 1,
+                );
+                event.preventDefault();
+                return;
+            }
+            if (event.key === "ArrowUp") {
+                suggestion_highlighted_idx = Math.max(
+                    suggestion_highlighted_idx - 1,
+                    -1,
+                );
+                event.preventDefault();
+                return;
+            }
+            if (event.key === "Escape") {
+                is_focused = false;
+                event.preventDefault();
+                return;
+            }
+            if (event.key === "Enter" && suggestion_highlighted_idx >= 0) {
+                selectSuggestion(suggestions[suggestion_highlighted_idx]);
+                event.preventDefault();
+                return;
+            }
+        }
+
         if (event.key === "Enter") {
             if (event.shiftKey) {
                 navigatePrevious();
@@ -70,14 +142,27 @@
             event.preventDefault();
         }
     }
+
+    function handleFocus(): void {
+        is_focused = true;
+    }
+
+    function handleBlur(): void {
+        // Delay so click on suggestion registers before hiding
+        setTimeout(() => {
+            is_focused = false;
+        }, 150);
+    }
 </script>
 
 <div class="search-container">
-    <div class="search-bar">
+    <div class="search-bar" class:focused={is_focused}>
         <input
             type="text"
             bind:value={search_query}
             on:keydown={handleKeydown}
+            on:focus={handleFocus}
+            on:blur={handleBlur}
             {placeholder}
             class="search-input"
         />
@@ -156,6 +241,36 @@
             </button>
         </div>
     </div>
+
+    {#if show_suggestions}
+        <ul
+            class="suggestions-box"
+            role="listbox"
+            aria-label="Search suggestions"
+        >
+            {#each suggestions as suggestion, i}
+                <li
+                    class="suggestion-item"
+                    class:highlighted={i === suggestion_highlighted_idx}
+                    class:active={suggestion.id === current_node}
+                    role="option"
+                    aria-selected={suggestion.id === current_node}
+                    on:mousedown|preventDefault={() =>
+                        selectSuggestion(suggestion)}
+                    on:mouseover={() => (suggestion_highlighted_idx = i)}
+                    on:focus={() => (suggestion_highlighted_idx = i)}
+                >
+                    <span class="suggestion-label">{suggestion.label}</span>
+                </li>
+            {/each}
+
+            {#if filtered_results.length > 10}
+                <li class="suggestions-overflow">
+                    +{filtered_results.length - 10} more — keep typing to narrow down
+                </li>
+            {/if}
+        </ul>
+    {/if}
 </div>
 
 <style lang="scss">
@@ -165,8 +280,10 @@
             -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
             Ubuntu, Cantarell, sans-serif;
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        align-items: stretch;
         background: var(--button-bg-color);
+        position: relative;
     }
 
     .search-bar {
@@ -178,7 +295,7 @@
         border-radius: 8px;
         transition: border-color 0.2s;
 
-        &:focus-within {
+        &.focused {
             border-color: var(--border-highlight-color);
         }
     }
@@ -239,5 +356,57 @@
             opacity: 0.3;
             cursor: not-allowed;
         }
+    }
+
+    /* Suggestion box */
+    .suggestions-box {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        margin: 0;
+        padding: 4px 0;
+        list-style: none;
+        background: var(--button-bg-color, #fff);
+        border: 1px solid black;
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        z-index: 100;
+        overflow: hidden;
+    }
+
+    .suggestion-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.1s;
+
+        &.highlighted {
+            background: var(--option-hover-color);
+        }
+
+        &.active {
+            color: var(--border-highlight-color, #131313);
+            font-weight: 600;
+        }
+    }
+
+    .suggestion-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .suggestions-overflow {
+        padding: 5px 12px;
+        font-size: 12px;
+        color: #999;
+        border-top: 1px solid #eee;
+        text-align: center;
+        font-style: italic;
+        cursor: default;
     }
 </style>
