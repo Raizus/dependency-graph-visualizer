@@ -61,7 +61,6 @@ namespace NodeFilterActionItems {
         label: "This",
         type: "action",
         action: (context: NodeMenuContextI) => {
-            console.log("Remove this");
             filter_node_action(context.state_store, context.node, false);
         },
     };
@@ -72,7 +71,6 @@ namespace NodeFilterActionItems {
         type: "action",
         action: (context: NodeMenuContextI) => {
             filter_sources_action(context.state_store, context.node, false);
-            console.log("Remove sources");
         },
     };
 
@@ -82,7 +80,6 @@ namespace NodeFilterActionItems {
         type: "action",
         action: (context: NodeMenuContextI) => {
             filter_targets_action(context.state_store, context.node, false);
-            console.log("Remove targets");
         },
     };
 
@@ -92,7 +89,6 @@ namespace NodeFilterActionItems {
         type: "action",
         action: (context: NodeMenuContextI) => {
             filter_siblings_action(context.state_store, context.node, false);
-            console.log("Remove siblings");
         },
     };
 
@@ -136,48 +132,44 @@ namespace NodeFilterActionItems {
         };
 
     export const SHOW_NODE: MenuAction<NodeMenuContextI> = {
-        id: "Show This",
+        id: "Show This Node",
         label: "This",
         type: "action",
         action: (context: NodeMenuContextI) => {
             filter_node_action(context.state_store, context.node, true);
-            console.log("Show this");
         },
     };
 
     export const SHOW_SOURCES: MenuAction<NodeMenuContextI> = {
-        id: "Show Sources",
+        id: "Show Sources Of Node",
         label: "Sources",
         type: "action",
         action: (context: NodeMenuContextI) => {
             filter_sources_action(context.state_store, context.node, true);
-            console.log("Show sources");
         },
     };
 
     export const SHOW_TARGETS: MenuAction<NodeMenuContextI> = {
-        id: "Show Targets",
+        id: "Show Targets Of Node",
         label: "Targets",
         type: "action",
         action: (context: NodeMenuContextI) => {
             filter_targets_action(context.state_store, context.node, true);
-            console.log("Show targets");
         },
     };
 
     export const SHOW_SIBLINGS: MenuAction<NodeMenuContextI> = {
-        id: "Show Siblings",
+        id: "Show Siblings Of Node",
         label: "Siblings",
         type: "action",
         action: (context: NodeMenuContextI) => {
             filter_siblings_action(context.state_store, context.node, true);
-            console.log("Show siblings");
         },
     };
 
     export const SHOW_REACHABLES: MenuAction<NodeMenuContextI> = {
-        id: "Show Reachables",
-        label: "Reachables",
+        id: "Show Reachable Targets of Node",
+        label: "Reachable Targets",
         type: "action",
         action: (context: NodeMenuContextI) => {
             filter_reachables_of_node_action(
@@ -185,7 +177,6 @@ namespace NodeFilterActionItems {
                 context.node,
                 true,
             );
-            console.log("Show reachable nodes");
         },
     };
 }
@@ -197,7 +188,6 @@ namespace FilterSelectionActionItems {
         type: "action",
         action: (context: BaseMenuContextI) => {
             filter_selection_action(context.state_store, false);
-            console.log("Remove selected");
         },
     };
 
@@ -207,7 +197,6 @@ namespace FilterSelectionActionItems {
         type: "action",
         action: (context: BaseMenuContextI) => {
             filter_all_but_selected_action(context.state_store, false);
-            console.log("Remove All but selected");
         },
     };
 
@@ -221,7 +210,6 @@ namespace FilterSelectionActionItems {
                     context.state_store,
                     false,
                 );
-                console.log("Remove reachables of selection");
             },
         };
 
@@ -231,7 +219,6 @@ namespace FilterSelectionActionItems {
         type: "action",
         action: (context: BaseMenuContextI) => {
             filter_reaching_of_selection_action(context.state_store, false);
-            console.log("Remove reaching sources of selection");
         },
     };
 
@@ -241,7 +228,6 @@ namespace FilterSelectionActionItems {
         type: "action",
         action: (context: BaseMenuContextI) => {
             filter_selection_action(context.state_store, true);
-            console.log("Show selected");
         },
     };
 
@@ -251,17 +237,15 @@ namespace FilterSelectionActionItems {
         type: "action",
         action: (context: BaseMenuContextI) => {
             filter_all_but_selected_action(context.state_store, true);
-            console.log("Show All but selected");
         },
     };
 
     export const SHOW_REACHABLES_OF_SELECTION: MenuAction<BaseMenuContextI> = {
-        id: "Show Reachables of Selection",
-        label: "Reachable of selection",
+        id: "Show Reachable Targets of Selection",
+        label: "Reachable targets of selection",
         type: "action",
         action: (context: BaseMenuContextI) => {
             filter_reachables_of_selection_action(context.state_store, true);
-            console.log("Show reachable nodes of selection");
         },
     };
 
@@ -271,49 +255,43 @@ namespace FilterSelectionActionItems {
         type: "action",
         action: (context: BaseMenuContextI) => {
             filter_reaching_of_selection_action(context.state_store, true);
-            console.log("Show reaching sources of selection");
         },
     };
 }
 
 namespace SelectionActionItems {
     export const SELECT_THIS: MenuAction<NodeMenuContextI> = {
-        id: "Select This",
+        id: "Select This Node",
         label: "This",
         type: "action",
         action: (context: NodeMenuContextI) => {
-            // set selection action
-            console.log("Select this");
             set_selection_to_this_node(context.node, context.state_store);
         },
     };
 
     export const SELECT_SOURCES: MenuAction<NodeMenuContextI> = {
-        id: "Select Sources",
+        id: "Select Sources Of Node",
         label: "Sources",
         type: "action",
         action: (context: NodeMenuContextI) => {
-            console.log("Select sources");
             set_selection_to_sources_of_node(context.node, context.state_store);
         },
     };
 
     export const SELECT_TARGETS: MenuAction<NodeMenuContextI> = {
-        id: "Select Targets",
+        id: "Select Targets Of Node",
         label: "Targets",
         type: "action",
         action: (context: NodeMenuContextI) => {
-            console.log("Select targets");
             set_selection_to_targets_of_node(context.node, context.state_store);
         },
     };
 
     export const SELECT_NEIGHBORS: MenuAction<NodeMenuContextI> = {
-        id: "Select Neighbours",
+        id: "Select Neighbours Of Node",
         label: "Neighbours",
         type: "action",
         action: (context: NodeMenuContextI) => {
-            console.log("Select neighbours");
             set_selection_to_neighbours_of_node(
                 context.node,
                 context.state_store,
@@ -322,7 +300,7 @@ namespace SelectionActionItems {
     };
 
     export const SELECT_SIBLINGS: MenuAction<NodeMenuContextI> = {
-        id: "Select Siblings",
+        id: "Select Siblings Of Node",
         label: "Siblings",
         type: "action",
         action: (context: NodeMenuContextI) => {
@@ -335,11 +313,10 @@ namespace SelectionActionItems {
     };
 
     export const SELECT_REACHABLES: MenuAction<NodeMenuContextI> = {
-        id: "Select Reachables",
+        id: "Select Reachable Targets Of Node",
         label: "Reachables",
         type: "action",
         action: (context: NodeMenuContextI) => {
-            console.log("Select reachables of node");
             set_selection_to_reachables_of_node(
                 context.node,
                 context.state_store,
@@ -347,23 +324,20 @@ namespace SelectionActionItems {
         },
     };
 
-    export const SELECT_REACHABLES_OF_SELECTION: MenuAction<NodeMenuContextI> =
-        {
-            id: "Select Reachables Of Selection",
-            label: "Reachables of selection",
-            type: "action",
-            action: (context: NodeMenuContextI) => {
-                console.log("Sekects reachables of selection");
-                set_selection_to_reachables_of_selection(context.state_store);
-            },
-        };
+    export const SELECT_REACHABLES_OF_SELECTION: MenuAction<BaseMenuContextI> = {
+        id: "Select Reachable Targets Of Selection",
+        label: "Reachable targets of selection",
+        type: "action",
+        action: (context: BaseMenuContextI) => {
+            set_selection_to_reachables_of_selection(context.state_store);
+        },
+    };
 
     export const SELECT_REACHING_SOURCES: MenuAction<NodeMenuContextI> = {
-        id: "Select Reaching Sources",
+        id: "Select Reaching Sources Of Node",
         label: "Reaching sources",
         type: "action",
         action: (context: NodeMenuContextI) => {
-            console.log("Select reaching sources of node");
             set_selection_to_reaching_of_node(
                 context.node,
                 context.state_store,
@@ -377,18 +351,16 @@ namespace SelectionActionItems {
             label: "Reaching sources of selection",
             type: "action",
             action: (context: NodeMenuContextI) => {
-                console.log("Select reaching sources of selection");
                 set_selection_to_reaching_of_selection(context.state_store);
             },
         };
 
     export const SELECT_INTERSECTION_OF_REACHING_AND_REACHABLES: MenuAction<NodeMenuContextI> =
         {
-            id: "Select Reaching And Reachables",
-            label: "Reaching and Reachables",
+            id: "Select Intersection Of Reaching And Reachables",
+            label: "Intersection Of reaching and reachables",
             type: "action",
             action: (context: NodeMenuContextI) => {
-                console.log("Select Intersection of reaching and reachables");
                 set_selection_to_intersection_of_reaching_reachables(
                     context.node,
                     context.state_store,
@@ -401,7 +373,6 @@ namespace SelectionActionItems {
         label: "Select cluster nodes",
         type: "action",
         action: (context: ClusterBoxMenuContextI) => {
-            console.log("Select cluster nodes");
             set_selection_to_nodes_of_cluster_action(
                 context.state_store,
                 context.cluster_id,
@@ -490,7 +461,6 @@ namespace FoldUnfoldClusterActionItems {
         label: "Fold/Unfold this cluster",
         type: "action",
         action: (context: ClusterBoxMenuContextI) => {
-            console.log("Fold/Unfold this");
             const cluster_id = context.cluster_id;
             if (!cluster_id) return;
             context.state_store.foldOrUnfoldCluster(cluster_id);
@@ -503,7 +473,6 @@ namespace FoldUnfoldClusterActionItems {
             label: "Fold direct child clusters",
             type: "action",
             action: (context: ClusterBoxMenuContextI) => {
-                console.log("Fold direct child clusters");
                 const cluster_id = context.cluster_id;
                 if (!cluster_id) return;
                 context.state_store.foldDirectChildClusters(cluster_id);
@@ -516,7 +485,6 @@ namespace FoldUnfoldClusterActionItems {
             label: "Unfold direct child clusters",
             type: "action",
             action: (context: ClusterBoxMenuContextI) => {
-                console.log("Unfold direct child clusters");
                 const cluster_id = context.cluster_id;
                 if (!cluster_id) return;
                 context.state_store.unfoldDirectChildClusters(cluster_id);
@@ -646,7 +614,6 @@ function build_cluster_node_menu(
             label: "Fold/Unfold this",
             type: "action",
             action: (context: NodeMenuContextI) => {
-                console.log("Fold/Unfold this");
                 const node_id = context.node;
                 if (!node_id) return;
                 context.state_store.foldOrUnfoldCluster(node_id);
