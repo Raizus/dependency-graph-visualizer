@@ -43,7 +43,6 @@ export function loadStateJson(data: StateJSON): {
     view.clusters = new ClusterManager([...cluster_map.values()]);
     const view_map = new ViewMap();
     view_map.set(label, view);
-    // const views = data.views ? ViewMap.fromJSON(data.views) : newViewMap();
 
     return {
         graph,
@@ -424,8 +423,6 @@ export class StateStore {
 
         const success = views.rename(old_name, new_name);
         if (!success) return false;
-
-        console.log(old_name, new_name);
         this.setViews(views);
         const current_view_label = get(this._current_view_label);
         if (old_name !== current_view_label) return true;
