@@ -58,6 +58,9 @@
         filtered_results = state_store.searchFilteredGraphNodes(search_query);
         current_idx = filtered_results.length > 0 ? 0 : -1;
         suggestion_highlighted_idx = -1;
+    }
+
+    $: if(search_query) {
         is_focused = true;
     }
 
@@ -161,8 +164,9 @@
         }
     }
 
-    function handleFocus(): void {
+    function setFocus(): void {
         is_focused = true;
+        suggestion_highlighted_idx = -1;
     }
 
     function handleBlur(): void {
@@ -180,7 +184,7 @@
                 type="text"
                 bind:value={search_query}
                 on:keydown={handleKeydown}
-                on:focus={handleFocus}
+                on:focus={setFocus}
                 on:blur={handleBlur}
                 {placeholder}
                 class="search-input"
