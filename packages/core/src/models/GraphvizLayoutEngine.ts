@@ -11,6 +11,12 @@ import {
     SubgraphAttributesObject,
 } from "ts-graphviz";
 import { Graph, ClustersI, NodeAttributesI, LayoutI } from "./schema";
+import { buildNodeRankMap } from "./Graph";
+
+const DEFAULT_EDGE_COLOR = "#bfbfbf";
+const DEFAULT_EXPORT_EDGE_COLOR = "#000000";
+const DEFAULT_BG_COLOR = "none";
+const DEFAULT_EXPORT_BG_COLOR = "#ffffff";
 
 export interface LayoutPosition {
     x: number;
@@ -51,7 +57,7 @@ function clusterBoxStyle(): SubgraphAttributesObject {
     return {
         style: "rounded",
         color: "#3498db",
-        fontcolor: "#cecece"
+        fontcolor: "#cecece",
     };
 }
 
@@ -90,9 +96,9 @@ function baseNodeStyle(attrs: NodeAttributesI): NodeAttributesObject {
     };
 }
 
-function getEdgeStyle(): EdgeAttributesObject { 
+function getEdgeStyle(): EdgeAttributesObject {
     return {
-        color: "#bfbfbf",
+        color: DEFAULT_EDGE_COLOR,
     };
 }
 
@@ -102,9 +108,24 @@ interface GraphOptions {
     edgeAttrs?: EdgeAttributesObject;
 }
 
+function getExportGraphOptions(graph_options: GraphOptions): GraphOptions {
+    const export_options: GraphOptions = {
+        graphAttrs: {
+            ...graph_options.graphAttrs,
+            bgcolor: DEFAULT_EXPORT_BG_COLOR,
+        },
+        edgeAttrs: {
+            ...graph_options.edgeAttrs,
+            color: DEFAULT_EXPORT_EDGE_COLOR,
+        },
+    };
+
+    return export_options;
+}
+
 const DEFAULT_DOT_OPTIONS: GraphOptions = {
     graphAttrs: {
-        bgcolor: "none",
+        bgcolor: DEFAULT_BG_COLOR,
         layout: "dot",
         rankdir: "TB",
         ranksep: 1.0,
@@ -115,13 +136,13 @@ const DEFAULT_DOT_OPTIONS: GraphOptions = {
     },
 
     edgeAttrs: {
-        color: "#949494",
+        color: DEFAULT_EDGE_COLOR,
     },
-};
+} as const;
 
 const DEFAULT_FDP_OPTIONS: GraphOptions = {
     graphAttrs: {
-        bgcolor: "none",
+        bgcolor: DEFAULT_BG_COLOR,
         layout: "fdp",
         splines: "curved", // or 'polyline'; 'ortho' doesn't work well with fdp
         overlap: "prism", // or 'false' to remove node overlap (can be slow on large graphs)
@@ -132,13 +153,13 @@ const DEFAULT_FDP_OPTIONS: GraphOptions = {
     },
 
     edgeAttrs: {
-        color: "#949494",
+        color: DEFAULT_EDGE_COLOR,
     },
-};
+} as const;
 
 const DEFAULT_SFDP_OPTIONS: GraphOptions = {
     graphAttrs: {
-        bgcolor: "none",
+        bgcolor: DEFAULT_BG_COLOR,
         layout: "sfdp",
 
         // Graph-level
@@ -152,81 +173,28 @@ const DEFAULT_SFDP_OPTIONS: GraphOptions = {
     },
 
     edgeAttrs: {
-        color: "#949494",
+        color: DEFAULT_EDGE_COLOR,
     },
-};
+} as const;
 
 const DEFAULT_TWOPI_OPTIONS: GraphOptions = {
     graphAttrs: {
-        bgcolor: "none",
+        bgcolor: DEFAULT_BG_COLOR,
         layout: "twopi",
 
         // Graph-level
-        splines: "curved",
+        splines: "line",
         overlap: "false", // twopi often needs this since rings can get crowded
         sep: "+8",
         ranksep: 2.0, // distance between concentric rings — main tuning knob
         root: "1", // which node to place at the center (defaults to arbitrary if omitted)
+        normalize: true,
     },
 
     edgeAttrs: {
-        color: "#949494",
+        color: DEFAULT_EDGE_COLOR,
     },
-};
-
-const DEFAULT_EXPORT_DOT_OPTIONS: GraphOptions = {
-    graphAttrs: {
-        bgcolor: "#ffffff",
-        layout: "dot",
-        rankdir: "TB",
-        ranksep: 1.0,
-        nodesep: 0.5,
-        splines: "spline",
-        newrank: true,
-        compound: true,
-    },
-
-    edgeAttrs: {
-        color: "#000000",
-    },
-};
-
-const DEFAULT_EXPORT_FDP_OPTIONS: GraphOptions = {
-    graphAttrs: {
-        bgcolor: "white",
-        layout: "fdp",
-        splines: "curved", // or 'polyline'; 'ortho' doesn't work well with fdp
-        overlap: "prism", // or 'false' to remove node overlap (can be slow on large graphs)
-        sep: "+8", // extra space between nodes after overlap removal
-        K: 0.6, // ideal edge length (spring constant) — lower = tighter
-        maxiter: 1000, // max iterations for layout
-        start: "", // or a seed number like 3 for reproducible layouts
-    },
-
-    edgeAttrs: {
-        color: "#000000",
-    },
-};
-
-const DEFAULT_EXPORT_SFDP_OPTIONS: GraphOptions = {
-    graphAttrs: {
-        bgcolor: "white",
-        layout: "sfdp",
-
-        // Graph-level
-        splines: "curved",
-        overlap: "prism", // sfdp has its own overlap handling, prism cleans it up after
-        sep: "+8",
-        K: 0.6, // spring constant, same as fdp
-        repulsiveforce: 1.0, // increase to push nodes apart more (default is 1.0)
-        smoothing: "triangle", // improves layout quality: 'none' | 'avg_dist' | 'graph_dist' | 'power_dist' | 'rng' | 'spring' | 'triangle'
-        maxiter: 200,
-    },
-
-    edgeAttrs: {
-        color: "#000000",
-    },
-};
+} as const;
 
 export function layoutToDotOptions(layout: LayoutI) {
     if (layout.type === "fdp") return DEFAULT_FDP_OPTIONS;
@@ -236,9 +204,7 @@ export function layoutToDotOptions(layout: LayoutI) {
 }
 
 export function layoutToExportDotOptions(layout: LayoutI) {
-    if (layout.type === "fdp") return DEFAULT_EXPORT_FDP_OPTIONS;
-    if (layout.type === "sfdp") return DEFAULT_EXPORT_SFDP_OPTIONS;    
-    return DEFAULT_EXPORT_DOT_OPTIONS;
+    return getExportGraphOptions(layoutToDotOptions(layout));
 }
 
 /**
@@ -271,10 +237,11 @@ class GraphvizGraphModelBuilder {
                 return g;
             }
             case "twopi": {
-                const g = GraphvizGraphModelBuilder.buildFdpLayoutGraphModel(
+                const g = GraphvizGraphModelBuilder.buildDotLayoutGraphModel(
                     graph,
                     clusters,
                     options,
+                    true,
                 );
                 return g;
             }
@@ -294,47 +261,41 @@ class GraphvizGraphModelBuilder {
         graph: Graph,
         clusters: ClustersI,
         options: GraphOptions,
+        rank_nodes: boolean = false,
     ) {
         // Create main digraph
-        const g = digraph(
-            "G",
-            { ...options.graphAttrs },
-            (g) => {
-                if (options.edgeAttrs) g.edge(options.edgeAttrs);
+        const g = digraph("G", { ...options.graphAttrs }, (g) => {
+            if (options.edgeAttrs) g.edge(options.edgeAttrs);
 
-                // Build cluster hierarchy
-                GraphvizGraphModelBuilder.addClustersToGraph(
-                    g,
-                    clusters,
-                    graph,
-                    undefined,
-                    false,
-                );
+            // Build cluster hierarchy
+            GraphvizGraphModelBuilder.addClustersToGraph(
+                g,
+                clusters,
+                graph,
+                undefined,
+                false,
+            );
 
-                // Add nodes that aren't in any cluster
-                GraphvizGraphModelBuilder.addUnclusteredNodes(
-                    g,
-                    graph,
-                    clusters,
-                );
+            // Add nodes that aren't in any cluster
+            GraphvizGraphModelBuilder.addUnclusteredNodes(g, graph, clusters);
 
-                // Add edges
-                GraphvizGraphModelBuilder.addEdgesToGraph(g, graph, clusters);
+            // Add edges
+            GraphvizGraphModelBuilder.addEdgesToGraph(g, graph, clusters);
 
-                // set node graph ranks
-                // rank graph nodes
-                // const rank_to_nodes = buildNodeRankMap(graph);
-                // for (const [rank, nodes] of rank_to_nodes.entries()) {
-                //     if (nodes.length <= 1) continue;
+            if (!rank_nodes) return;
 
-                //     g.subgraph({ rank: "same" }, (s) => {
-                //         for (const node of nodes) {
-                //             s.node(node);
-                //         }
-                //     });
-                // }
-            },
-        );
+            // rank graph nodes
+            const rank_to_nodes = buildNodeRankMap(graph);
+            for (const [rank, nodes] of rank_to_nodes.entries()) {
+                if (nodes.length <= 1) continue;
+
+                g.subgraph({ rank: "same" }, (s) => {
+                    for (const node of nodes) {
+                        s.node(node);
+                    }
+                });
+            }
+        });
 
         return g;
     }
