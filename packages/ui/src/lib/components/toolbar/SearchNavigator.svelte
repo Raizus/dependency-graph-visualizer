@@ -16,6 +16,7 @@
     let filtered_results: string[] = [];
     let is_focused: boolean = false;
     let suggestion_highlighted_idx: number = -1;
+    const MAX_SUGGESTIONS: number | null = null;
 
     interface Suggestion {
         id: string;
@@ -73,7 +74,7 @@
         const graph = get(state_store.filtered_clustered_graph);
         if (!graph) return suggestions;
 
-        for (const node_id of filter_results.slice(0, 10)) {
+        for (const node_id of filter_results) {
             const node_label = graph?.getNodeAttribute(node_id, "label");
             if (!node_label) continue;
 
@@ -81,6 +82,10 @@
                 id: node_id,
                 label: node_label,
             });
+
+            if (MAX_SUGGESTIONS !== null && suggestions.length >= MAX_SUGGESTIONS) {
+                break;
+            }
         }
 
         return suggestions;
