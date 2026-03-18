@@ -3,31 +3,16 @@
     import type { StateStore } from "./StateStore";
     import type { GraphRenderer } from "./visualizer/GraphRenderer";
     import {
-        background_menu,
-        build_node_click_context_menu,
-        cluster_box_click_context_menu,
-        type MenuContextI,
-    } from "./components/ContextMenu/GraphCanvasContextMenu";
-    import ContextMenu from "./components/ContextMenu/ContextMenu.svelte";
-    import { filter_and_selection_menu } from "./components/ContextMenu/GraphCanvasContextMenu";
-    import type { MenuItem } from "./components/ContextMenu/ContextMenu";
-    import {
         layoutToDotOptions,
         type Graph,
         type ViewI,
     } from "@dep-graph-vis/core";
     import { D3GraphRenderer } from "./visualizer/D3GraphRenderer";
+    import ContextMenuBuilder from "./components/ContextMenu/ContextMenuBuilder.svelte";
 
     export let state_store: StateStore;
-    let renderer: GraphRenderer;
+    let renderer: GraphRenderer = new D3GraphRenderer();
     let container: HTMLElement;
-
-    let context_menu_items: MenuItem<any>[] = filter_and_selection_menu;
-    let selected_node_id: string | null = null;
-    let menu_context: MenuContextI = {
-        state_store,
-        node: null,
-    };
 
     let { current_view, selected_nodes, filtered_clustered_graph } = state_store;
 
@@ -48,7 +33,6 @@
             return;
         }
 
-        renderer = new D3GraphRenderer();
         renderer.initialize(container);
         state_store.setRenderer(renderer);
 
@@ -58,62 +42,16 @@
         }
 
         // Set up renderer events
-
         // Listen for selection changes from the renderer
         renderer.on("selectionChanged", (event) => {
             const nodes = event.nodes;
             state_store.setSelectedNodes(nodes);
         });
 
-        // Handle right-click on node
-        renderer.on("nodeRightClick", (event) => {
-            console.log("Node right-clicked:", event.nodeId);
-            // event.event.preventDefault();
-            selected_node_id = event.nodeId;
-            context_menu_items = filter_and_selection_menu;
-            menu_context = {
-                state_store,
-                node: event.nodeId,
-            };
-
-            // // Get node details from graph
-            const node_attr = $filtered_clustered_graph?.getNodeAttributes(event.nodeId);
-            if (!node_attr) return;
-
-            context_menu_items = build_node_click_context_menu(node_attr, []);
-        });
-
         // handle background click
         renderer.on("backgroundClick", (event) => {
             // Clear selection on regular click
             state_store.setSelectedNodes([]);
-        });
-
-        // Handle background right-click
-        renderer.on("backgroundRightClick", (event) => {
-            // Check if it was a right-click
-            if ((event.event as any).button !== 2) return;
-
-            event.event.preventDefault();
-            context_menu_items = background_menu;
-
-            menu_context = {
-                state_store,
-                renderer,
-            };
-        });
-
-        // Handle cluster box right-click
-        renderer.on("clusterBoxRightClick", (event) => {
-            console.log("Cluster box right-clicked:", event.clusterId);
-            event.event.preventDefault();
-            context_menu_items = cluster_box_click_context_menu();
-
-            menu_context = {
-                state_store,
-                renderer,
-                cluster_id: event.clusterId,
-            };
         });
 
         // Prevent default context menu on the container
@@ -127,6 +65,7 @@
             renderer.destroy();
             state_store.setRenderer(null); 
         }
+        
         container.removeEventListener("contextmenu", (e) => {
             e.preventDefault();
         });
@@ -145,7 +84,7 @@
 <div class="graph-viewer-container">
     <div class="graph-canvas" bind:this={container}></div>
 
-    <ContextMenu items={context_menu_items} context={menu_context} />
+    <ContextMenuBuilder {state_store} {renderer} />
 </div>
 
 <style>
