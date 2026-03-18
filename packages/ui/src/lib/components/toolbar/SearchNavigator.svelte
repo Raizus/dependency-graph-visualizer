@@ -284,9 +284,9 @@
                 </li>
             {/each}
 
-            {#if filtered_results.length > 10}
+            {#if MAX_SUGGESTIONS !== null && filtered_results.length > MAX_SUGGESTIONS}
                 <li class="suggestions-overflow">
-                    +{filtered_results.length - 10} more — keep typing to narrow down
+                    +{filtered_results.length - MAX_SUGGESTIONS} more — keep typing to narrow down
                 </li>
             {/if}
         </ul>
