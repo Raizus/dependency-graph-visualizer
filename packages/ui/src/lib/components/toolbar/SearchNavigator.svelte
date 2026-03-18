@@ -27,9 +27,16 @@
     // Top 10 suggestions derived from filtered results
     $: suggestions = buildSuggestions(filtered_results);
 
-    // Show suggestion box only when focused and query is non-empty
+    // Show suggestion box only when focused and query is non-empty,
+    // and either there are multiple suggestions, or the single suggestion
+    // label doesn't exactly match the current query.
     $: show_suggestions =
-        is_focused && search_query.trim() !== "" && suggestions.length > 0;
+        is_focused &&
+        search_query.trim() !== "" &&
+        suggestions.length > 0 &&
+        (suggestions.length > 1 ||
+            suggestions[0].label.toLowerCase() !==
+                search_query.trim().toLowerCase());
 
     // update current item on current index update
     $: current_node =
@@ -44,11 +51,13 @@
         renderer?.fitToNodes([current_node]);
     }
 
-    // Reactive statement to filter results whenever search_query changes
+    // Reactive statement to filter results whenever search_query changes.
+    // Also re-focuses the suggestion box so it reappears after a selection.
     $: {
         filtered_results = state_store.searchFilteredGraphNodes(search_query);
         current_idx = filtered_results.length > 0 ? 0 : -1;
         suggestion_highlighted_idx = -1;
+        is_focused = true;
     }
 
     // Call the callback whenever the current item changes
@@ -64,7 +73,7 @@
         const graph = get(state_store.filtered_clustered_graph);
         if (!graph) return suggestions;
 
-        for (const node_id of filter_results) {
+        for (const node_id of filter_results.slice(0, 10)) {
             const node_label = graph?.getNodeAttribute(node_id, "label");
             if (!node_label) continue;
 
@@ -97,9 +106,13 @@
         const idx = filtered_results.indexOf(suggestion.id);
         if (idx !== -1) {
             current_idx = idx;
-            search_query = suggestion.label;
         }
-        is_focused = false;
+        // Setting search_query triggers the reactive block that sets
+        // is_focused = true. Schedule closing after that flush completes.
+        search_query = suggestion.label;
+        setTimeout(() => {
+            is_focused = false;
+        }, 0);
     }
 
     // Handle keyboard navigation
@@ -155,90 +168,92 @@
     }
 </script>
 
-<div class="search-container">
-    <div class="search-bar" class:focused={is_focused}>
-        <input
-            type="text"
-            bind:value={search_query}
-            on:keydown={handleKeydown}
-            on:focus={handleFocus}
-            on:blur={handleBlur}
-            {placeholder}
-            class="search-input"
-        />
+<div class="search-wrapper">
+    <div class="search-container">
+        <div class="search-bar" class:focused={is_focused}>
+            <input
+                type="text"
+                bind:value={search_query}
+                on:keydown={handleKeydown}
+                on:focus={handleFocus}
+                on:blur={handleBlur}
+                {placeholder}
+                class="search-input"
+            />
 
-        <div class="search-controls">
-            <span class="result-counter">
-                {#if search_query.trim() === "" || filtered_results.length === 0}
-                    No results
-                {:else}
-                    {current_idx + 1} of {filtered_results.length}
-                {/if}
-            </span>
+            <div class="search-controls">
+                <span class="result-counter">
+                    {#if search_query.trim() === "" || filtered_results.length === 0}
+                        No results
+                    {:else}
+                        {current_idx + 1} of {filtered_results.length}
+                    {/if}
+                </span>
 
-            <button
-                class="nav-button"
-                on:click={navigatePrevious}
-                disabled={filtered_results.length === 0}
-                aria-label="Previous result"
-                title="Previous (Shift + Enter)"
-            >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path
-                        d="M8 12L4 8L8 4"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    />
-                    <path
-                        d="M8 8L12 4"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    />
-                    <path
-                        d="M8 8L12 12"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    />
-                </svg>
-            </button>
+                <button
+                    class="nav-button"
+                    on:click={navigatePrevious}
+                    disabled={filtered_results.length === 0}
+                    aria-label="Previous result"
+                    title="Previous (Shift + Enter)"
+                >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path
+                            d="M8 12L4 8L8 4"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M8 8L12 4"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M8 8L12 12"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </button>
 
-            <button
-                class="nav-button"
-                on:click={navigateNext}
-                disabled={filtered_results.length === 0}
-                aria-label="Next result"
-                title="Next (Enter)"
-            >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path
-                        d="M8 4L12 8L8 12"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    />
-                    <path
-                        d="M8 8L4 12"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    />
-                    <path
-                        d="M8 8L4 4"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    />
-                </svg>
-            </button>
+                <button
+                    class="nav-button"
+                    on:click={navigateNext}
+                    disabled={filtered_results.length === 0}
+                    aria-label="Next result"
+                    title="Next (Enter)"
+                >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path
+                            d="M8 4L12 8L8 12"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M8 8L4 12"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M8 8L4 4"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -274,16 +289,19 @@
 </div>
 
 <style lang="scss">
-    .search-container {
-        max-width: 600px;
+    .search-wrapper {
         font-family:
             -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
             Ubuntu, Cantarell, sans-serif;
         display: flex;
         flex-direction: column;
         align-items: stretch;
-        background: var(--button-bg-color);
         position: relative;
+    }
+
+    .search-container {
+        max-width: 600px;
+        
     }
 
     .search-bar {
@@ -293,6 +311,7 @@
         padding: 4px 8px;
         border: 2px solid #131313;
         border-radius: 8px;
+        background: var(--button-bg-color);
         transition: border-color 0.2s;
 
         &.focused {
@@ -372,7 +391,8 @@
         border-radius: 8px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         z-index: 100;
-        overflow: hidden;
+        max-height: 280px;
+        overflow-y: auto;
     }
 
     .suggestion-item {
@@ -408,5 +428,9 @@
         text-align: center;
         font-style: italic;
         cursor: default;
+        /* Stick to the bottom while scrolling */
+        position: sticky;
+        bottom: 0;
+        background: var(--button-bg-color, #fff);
     }
 </style>
