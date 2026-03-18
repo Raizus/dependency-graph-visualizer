@@ -9,6 +9,7 @@ import {
     filter_node_action,
     filter_reachables_of_node_action,
     filter_reachables_of_selection_action,
+    filter_reaching_of_selection_action,
     filter_selection_action,
     filter_siblings_action,
     filter_sources_action,
@@ -200,22 +201,22 @@ namespace FilterSelectionActionItems {
         },
     };
 
-    export const REMOVE_ALL_BUT_SELECTED: MenuAction<NodeMenuContextI> = {
+    export const REMOVE_ALL_BUT_SELECTED: MenuAction<BaseMenuContextI> = {
         id: "Remove All But Selected",
         label: "All but selected",
         type: "action",
-        action: (context: NodeMenuContextI) => {
+        action: (context: BaseMenuContextI) => {
             filter_all_but_selected_action(context.state_store, false);
             console.log("Remove All but selected");
         },
     };
 
-    export const REMOVE_REACHABLES_OF_SELECTION: MenuAction<NodeMenuContextI> =
+    export const REMOVE_REACHABLES_OF_SELECTION: MenuAction<BaseMenuContextI> =
         {
             id: "Remove Reachable Targets Of Selection",
             label: "Reachable Targets Of Selection",
             type: "action",
-            action: (context: NodeMenuContextI) => {
+            action: (context: BaseMenuContextI) => {
                 filter_reachables_of_selection_action(
                     context.state_store,
                     false,
@@ -224,33 +225,53 @@ namespace FilterSelectionActionItems {
             },
         };
 
-    export const SHOW_SELECTED: MenuAction<NodeMenuContextI> = {
+    export const REMOVE_REACHING_OF_SELECTION: MenuAction<BaseMenuContextI> = {
+        id: "Remove Reaching Sources Of Selection",
+        label: "Reaching sources of selection",
+        type: "action",
+        action: (context: BaseMenuContextI) => {
+            filter_reaching_of_selection_action(context.state_store, false);
+            console.log("Remove reaching sources of selection");
+        },
+    };
+
+    export const SHOW_SELECTED: MenuAction<BaseMenuContextI> = {
         id: "Show Selected",
         label: "Selected",
         type: "action",
-        action: (context: NodeMenuContextI) => {
+        action: (context: BaseMenuContextI) => {
             filter_selection_action(context.state_store, true);
             console.log("Show selected");
         },
     };
 
-    export const SHOW_ALL_BUT_SELECTED: MenuAction<NodeMenuContextI> = {
+    export const SHOW_ALL_BUT_SELECTED: MenuAction<BaseMenuContextI> = {
         id: "Show All But Selected",
         label: "All but selected",
         type: "action",
-        action: (context: NodeMenuContextI) => {
+        action: (context: BaseMenuContextI) => {
             filter_all_but_selected_action(context.state_store, true);
             console.log("Show All but selected");
         },
     };
 
-    export const SHOW_REACHABLES_OF_SELECTION: MenuAction<NodeMenuContextI> = {
+    export const SHOW_REACHABLES_OF_SELECTION: MenuAction<BaseMenuContextI> = {
         id: "Show Reachables of Selection",
         label: "Reachable of selection",
         type: "action",
-        action: (context: NodeMenuContextI) => {
+        action: (context: BaseMenuContextI) => {
             filter_reachables_of_selection_action(context.state_store, true);
             console.log("Show reachable nodes of selection");
+        },
+    };
+
+    export const SHOW_REACHING_OF_SELECTION: MenuAction<BaseMenuContextI> = {
+        id: "Show Reaching Sources Of Selection",
+        label: "Reaching sources of selection",
+        type: "action",
+        action: (context: BaseMenuContextI) => {
+            filter_reaching_of_selection_action(context.state_store, true);
+            console.log("Show reaching sources of selection");
         },
     };
 }
@@ -519,11 +540,11 @@ namespace OtherActionItems {
         type: "action",
         action: (context: BaseMenuContextI) => {
             const selection = get(context.state_store.selected_nodes);
+            if (selection.length === 0) return;
             const renderer = get(context.state_store.renderer);
             renderer?.fitToNodes(selection);
         },
     };
-
 
     export const RELAYOUT: MenuItem<BackgroundMenuContextI> = {
         id: "Relayout",
@@ -702,6 +723,26 @@ export const filter_and_selection_menu: MenuItem<NodeMenuContextI>[] = [
 
 export const background_menu: MenuItem<BackgroundMenuContextI>[] = [
     {
+        id: "Remove Menu",
+        label: "Remove",
+        type: "group",
+        children: [
+            FilterSelectionActionItems.REMOVE_SELECTED,
+            FilterSelectionActionItems.REMOVE_ALL_BUT_SELECTED,
+            FilterSelectionActionItems.REMOVE_REACHABLES_OF_SELECTION,
+        ],
+    },
+    {
+        id: "Show Menu",
+        label: "Show (add)",
+        type: "group",
+        children: [
+            FilterSelectionActionItems.SHOW_SELECTED,
+            FilterSelectionActionItems.SHOW_ALL_BUT_SELECTED,
+            FilterSelectionActionItems.SHOW_REACHABLES_OF_SELECTION,
+        ],
+    },
+    {
         id: "Selection Menu",
         label: "Selection",
         type: "group",
@@ -794,6 +835,7 @@ export function cluster_box_click_context_menu(): MenuItem<ClusterBoxMenuContext
         },
         separator("Cluster Box Separator 2"),
         OtherActionItems.HOME,
+        OtherActionItems.ZOOM_TO_SELECTION,
         OtherActionItems.RELAYOUT,
     ];
 
