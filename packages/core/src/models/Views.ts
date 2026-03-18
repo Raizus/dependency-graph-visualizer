@@ -89,8 +89,8 @@ export class ViewMap {
 
         this.map.set(key, value);
         // insert at position given by idx if not null, else push into the array
-        if (idx !== null) {
-            this.order.splice(idx, 0, key);
+        if (idx !== null && idx >= 0 && idx <= this.order.length) {
+            this.order[idx] = key;
         } else {
             this.order.push(key);
         }
