@@ -672,13 +672,6 @@ export class D3GraphRenderer implements GraphRenderer {
             .transition()
             .duration(400)
             .call(this.zoom!.transform, transform);
-
-        setTimeout(() => {
-            console.log(
-                "applied transform:",
-                d3.zoomTransform(this.svg!.node()!),
-            );
-        }, 800);
     }
 
     // ── Event Emitter ───────────────────────────────────────────────────────────

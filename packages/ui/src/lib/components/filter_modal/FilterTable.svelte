@@ -10,7 +10,6 @@
 
     let selected_id: string | null = null;
     let selectedIdx: number | null = null;
-    // $: console.log("Selected filter index:", selectedIdx);
 
     function getSelectedIdx(selected_id: string | null) {
         if (!selected_id) return null;
@@ -58,7 +57,6 @@
     }
 
     function handleKeydown(event: KeyboardEvent) {
-        // console.log("selectedIdx: ", selectedIdx);
         if(event.key !== "Delete") return;
         deleteFilter();
     } 
