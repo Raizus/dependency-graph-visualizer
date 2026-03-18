@@ -30,7 +30,7 @@ import {
 } from "../../actions/SelectionActions";
 import type { StateStore } from "../../StateStore";
 import type { GraphRenderer } from "../../visualizer/GraphRenderer";
-import { separator, type MenuAction, type MenuItem } from "./ContextMenu";
+import { separator, type MenuAction, type MenuGroup, type MenuItem } from "./ContextMenu";
 import { get } from "svelte/store";
 
 export interface BaseMenuContextI {
@@ -222,6 +222,23 @@ namespace FilterSelectionActionItems {
         },
     };
 
+    export const REMOVE_NODES_WITHOUT_EDGES: MenuAction<BaseMenuContextI> = {
+        id: "Remove Nodes Without Edges",
+        label: "Remove nodes without edges",
+        type: "action",
+        disabled: true,
+        action: (context: BaseMenuContextI) => {},
+    };
+
+    export const REMOVE_NODES_REACHABLE_FROM_MULTIPLE_CLUSTERS: MenuAction<BaseMenuContextI> =
+        {
+            id: "Remove Nodes Reachable From Multiple Clusters",
+            label: "Remove nodes reachable from multiple clusters",
+            type: "action",
+            disabled: true,
+            action: (context: BaseMenuContextI) => {},
+        };
+
     export const SHOW_SELECTED: MenuAction<BaseMenuContextI> = {
         id: "Show Selected",
         label: "Selected",
@@ -257,6 +274,23 @@ namespace FilterSelectionActionItems {
             filter_reaching_of_selection_action(context.state_store, true);
         },
     };
+
+    export const SHOW_NODES_WITHOUT_EDGES: MenuAction<BaseMenuContextI> = {
+        id: "Show Nodes Without Edges",
+        label: "Show nodes without edges",
+        type: "action",
+        disabled: true,
+        action: (context: BaseMenuContextI) => {},
+    };
+
+    export const SHOW_NODES_REACHABLE_FROM_MULTIPLE_CLUSTERS: MenuAction<BaseMenuContextI> =
+        {
+            id: "Show Nodes Reachable From Multiple Clusters",
+            label: "Show nodes reachable from multiple clusters",
+            type: "action",
+            disabled: true,
+            action: (context: BaseMenuContextI) => {},
+        };
 }
 
 namespace SelectionActionItems {
@@ -324,14 +358,15 @@ namespace SelectionActionItems {
         },
     };
 
-    export const SELECT_REACHABLES_OF_SELECTION: MenuAction<BaseMenuContextI> = {
-        id: "Select Reachable Targets Of Selection",
-        label: "Reachable targets of selection",
-        type: "action",
-        action: (context: BaseMenuContextI) => {
-            set_selection_to_reachables_of_selection(context.state_store);
-        },
-    };
+    export const SELECT_REACHABLES_OF_SELECTION: MenuAction<BaseMenuContextI> =
+        {
+            id: "Select Reachable Targets Of Selection",
+            label: "Reachable targets of selection",
+            type: "action",
+            action: (context: BaseMenuContextI) => {
+                set_selection_to_reachables_of_selection(context.state_store);
+            },
+        };
 
     export const SELECT_REACHING_SOURCES: MenuAction<NodeMenuContextI> = {
         id: "Select Reaching Sources Of Node",
@@ -435,6 +470,14 @@ namespace SelectionActionItems {
                 context.state_store.setSelectedNodes([...nodes]);
             },
         };
+
+    export const SELECT_TRACE: MenuAction<NodeMenuContextI> = {
+        id: "Select Trace",
+        label: "Select Trace",
+        type: "action",
+        disabled: true,
+        action: (context: NodeMenuContextI) => {},
+    };
 }
 
 namespace FoldUnfoldClusterActionItems {
@@ -518,6 +561,7 @@ namespace OtherActionItems {
         id: "Relayout",
         label: "Relayout",
         type: "action",
+        disabled: true,
         action: (context: BackgroundMenuContextI) => {},
     };
 }
@@ -562,6 +606,30 @@ const node_select_items: MenuItem<NodeMenuContextI>[] = [
     SelectionActionItems.SELECT_REACHING_SOURCES_OF_SELECTION,
     SelectionActionItems.SELECT_INTERSECTION_OF_REACHING_AND_REACHABLES,
 ];
+
+const SELECTION_REMOVE_MENU: MenuGroup<BaseMenuContextI> = {
+    id: "Selection Remove Menu",
+    label: "Remove",
+    type: "group",
+    children: [
+        FilterSelectionActionItems.REMOVE_SELECTED,
+        FilterSelectionActionItems.REMOVE_ALL_BUT_SELECTED,
+        FilterSelectionActionItems.REMOVE_REACHABLES_OF_SELECTION,
+        FilterSelectionActionItems.REMOVE_REACHING_OF_SELECTION,
+    ],
+};
+
+const SELECTION_SHOW_MENU: MenuGroup<BaseMenuContextI> = {
+    id: "Show Menu",
+    label: "Show (add)",
+    type: "group",
+    children: [
+        FilterSelectionActionItems.SHOW_SELECTED,
+        FilterSelectionActionItems.SHOW_ALL_BUT_SELECTED,
+        FilterSelectionActionItems.SHOW_REACHABLES_OF_SELECTION,
+        FilterSelectionActionItems.SHOW_REACHING_OF_SELECTION,
+    ],
+};
 
 const trace_items: MenuItem<NodeMenuContextI>[] = [];
 
@@ -689,50 +757,22 @@ export const filter_and_selection_menu: MenuItem<NodeMenuContextI>[] = [
 ];
 
 export const background_menu: MenuItem<BackgroundMenuContextI>[] = [
-    {
-        id: "Remove Menu",
-        label: "Remove",
-        type: "group",
-        children: [
-            FilterSelectionActionItems.REMOVE_SELECTED,
-            FilterSelectionActionItems.REMOVE_ALL_BUT_SELECTED,
-            FilterSelectionActionItems.REMOVE_REACHABLES_OF_SELECTION,
-        ],
-    },
-    {
-        id: "Show Menu",
-        label: "Show (add)",
-        type: "group",
-        children: [
-            FilterSelectionActionItems.SHOW_SELECTED,
-            FilterSelectionActionItems.SHOW_ALL_BUT_SELECTED,
-            FilterSelectionActionItems.SHOW_REACHABLES_OF_SELECTION,
-        ],
-    },
+    SELECTION_REMOVE_MENU,
+    SELECTION_SHOW_MENU,
     {
         id: "Selection Menu",
         label: "Selection",
         type: "group",
         children: [
             SelectionActionItems.SELECT_CYCLES,
+            SelectionActionItems.SELECT_TOP_5_MOST_INCOMING,
+            SelectionActionItems.SELECT_TOP_5_MOST_OUTGOING,
             separator("Selection Separator 1"),
             SelectionActionItems.INVERT_SELECTION,
             SelectionActionItems.CLEAR_SELECTION,
         ],
     },
     separator("Background Menu Separator 1"),
-    // {
-    //     id: "Remove Nodes Without Edges",
-    //     label: "Remove nodes without edges",
-    //     type: "action",
-    //     action: (context: BackgroundMenuContextI) => {},
-    // },
-    // {
-    //     id: "Remove Nodes Reachable From Multiple Clusters",
-    //     label: "Remove nodes reachable from multiple clusters",
-    //     type: "action",
-    //     action: (context: BackgroundMenuContextI) => {},
-    // },
     {
         id: "Cluster Menu",
         label: "Clusters",
@@ -771,8 +811,8 @@ export function build_node_click_context_menu(
 export function cluster_box_click_context_menu(): MenuItem<ClusterBoxMenuContextI>[] {
     const items: MenuItem<ClusterBoxMenuContextI>[] = [
         {
-            id: "Cluster Menu",
-            label: "Clusters",
+            id: "Fold/Unfold Cluster Menu",
+            label: "Fold/Unfold Clusters",
             type: "group",
             children: [
                 FoldUnfoldClusterActionItems.FOLD_UNFOLD_CLUSTER,
