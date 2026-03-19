@@ -1,6 +1,5 @@
 import { derived, get, writable, type Writable } from "svelte/store";
 import {
-    type ViewI,
     type Graph,
     type FilterI,
     newBlanckView,
@@ -59,15 +58,23 @@ export class StateStore {
     private _selected_nodes = writable<string[]>([]);
 
     private _current_view_label = writable<string | null>(null);
-    private _current_view = derived(
-        [this._current_view_label, this._views],
-        ([label, views]) => {
-            console.log("Update current view");
-            if (!label) return newBlanckView("View");
-            const view = views.get(label);
-            return view || newBlanckView("View");
-        },
-    );
+    private _current_view = writable<View>((() => {
+        const views = get(this._views);
+        const label = get(this._current_view_label);
+        if (!label) return newBlanckView("View");
+        const view = views.get(label);
+        return view || newBlanckView("View");
+    })())
+    // private _current_view = derived(
+    //     [this._current_view_label],
+    //     ([label]) => {
+    //         console.log("Update current view");
+    //         if (!label) return newBlanckView("View");
+    //         const views = get(this._views);
+    //         const view = views.get(label);
+    //         return view || newBlanckView("View");
+    //     },
+    // );
 
     private _clustered_graph = writable<Graph | null>(null);
     private _filtered_clustered_graph = writable<Graph | null>(null);
@@ -120,7 +127,22 @@ export class StateStore {
     }
 
     setCurrentViewLabel(label: string | null) {
+        if (!label) {
+            const view = newBlanckView("View");
+            this._current_view.set(view);
+            return;
+        }
+
+        const views = get(this._views);
+        const view = views.get(label);
+        if (!view) {
+            const view = newBlanckView("View");
+            this._current_view.set(view);
+            return;
+        }
+
         this._current_view_label.set(label);
+        this._current_view.set(view);
         this.updateClusteredGraph();
     }
 
@@ -167,8 +189,8 @@ export class StateStore {
             views.set(label, view);
         }
 
-        this.setCurrentViewLabel(label);
         this.setViews(views);
+        this.setCurrentViewLabel(label);
 
         this.updateClusteredGraph();
     }
@@ -291,7 +313,7 @@ export class StateStore {
         views.setOrder(new_order);
         this.setViews(views);
     }
-    
+
     // addCluster(cluster: ClusterI) {
     //     const view = get(this._currentView);
     //     if (!view) return;
@@ -393,6 +415,8 @@ export class StateStore {
             views.set(current_view_label, view);
             return views;
         });
+
+        this._current_view.update(() => view);
     }
 
     deleteView(view_id: string) {
