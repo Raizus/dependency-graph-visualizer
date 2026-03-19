@@ -4,21 +4,29 @@
     import DropdownSearchBox from "./DropdownSearchBox.svelte";
     import ViewMenu from "./ViewMenu.svelte";
     import ViewEditor from "./ViewEditor.svelte";
+    import DropdownMenuAddButton from "./DropdownMenuAddButton.svelte";
 
     export let items: DropdownItem[] = [];
     export let placeholder: string = "Select an item...";
     export let selected: string | null = null;
     export let addNewCallback: (() => void) | null = null;
     export let selectCallback: ((id: string) => void) | null = null;
+    export let reorderCallback: ((items: DropdownItem[]) => void) | null = null;
     export let title: string | undefined;
 
     let isOpen: boolean = false;
     let searchQuery: string = "";
     let configItem: DropdownItem | null = null;
 
+    // Drag state
+    let dragIndex: number | null = null;
+    let dropIndex: number | null = null;
+
     $: filteredItems = items.filter((item) =>
         item.label.toLowerCase().includes(searchQuery.toLowerCase()),
     );
+
+    $: isDraggable = searchQuery === "";
 
     $: selectedLabel = selected
         ? (items.find((i) => i.value === selected)?.label ?? placeholder)
@@ -33,6 +41,8 @@
     function closeDropdown(): void {
         isOpen = false;
         configItem = null;
+        dragIndex = null;
+        dropIndex = null;
     }
 
     function selectItem(item: DropdownItem): void {
@@ -52,6 +62,58 @@
 
     function addNewItem(): void {
         addNewCallback?.();
+    }
+
+    // Drag handlers
+    function onDragStart(event: DragEvent, index: number): void {
+        dragIndex = index;
+        if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", String(index));
+        }
+    }
+
+    function onDragOver(event: DragEvent, index: number): void {
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+        dropIndex = index;
+    }
+
+    function onDragLeave(event: DragEvent): void {
+        // Only clear if leaving the list entirely
+        const related = event.relatedTarget as HTMLElement | null;
+        if (!related?.closest(".list")) {
+            dropIndex = null;
+        }
+    }
+
+    function onDrop(event: DragEvent, index: number): void {
+        event.preventDefault();
+        if (
+            dragIndex === null ||
+            dragIndex === index ||
+            dragIndex + 1 === index
+        ) {
+            dragIndex = null;
+            dropIndex = null;
+            return;
+        }
+
+        const reordered = [...items];
+        const [moved] = reordered.splice(dragIndex, 1);
+        // When dragging down, the splice shifts everything up by 1, so compensate
+        const insertAt = index > dragIndex ? index - 1 : index;
+        reordered.splice(insertAt, 0, moved);
+        items = reordered;
+        reorderCallback?.(items);
+
+        dragIndex = null;
+        dropIndex = null;
+    }
+
+    function onDragEnd(): void {
+        dragIndex = null;
+        dropIndex = null;
     }
 
     $: console.log("configItem: ", configItem);
@@ -78,8 +140,8 @@
                     back={backToDropdown}
                     close={closeDropdown}
                 >
-                    <ViewMenu slot="menu" view_id={configItem.value}/>
-                    <ViewEditor item={configItem} slot="content"/>
+                    <ViewMenu slot="menu" view_id={configItem.value} />
+                    <ViewEditor item={configItem} slot="content" />
                 </DropdownConfigureWindow>
             {:else}
                 <!-- Search box -->
@@ -88,13 +150,29 @@
                 <hr class="divider" />
 
                 <!-- Item list -->
-                <ul class="list" role="listbox">
-                    {#each filteredItems as item (item.value)}
+                <ul class="list" role="listbox" on:dragleave={onDragLeave}>
+                    {#each filteredItems as item, i (item.value)}
                         <li
                             class="list-item"
+                            class:drag-over={dropIndex === i &&
+                                dragIndex !== null &&
+                                dragIndex !== i &&
+                                dragIndex + 1 !== i}
+                            class:dragging={dragIndex === i}
                             role="option"
                             aria-selected={item.value === selected}
+                            draggable={isDraggable}
+                            on:dragstart={(e) => onDragStart(e, i)}
+                            on:dragover={(e) => onDragOver(e, i)}
+                            on:drop={(e) => onDrop(e, i)}
+                            on:dragend={onDragEnd}
                         >
+                            {#if isDraggable}
+                                <span
+                                    class="drag-handle"
+                                    title="Drag to reorder">⠿</span
+                                >
+                            {/if}
                             <button
                                 class="item-select"
                                 on:click={() => selectItem(item)}
@@ -113,6 +191,39 @@
                             </button>
                         </li>
                     {/each}
+                    {#if isDraggable && dragIndex !== null && dragIndex !== filteredItems.length - 1}
+                        <li
+                            class="list-item drop-zone-bottom"
+                            class:drag-over={dropIndex === filteredItems.length}
+                            role="option"
+                            aria-selected={false}
+                            on:dragover={(e) => {
+                                e.preventDefault();
+                                dropIndex = filteredItems.length;
+                            }}
+                            on:drop={(e) => {
+                                e.preventDefault();
+                                if (
+                                    dragIndex !== null &&
+                                    dragIndex !== filteredItems.length - 1
+                                ) {
+                                    const reordered = [...items];
+                                    const [moved] = reordered.splice(
+                                        dragIndex,
+                                        1,
+                                    );
+                                    reordered.push(moved);
+                                    items = reordered;
+                                    reorderCallback?.(items);
+                                }
+                                dragIndex = null;
+                                dropIndex = null;
+                            }}
+                            on:dragleave={() => {
+                                dropIndex = null;
+                            }}
+                        ></li>
+                    {/if}
                     {#if filteredItems.length === 0}
                         <li class="list-empty">
                             No items match "{searchQuery}"
@@ -241,6 +352,44 @@
     .list-item {
         display: flex;
         align-items: center;
+        border-top: 2px solid transparent;
+        transition:
+            border-color 0.1s ease,
+            opacity 0.1s ease;
+
+        &.drag-over {
+            border-top-color: var(--border-highlight-color);
+        }
+
+        &.dragging {
+            opacity: 0.4;
+        }
+    }
+
+    .drag-handle {
+        flex-shrink: 0;
+        padding: 0 4px 0 6px;
+        font-size: 16px;
+        color: #6b7280;
+        cursor: grab;
+        user-select: none;
+        line-height: 1;
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+
+    .drop-zone-bottom {
+        height: 4px;
+        padding: 0;
+        margin: 0 4px;
+        border-top: 2px solid transparent;
+        pointer-events: all;
+
+        &.drag-over {
+            border-top-color: var(--border-highlight-color);
+        }
     }
 
     .list-item[aria-selected="true"] .item-select {
