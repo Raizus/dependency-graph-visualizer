@@ -6,6 +6,7 @@ import {
     node_siblings_filter_params,
     outgoing_node_filter_params,
     reachable_filter_params,
+    reaching_filter_params,
 } from "@dep-graph-vis/core";
 import type { StateStore } from "../StateStore";
 import { get } from "svelte/store";
@@ -141,3 +142,18 @@ export function filter_reachables_of_selection_action(
     const filter = create_filter(label, show, filter_params);
     state_store.addFilter(filter, show);
 }
+
+export function filter_reaching_of_selection_action(
+    state_store: StateStore,
+    show: boolean,
+) {
+    const selected = get(state_store.selected_nodes);
+    const all_nodes = getSubnodesAndSubclusters(state_store, selected);
+    const filter_params = reaching_filter_params(all_nodes);
+
+    const first_nodes = selected.slice(0, Math.min(3, selected.length));
+    const label = `Reaching sources of selection: ${first_nodes.join(", ")}...`;
+    const filter = create_filter(label, show, filter_params);
+    state_store.addFilter(filter, show);
+}
+
