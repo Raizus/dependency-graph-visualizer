@@ -70,7 +70,7 @@ export class View implements ViewI {
 
 export class ViewMap {
     private map: Map<string, View> = new Map();
-    private order: string[] = [];
+    private ordered_keys: string[] = [];
 
     has(key: string): boolean {
         return this.map.has(key);
@@ -89,12 +89,26 @@ export class ViewMap {
 
         this.map.set(key, value);
         // insert at position given by idx if not null, else push into the array
-        if (idx !== null && idx >= 0 && idx <= this.order.length) {
-            this.order[idx] = key;
+        if (idx !== null && idx >= 0 && idx <= this.ordered_keys.length) {
+            this.ordered_keys.splice(idx, 0, key);
+            // this.ordered_keys[idx] = key;
         } else {
-            this.order.push(key);
+            this.ordered_keys.push(key);
         }
         return key;
+    }
+
+    setOrder(ordered_keys: string[]) {
+        // ensure all keys in ordered_keys exist in the map
+        for (const key of ordered_keys) {
+            if (!this.has(key)) {
+                throw new Error(`Key ${key} does not exist in the map`);
+            }
+        }
+        if(ordered_keys.length !== this.map.size) {
+            throw new Error(`Ordered keys length ${ordered_keys.length} does not match map size ${this.map.size}`);
+        }
+        this.ordered_keys = ordered_keys;
     }
 
     /**
@@ -114,7 +128,7 @@ export class ViewMap {
      * @returns 
      */
     keys(): MapIterator<string> {
-        return this.order.values();
+        return this.ordered_keys.values();
     }
 
     size(): number {
@@ -122,18 +136,18 @@ export class ViewMap {
     }
 
     getIndex(key: string): number {
-        return this.order.indexOf(key);
+        return this.ordered_keys.indexOf(key);
     }
 
     getFirstKey(): string | null {
-        const firstKey = this.order[0];
+        const firstKey = this.ordered_keys[0];
         return firstKey || null;
     }
 
     delete(key: string): ViewI | undefined {
         const view = this.map.get(key);
         this.map.delete(key);
-        this.order = this.order.filter((k) => k !== key);
+        this.ordered_keys = this.ordered_keys.filter((k) => k !== key);
         return view;
     }
 
@@ -184,7 +198,9 @@ export class ViewMap {
 
     toJSON(): ViewsJSON {
         const json: ViewsJSON = {};
-        for (const [key, view] of this.map.entries()) {
+        for (const key of this.ordered_keys) {
+            const view = this.map.get(key);
+            if (!view) continue;
             json[key] = {
                 label: view.label,
                 filters: view.filters,
