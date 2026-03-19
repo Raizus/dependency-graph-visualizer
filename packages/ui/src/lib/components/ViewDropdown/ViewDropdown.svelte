@@ -29,6 +29,11 @@
         console.log("buildItems: ", items);
         return items;
     }
+
+    function reorderCallback(items: DropdownItem[]): void {
+        const new_order = items.map((item) => item.value);
+        state_store.reorderViews(new_order);
+    }
 </script>
 
 <DropdownMenu
@@ -38,6 +43,7 @@
     placeholder="Select or create view..."
     addNewCallback={addNewView}
     selectCallback={selectView}
+    reorderCallback={reorderCallback}
 ></DropdownMenu>
 
 <style>

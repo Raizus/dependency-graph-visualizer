@@ -286,6 +286,12 @@ export class StateStore {
         this.setCurrentViewLabel(label);
     }
 
+    reorderViews(new_order: string[]) {
+        const views = get(this._views);
+        views.setOrder(new_order);
+        this.setViews(views);
+    }
+    
     // addCluster(cluster: ClusterI) {
     //     const view = get(this._currentView);
     //     if (!view) return;
