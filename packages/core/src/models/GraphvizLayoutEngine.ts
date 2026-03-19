@@ -184,11 +184,11 @@ const DEFAULT_TWOPI_OPTIONS: GraphOptions = {
 
         // Graph-level
         splines: "line",
-        overlap: "false", // twopi often needs this since rings can get crowded
+        overlap: false, // twopi often needs this since rings can get crowded
         sep: "+8",
-        ranksep: 2.0, // distance between concentric rings — main tuning knob
-        root: "1", // which node to place at the center (defaults to arbitrary if omitted)
-        normalize: true,
+        ranksep: 5.0, // distance between concentric rings — main tuning knob
+        // root: "1", // which node to place at the center (defaults to arbitrary if omitted)
+        normalize: false,
     },
 
     edgeAttrs: {
@@ -221,43 +221,44 @@ class GraphvizGraphModelBuilder {
 
         switch (layout) {
             case "fdp": {
-                const g = GraphvizGraphModelBuilder.buildFdpLayoutGraphModel(
-                    graph,
-                    clusters,
-                    options,
-                );
+                const g =
+                    GraphvizGraphModelBuilder.buildDotGraphModelWithClusters(
+                        graph,
+                        clusters,
+                        options,
+                    );
                 return g;
             }
             case "sfdp": {
-                const g = GraphvizGraphModelBuilder.buildFdpLayoutGraphModel(
-                    graph,
-                    clusters,
-                    options,
-                );
+                const g =
+                    GraphvizGraphModelBuilder.buildDotGraphModelNoClusters(
+                        graph,
+                        options,
+                    );
                 return g;
             }
             case "twopi": {
-                const g = GraphvizGraphModelBuilder.buildDotLayoutGraphModel(
-                    graph,
-                    clusters,
-                    options,
-                    true,
-                );
+                const g =
+                    GraphvizGraphModelBuilder.buildDotGraphModelNoClusters(
+                        graph,
+                        options,
+                    );
                 return g;
             }
             default: {
                 // dot
-                const g = GraphvizGraphModelBuilder.buildDotLayoutGraphModel(
-                    graph,
-                    clusters,
-                    options,
-                );
+                const g =
+                    GraphvizGraphModelBuilder.buildDotGraphModelWithClusters(
+                        graph,
+                        clusters,
+                        options,
+                    );
                 return g;
             }
         }
     }
 
-    private static buildDotLayoutGraphModel(
+    private static buildDotGraphModelWithClusters(
         graph: Graph,
         clusters: ClustersI,
         options: GraphOptions,
@@ -280,7 +281,7 @@ class GraphvizGraphModelBuilder {
             GraphvizGraphModelBuilder.addUnclusteredNodes(g, graph, clusters);
 
             // Add edges
-            GraphvizGraphModelBuilder.addEdgesToGraph(g, graph, clusters);
+            GraphvizGraphModelBuilder.addEdgesToGraph(g, graph);
 
             if (!rank_nodes) return;
 
@@ -300,36 +301,21 @@ class GraphvizGraphModelBuilder {
         return g;
     }
 
-    private static buildFdpLayoutGraphModel(
+    private static buildDotGraphModelNoClusters(
         graph: Graph,
-        clusters: ClustersI,
         options: GraphOptions,
     ) {
         // Create main digraph
         const g = digraph(
             "G",
-            { layout: "fdp", ...options.graphAttrs },
+            { ...options.graphAttrs },
             (g) => {
                 if (options.edgeAttrs) g.edge(options.edgeAttrs);
 
-                // Build cluster hierarchy
-                GraphvizGraphModelBuilder.addClustersToGraph(
-                    g,
-                    clusters,
-                    graph,
-                    undefined,
-                    false,
-                );
-
-                // Add nodes that aren't in any cluster
-                GraphvizGraphModelBuilder.addUnclusteredNodes(
-                    g,
-                    graph,
-                    clusters,
-                );
+                GraphvizGraphModelBuilder.addNodesToGraph(g, graph);
 
                 // Add edges
-                GraphvizGraphModelBuilder.addEdgesToGraph(g, graph, clusters);
+                GraphvizGraphModelBuilder.addEdgesToGraph(g, graph);
             },
         );
 
@@ -433,11 +419,24 @@ class GraphvizGraphModelBuilder {
         });
     }
 
-    private static addEdgesToGraph(
-        g: any,
+    private static addNodesToGraph(
+        g: RootGraphModel | SubgraphModel,
         graph: Graph,
-        clusters: ClustersI,
     ): void {
+        // Add nodes that aren't in any cluster
+        graph.forEachNode((nodeId, attrs) => {
+            const node_attrs = {
+                label: attrs.label,
+                ...baseNodeStyle(attrs),
+                tooltip: `${nodeId}; type: ${attrs.type}`,
+            };
+            if (attrs.type === "root") node_attrs.root = true;
+
+            g.node(nodeId, node_attrs);
+        });
+    }
+
+    private static addEdgesToGraph(g: any, graph: Graph): void {
         graph.forEachEdge((edgeKey, attrs, source, target) => {
             // Check if source/target are in collapsed clusters
 
