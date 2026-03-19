@@ -183,10 +183,10 @@ const DEFAULT_TWOPI_OPTIONS: GraphOptions = {
         layout: "twopi",
 
         // Graph-level
-        splines: "line",
+        splines: "curved",
         overlap: false, // twopi often needs this since rings can get crowded
         sep: "+8",
-        ranksep: 5.0, // distance between concentric rings — main tuning knob
+        ranksep: 7.0, // distance between concentric rings — main tuning knob
         // root: "1", // which node to place at the center (defaults to arbitrary if omitted)
         normalize: false,
     },
