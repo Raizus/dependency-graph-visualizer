@@ -27,10 +27,17 @@ import {
     set_selection_to_sources_of_node,
     set_selection_to_targets_of_node,
     set_selection_to_this_node,
+    set_selection_to_trace_from_node_action,
+    set_selection_to_trace_to_node_action,
 } from "../../actions/SelectionActions";
 import type { StateStore } from "../../StateStore";
 import type { GraphRenderer } from "../../visualizer/GraphRenderer";
-import { separator, type MenuAction, type MenuGroup, type MenuItem } from "./ContextMenu";
+import {
+    separator,
+    type MenuAction,
+    type MenuGroup,
+    type MenuItem,
+} from "./ContextMenu";
 import { get } from "svelte/store";
 
 export interface BaseMenuContextI {
@@ -471,12 +478,22 @@ namespace SelectionActionItems {
             },
         };
 
-    export const SELECT_TRACE: MenuAction<NodeMenuContextI> = {
-        id: "Select Trace",
-        label: "Select Trace",
+    export const SELECT_TRACE_FROM_THIS: MenuAction<NodeMenuContextI> = {
+        id: "Select Trace From This",
+        label: "Select Trace From This",
         type: "action",
-        disabled: true,
-        action: (context: NodeMenuContextI) => {},
+        action: (context: NodeMenuContextI) => {
+            set_selection_to_trace_from_node_action(context.state_store, context.node);
+        },
+    };
+
+    export const SELECT_TRACE_TO_THIS: MenuAction<NodeMenuContextI> = {
+        id: "Select Trace To This",
+        label: "Select Trace To This",
+        type: "action",
+        action: (context: NodeMenuContextI) => {
+            set_selection_to_trace_to_node_action(context.state_store, context.node);
+        },
     };
 }
 
@@ -631,7 +648,10 @@ const SELECTION_SHOW_MENU: MenuGroup<BaseMenuContextI> = {
     ],
 };
 
-const trace_items: MenuItem<NodeMenuContextI>[] = [];
+const trace_items: MenuItem<NodeMenuContextI>[] = [
+    SelectionActionItems.SELECT_TRACE_FROM_THIS,
+    SelectionActionItems.SELECT_TRACE_TO_THIS,
+];
 
 function build_cluster_items(clusters: string[]) {
     const items: MenuItem<NodeMenuContextI>[] = [];
@@ -751,7 +771,6 @@ export const filter_and_selection_menu: MenuItem<NodeMenuContextI>[] = [
         id: "Trace Menu",
         label: "Trace",
         type: "group",
-        disabled: true,
         children: trace_items,
     },
 ];
@@ -840,6 +859,8 @@ export function cluster_box_click_context_menu(): MenuItem<ClusterBoxMenuContext
                 SelectionActionItems.CLEAR_SELECTION,
             ],
         },
+        SELECTION_REMOVE_MENU,
+        SELECTION_SHOW_MENU,
         separator("Cluster Box Separator 2"),
         OtherActionItems.HOME,
         OtherActionItems.ZOOM_TO_SELECTION,
