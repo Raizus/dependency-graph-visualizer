@@ -114,7 +114,6 @@ export function findReachingNodes(
     return visited;
 }
 
-
 function nodeMatch(node_attr: NodeAttributesI, query: string): boolean {
     let regex: RegExp;
     try {
@@ -133,9 +132,9 @@ function nodeMatch(node_attr: NodeAttributesI, query: string): boolean {
 
 export function searchGraphForNodes(graph: Graph, query: string): string[] {
     const results: string[] = [];
-    graph.forEachNode((node, attributes) => {
+    graph.forEachNode((node_id, attributes) => {
         if (nodeMatch(attributes, query)) {
-            results.push(attributes.key);
+            results.push(node_id);
         }
     });
     return results;
