@@ -10,11 +10,11 @@
     let selected_id: string | null = null;
     let selectedIdx: number | null = null;
 
-    function getSelectedIdx(selected_id: string | null) {
-        if (!selected_id) return null;
-        const idx = filters.findIndex(filter => filter.id === selected_id);
-        return idx;
-    }
+    // function getSelectedIdx(selected_id: string | null) {
+    //     if (!selected_id) return null;
+    //     const idx = filters.findIndex(filter => filter.id === selected_id);
+    //     return idx;
+    // }
 
     function selectRow(idx: number) {
         selectedIdx = idx;
