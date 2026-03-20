@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { FilterI } from "@dep-graph-vis/core";
     import TableCheckbox from "./TableCheckbox..svelte";
     import { getContext, onDestroy, onMount } from "svelte";
     import type { StateStore } from "../../StateStore";
@@ -17,14 +16,15 @@
         return idx;
     }
 
-    function selectRow(filter_id: string) {
-        selected_id = filter_id;
-        selectedIdx = getSelectedIdx(selected_id);
+    function selectRow(idx: number) {
+        selectedIdx = idx;
+        // selected_id = filter_id;
+        // selectedIdx = getSelectedIdx(selected_id);
     }
 
     // Placeholder global state functions
     function onReorder() {
-        selectedIdx = getSelectedIdx(selected_id);
+        // selectedIdx = getSelectedIdx(selected_id);
     }
 
     function onToggleApplied(idx: number, value: boolean) {
@@ -38,13 +38,15 @@
     function moveUp() {
         if (selectedIdx === null) return
         state_store.filterMoveUp(selectedIdx);
-        onReorder();
+        selectedIdx = selectedIdx - 1;
+        // onReorder();
     }
 
     function moveDown() {
         if (selectedIdx === null) return
         state_store.filterMoveDown(selectedIdx);
-        onReorder();
+        selectedIdx = selectedIdx + 1;
+        // onReorder();
     }
 
     function handleAppliedChange(idx: number, value: boolean) {
@@ -85,11 +87,11 @@
                 </tr>
             </thead>
             <tbody>
-                {#each filters as filter, idx (filter.id)}
+                {#each filters as filter, idx}
                     <tr
                         class="row"
-                        class:selected={filter.id === selected_id}
-                        on:click={() => selectRow(filter.id)}
+                        class:selected={idx === selectedIdx}
+                        on:click={() => selectRow(idx)}
                     >
                         <td class="label-cell">{filter.label}</td>
                         <td class="checkbox-cell">
@@ -165,6 +167,27 @@
         border-collapse: collapse;
         width: 100%;
         background-color: var(--bg-color-2);
+        display: flex;
+        flex-direction: column;
+    }
+
+    thead {
+        display: block;
+        width: 100%;
+    }
+
+    tbody {
+        display: block;
+        height: 240px;
+        overflow-y: auto;
+        width: 100%;
+    }
+
+    thead tr,
+    tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
     }
 
     thead tr {
@@ -185,7 +208,8 @@
     .row {
         cursor: pointer;
         transition: background-color 0.12s ease;
-
+        border-bottom: 1px solid black;
+        
         &:hover {
             background-color: #a6a6a6;
         }
@@ -201,12 +225,11 @@
 
     td {
         padding: 5px 5px;
-        border-bottom: 1px solid black;
     }
 
-    .row:last-child td {
+    /* .row:last-child td {
         border-bottom: none;
-    }
+    } */
 
     .label-cell {
         text-align: left;

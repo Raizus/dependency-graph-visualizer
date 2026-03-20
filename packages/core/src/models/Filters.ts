@@ -378,9 +378,7 @@ export function create_filter(
     show: boolean,
     params: FilterParamsI,
 ): FilterI {
-    const id = uniqueId("filter_");
     const filter: FilterI = {
-        id,
         label,
         show,
         applied: true,

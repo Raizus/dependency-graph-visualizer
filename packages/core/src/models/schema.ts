@@ -69,7 +69,6 @@ export type FilterParamsI =
     | NoOutgoingFilterParamsI;
 
 export interface FilterI {
-    id: string;
     label: string;
     show: boolean;
     applied: boolean;
