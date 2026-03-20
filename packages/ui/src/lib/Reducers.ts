@@ -6,6 +6,7 @@ import {
     outgoing_node_filter_params,
     reachable_filter_params,
     reaching_filter_params,
+    tracePath,
     type FilterParamsI,
     type Graph,
 } from "@dep-graph-vis/core";
@@ -15,13 +16,13 @@ import {
  ************************************************************************/
 
 /**
- * Given a graph, current selection of nodes and a function that returns a 
+ * Given a graph, current selection of nodes and a function that returns a
  * graph filter parameters, it returns a new selection of nodes.
- * The selection is additive, the selected nodes will be added to the new 
+ * The selection is additive, the selected nodes will be added to the new
  * filtered nodes.
- * @param graph 
- * @param selected 
- * @param params_builder_func 
+ * @param graph
+ * @param selected
+ * @param params_builder_func
  * @returns the new selection
  */
 function generic_selection_func(
@@ -63,7 +64,11 @@ export function select_neighbours_of_node(
     graph: Graph | null,
     selected: string[],
 ): string[] {
-    return generic_selection_func(graph, selected, node_neighbours_filter_params);
+    return generic_selection_func(
+        graph,
+        selected,
+        node_neighbours_filter_params,
+    );
 }
 
 export function select_reachables(
@@ -86,6 +91,17 @@ export function select_reaching_intersection_reachables(
 ): string[] {
     const reaching = new Set(select_reaching(graph, selected));
     const reachables = new Set(select_reachables(graph, selected));
-    const result = [...reaching.intersection(reachables).union(new Set(selected))];
+    const result = [
+        ...reaching.intersection(reachables).union(new Set(selected)),
+    ];
     return result;
+}
+
+export function select_trace(
+    graph: Graph | null,
+    from: string[],
+    to: string[],
+): string[] {
+    if (!graph) return [];
+    return [...tracePath(graph, from, to)];
 }

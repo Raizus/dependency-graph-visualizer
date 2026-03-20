@@ -1,8 +1,20 @@
-import { filterFunctionFactory, inverse_node_selection_filter_params, type Graph } from "@dep-graph-vis/core";
+import {
+    filterFunctionFactory,
+    inverse_node_selection_filter_params,
+    type Graph,
+} from "@dep-graph-vis/core";
 import { get } from "svelte/store";
-import { select_sources_of_node, select_targets_of_node, select_siblings_of_node, select_neighbours_of_node, select_reachables, select_reaching, select_reaching_intersection_reachables } from "../Reducers";
+import {
+    select_sources_of_node,
+    select_targets_of_node,
+    select_siblings_of_node,
+    select_neighbours_of_node,
+    select_reachables,
+    select_reaching,
+    select_reaching_intersection_reachables,
+    select_trace,
+} from "../Reducers";
 import type { StateStore } from "../StateStore";
-
 
 /************************************************************************
  *              SELECTION ACTIONS                                       *
@@ -10,7 +22,7 @@ import type { StateStore } from "../StateStore";
 function generic_update_selection_for_node_action(
     node: string | null,
     state_store: StateStore,
-    select_func: (graph: Graph | null, selected: string[]) => string[]
+    select_func: (graph: Graph | null, selected: string[]) => string[],
 ) {
     if (node === null) return;
     const graph = get(state_store.clustered_graph);
@@ -20,7 +32,7 @@ function generic_update_selection_for_node_action(
 }
 function generic_update_selection_for_selection_action(
     state_store: StateStore,
-    select_func: (graph: Graph | null, selected: string[]) => string[]
+    select_func: (graph: Graph | null, selected: string[]) => string[],
 ) {
     const graph = get(state_store.clustered_graph);
     const selection = get(state_store.selected_nodes);
@@ -31,7 +43,7 @@ function generic_update_selection_for_selection_action(
 
 export function set_selection_to_this_node(
     node: string | null,
-    state_store: StateStore
+    state_store: StateStore,
 ) {
     if (node === null) return;
     state_store.setSelectedNodes([node]);
@@ -39,99 +51,99 @@ export function set_selection_to_this_node(
 
 export function set_selection_to_sources_of_node(
     node: string | null,
-    state_store: StateStore
+    state_store: StateStore,
 ) {
     generic_update_selection_for_node_action(
         node,
         state_store,
-        select_sources_of_node
+        select_sources_of_node,
     );
 }
 
 export function set_selection_to_targets_of_node(
     node: string | null,
-    state_store: StateStore
+    state_store: StateStore,
 ) {
     generic_update_selection_for_node_action(
         node,
         state_store,
-        select_targets_of_node
+        select_targets_of_node,
     );
 }
 
 export function set_selection_to_siblings_of_node(
     node: string | null,
-    state_store: StateStore
+    state_store: StateStore,
 ) {
     generic_update_selection_for_node_action(
         node,
         state_store,
-        select_siblings_of_node
+        select_siblings_of_node,
     );
 }
 
 export function set_selection_to_neighbours_of_node(
     node: string | null,
-    state_store: StateStore
+    state_store: StateStore,
 ) {
     generic_update_selection_for_node_action(
         node,
         state_store,
-        select_neighbours_of_node
+        select_neighbours_of_node,
     );
 }
 
 export function set_selection_to_reachables_of_node(
     node: string | null,
-    state_store: StateStore
+    state_store: StateStore,
 ) {
     generic_update_selection_for_node_action(
         node,
         state_store,
-        select_reachables
+        select_reachables,
     );
 }
 
 export function set_selection_to_reachables_of_selection(
-    state_store: StateStore
+    state_store: StateStore,
 ) {
     generic_update_selection_for_selection_action(
         state_store,
-        select_reachables
+        select_reachables,
     );
 }
 
 export function set_selection_to_reaching_of_node(
     node: string | null,
-    state_store: StateStore
+    state_store: StateStore,
 ) {
     generic_update_selection_for_node_action(
         node,
         state_store,
-        select_reaching
+        select_reaching,
     );
 }
 
 export function set_selection_to_reaching_of_selection(
-    state_store: StateStore
+    state_store: StateStore,
 ) {
     generic_update_selection_for_selection_action(state_store, select_reaching);
 }
 
 export function set_selection_to_intersection_of_reaching_reachables(
     node: string | null,
-    state_store: StateStore
+    state_store: StateStore,
 ) {
     generic_update_selection_for_node_action(
         node,
         state_store,
-        select_reaching_intersection_reachables
+        select_reaching_intersection_reachables,
     );
 }
 
 export function set_selection_to_nodes_of_cluster_action(
     state_store: StateStore,
-    cluster_id: string | null
+    cluster_id: string | null,
 ) {
     if (!cluster_id) return;
     const view = get(state_store.current_view);
@@ -140,9 +152,7 @@ export function set_selection_to_nodes_of_cluster_action(
     state_store.setSelectedNodes([...nodes, ...sub_clusters]);
 }
 
-export function invert_selection_action(
-    state_store: StateStore,
-) {
+export function invert_selection_action(state_store: StateStore) {
     const selection = get(state_store.selected_nodes);
     const graph = get(state_store.clustered_graph);
     if (!graph) return;
@@ -151,4 +161,40 @@ export function invert_selection_action(
     const filter_func = filterFunctionFactory(filter_params);
     const inverse = filter_func(graph);
     state_store.setSelectedNodes(inverse);
+}
+
+/**
+ * Sets the selection to the trace from the given node to the current selection
+ * If there are multiple paths from the node to the selection, all nodes in all paths will be selected
+ * @param state_store 
+ * @param node_id 
+ * @returns 
+ */
+export function set_selection_to_trace_from_node_action(
+    state_store: StateStore,
+    node_id: string | null,
+) {
+    if (node_id === null) return;
+    const graph = get(state_store.clustered_graph);
+    const selection = get(state_store.selected_nodes);
+    const trace = select_trace(graph, [node_id], selection);
+    state_store.setSelectedNodes([...trace]);
+}
+
+/**
+ * Sets the selection to the trace from the current selection to the given node
+ * If there are multiple paths from the selection to the node, all nodes in all paths will be selected
+ * @param state_store 
+ * @param node_id 
+ * @returns 
+ */
+export function set_selection_to_trace_to_node_action(
+    state_store: StateStore,
+    node_id: string | null,
+) {
+    if (node_id === null) return;
+    const graph = get(state_store.clustered_graph);
+    const selection = get(state_store.selected_nodes);
+    const trace = select_trace(graph, selection, [node_id]);
+    state_store.setSelectedNodes([...trace]);
 }

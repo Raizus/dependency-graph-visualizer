@@ -114,6 +114,22 @@ export function findReachingNodes(
     return visited;
 }
 
+export function tracePath(
+    graph: Graph,
+    from: string[],
+    to: string[],
+): Set<string> {
+    const reachable = findReachableNodes(graph, from);
+    const reaching = findReachingNodes(graph, to);
+    const result: Set<string> = new Set();
+    for (const node of reachable) {
+        if (reaching.has(node)) {
+            result.add(node);
+        }
+    }
+    return result;
+}
+
 function nodeMatch(node_attr: NodeAttributesI, query: string): boolean {
     let regex: RegExp;
     try {
