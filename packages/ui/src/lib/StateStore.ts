@@ -58,38 +58,21 @@ export class StateStore {
     private _selected_nodes = writable<string[]>([]);
 
     private _current_view_label = writable<string | null>(null);
-    private _current_view = writable<View>((() => {
-        const views = get(this._views);
-        const label = get(this._current_view_label);
-        if (!label) return newBlanckView("View");
-        const view = views.get(label);
-        return view || newBlanckView("View");
-    })())
-    // private _current_view = derived(
-    //     [this._current_view_label],
-    //     ([label]) => {
-    //         console.log("Update current view");
-    //         if (!label) return newBlanckView("View");
-    //         const views = get(this._views);
-    //         const view = views.get(label);
-    //         return view || newBlanckView("View");
-    //     },
-    // );
+    private _current_view = writable<View>(
+        (() => {
+            const views = get(this._views);
+            const label = get(this._current_view_label);
+            if (!label) return newBlanckView("View");
+            const view = views.get(label);
+            return view || newBlanckView("View");
+        })(),
+    );
 
     private _clustered_graph = writable<Graph | null>(null);
     private _filtered_clustered_graph = writable<Graph | null>(null);
     private _hidden_nodes = writable<Set<string>>(new Set());
     private _shown_nodes = writable<Set<string>>(new Set());
     private _renderer = writable<GraphRenderer | null>(null);
-
-    constructor() {
-        // ... existing initialization
-        this.layoutEngine = new GraphvizLayoutEngine();
-    }
-
-    async initialize() {
-        await this.layoutEngine.initialize();
-    }
 
     // Public readable stores
     public graph = { subscribe: this._graph.subscribe };
@@ -108,6 +91,15 @@ export class StateStore {
         subscribe: this._filtered_clustered_graph.subscribe,
     };
     public renderer = { subscribe: this._renderer.subscribe };
+
+    constructor() {
+        // ... existing initialization
+        this.layoutEngine = new GraphvizLayoutEngine();
+    }
+
+    async initialize() {
+        await this.layoutEngine.initialize();
+    }
 
     setRenderer(renderer: GraphRenderer | null) {
         this._renderer.set(renderer);
@@ -194,6 +186,9 @@ export class StateStore {
 
         this.updateClusteredGraph();
     }
+
+    /* ------------------------------------------------------------------------------------------- */
+    /* ----- Filter related methods -------------------------------------------------------------- */
 
     /**
      * Adds a filter to the current view
@@ -299,20 +294,8 @@ export class StateStore {
         this.updateFilteredClusteredGraph();
     }
 
-    addView(view: View) {
-        let label = "View";
-        this._views.update((views) => {
-            label = views.set(label, view);
-            return views;
-        });
-        this.setCurrentViewLabel(label);
-    }
-
-    reorderViews(new_order: string[]) {
-        const views = get(this._views);
-        views.setOrder(new_order);
-        this.setViews(views);
-    }
+    /* ------------------------------------------------------------------------------------------- */
+    /* ----- Cluster related methods ------------------------------------------------------------- */
 
     // addCluster(cluster: ClusterI) {
     //     const view = get(this._currentView);
@@ -390,6 +373,30 @@ export class StateStore {
         this.updateClusteredGraph();
     }
 
+    /* ------------------------------------------------------------------------------------------- */
+    /* ----- View related methods ---------------------------------------------------------------- */
+
+    updateCurrentView(view: View) {
+        const current_view_label = get(this._current_view_label);
+        if (!current_view_label) return;
+
+        this._views.update((views) => {
+            views.set(current_view_label, view);
+            return views;
+        });
+
+        this._current_view.update(() => view);
+    }
+
+    addView(view: View) {
+        let label = "View";
+        this._views.update((views) => {
+            label = views.set(label, view);
+            return views;
+        });
+        this.setCurrentViewLabel(label);
+    }
+
     setViewLayout(view_id: string, layout: LayoutI) {
         this._views.update((views) => {
             const view = views.get(view_id);
@@ -405,18 +412,6 @@ export class StateStore {
 
         // updating projected graph will trigger the re-render
         this._clustered_graph.update((graph) => graph);
-    }
-
-    updateCurrentView(view: View) {
-        const current_view_label = get(this._current_view_label);
-        if (!current_view_label) return;
-
-        this._views.update((views) => {
-            views.set(current_view_label, view);
-            return views;
-        });
-
-        this._current_view.update(() => view);
     }
 
     deleteView(view_id: string) {
@@ -460,6 +455,15 @@ export class StateStore {
 
         return true;
     }
+
+    reorderViews(new_order: string[]) {
+        const views = get(this._views);
+        views.setOrder(new_order);
+        this.setViews(views);
+    }
+
+    /* ------------------------------------------------------------------------------------------- */
+    /* ----- Other methods ----------------------------------------------------------------------- */
 
     searchFilteredGraphNodes(query: string): string[] {
         if (query.trim() === "") return [];
