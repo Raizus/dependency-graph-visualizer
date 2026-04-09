@@ -15,12 +15,12 @@
     };
 
     function getDot() {
-        const proj_graph = get(state_store.clustered_graph);
-        if (!proj_graph) return;
+        const graph = get(state_store.filtered_clustered_graph);
+        if (!graph) return;
         const view = get(state_store.current_view);
         const clusters = view.clusters;
         const dot_options = layoutToExportDotOptions(view.layout);
-        const dot = state_store.layoutEngine.buildDot(proj_graph, clusters, dot_options);
+        const dot = state_store.layoutEngine.buildDot(graph, clusters, dot_options);
         return dot;        
     }
 
