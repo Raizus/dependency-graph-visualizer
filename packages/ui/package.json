@@ -24,6 +24,7 @@
     },
     "exports": {
         "./App.svelte": "./src/App.svelte",
+        "./app.scss": "./src/app.scss",
         "./GraphViewer.svelte": "./src/components/GraphViewer.svelte"
     },
     "dependencies": {
