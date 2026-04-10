@@ -7,7 +7,7 @@ export default defineConfig({
         lib: {
             entry: {
                 App: "./src/App.svelte",
-                GraphViewer: "./src/components/GraphViewer.svelte",
+                GraphCanvas: "./src/lib/GraphCanvas.svelte",
             },
             formats: ["es"],
         },

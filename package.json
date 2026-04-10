@@ -4,6 +4,7 @@
     "description": "",
     "author": "",
     "private": true,
+    "packageManager": "npm@11.9.0",
     "workspaces": [
         "packages/*"
     ],
@@ -20,6 +21,7 @@
     },
     "scripts": {
         "dev": "turbo run dev",
+        "dev:standalone": "turbo run dev --filter=@dep-graph-vis/standalone...",
         "build": "turbo run build",
         "test": "turbo run test",
         "lint": "turbo run lint",
