@@ -660,7 +660,6 @@ export class D3GraphRenderer implements GraphRenderer {
         const scale = Math.min(
             W / (bbox.width * uniformScale),
             H / (bbox.height * uniformScale),
-            8,
         );
 
         const transform = d3.zoomIdentity
