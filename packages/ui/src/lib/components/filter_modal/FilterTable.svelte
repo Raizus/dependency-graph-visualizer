@@ -1,5 +1,5 @@
 <script lang="ts">
-    import TableCheckbox from "./TableCheckbox..svelte";
+    import TableCheckbox from "./TableCheckbox.svelte";
     import { getContext, onDestroy, onMount } from "svelte";
     import type { StateStore } from "../../StateStore";
 
