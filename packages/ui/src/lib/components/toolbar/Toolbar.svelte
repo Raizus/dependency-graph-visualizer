@@ -4,12 +4,14 @@
     import SaveButton from "./SaveButton.svelte";
     import SearchNavigator from "./SearchNavigator.svelte";
     import ViewDropdown from "../ViewDropdown/ViewDropdown.svelte";
+    import ClustersButton from "./ClustersButton.svelte";
 </script>
 
 <div id="toolbar">
     <LoadButton />
     <SaveButton />
     <FilterButton />
+    <ClustersButton />
     <ViewDropdown />
     <SearchNavigator />
 </div>
