@@ -155,9 +155,11 @@ export interface ClustersI {
     findClusterWithNode(node_id: string): string | null;
     getClusterNodes(cluster_id: string): Set<string>;
 
+    // clusters
     getDirectSubclusters(cluster_id?: string): string[];
     getSubclustersRecursive(cluster_id?: string): string[];
-    getParentClusters(cluster_id: string): string[];
+    getParentClusters(cluster_id: string): string[]; // get parents up to root
+    getParentCluster(cluster_id: string): string | undefined;
 
     // expand and collapse
     getExpandedClusters(): Set<string>;

@@ -492,6 +492,12 @@ export class ClusterManager implements ClustersI {
         return parents;
     }
 
+    getParentCluster(cluster_id: string): string | undefined {
+        const cluster = this._clusters.get(cluster_id);
+        const parent = cluster?.parent_id;
+        return parent;
+    }
+
     /**
      * Get all expanded clusters
      */
