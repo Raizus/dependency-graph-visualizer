@@ -130,7 +130,7 @@ export function tracePath(
     return result;
 }
 
-function nodeMatch(node_attr: NodeAttributesI, query: string): boolean {
+export function nodeMatch(node_attr: NodeAttributesI, query: string): boolean {
     let regex: RegExp;
     try {
         regex = new RegExp(query, "i");
