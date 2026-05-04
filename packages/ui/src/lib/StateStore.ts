@@ -105,9 +105,24 @@ export class StateStore {
         this._renderer.set(renderer);
     }
 
+    // --------------------------------------------------------------------------------- //
+    // ----- Getters ------------------------------------------------------------------- //
+
     getRenderer(): GraphRenderer | null {
         return get(this._renderer);
     }
+
+    getCurrentView(): View {
+        return get(this._current_view);
+    }
+
+    getClusterManager(): ClusterManager {
+        const current_view = this.getCurrentView();
+        return current_view.clusters;
+    }
+
+    // --------------------------------------------------------------------------------- //
+    // ----- Setters ------------------------------------------------------------------- //
 
     // Actions
     setGraph(graph: Graph) {
