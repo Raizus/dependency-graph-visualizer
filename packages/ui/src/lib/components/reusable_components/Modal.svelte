@@ -46,6 +46,7 @@
         class="modal-backdrop"
         role="presentation"
         on:click={handleBackdropClick}
+        on:contextmenu|stopPropagation
         transition:fade={{ duration: 200 }}
     ></div>
 
@@ -56,8 +57,10 @@
         aria-modal="true"
         aria-labelledby={title ? "modal-title" : undefined}
     >
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
             class="modal modal--{size}"
+            on:contextmenu|stopPropagation
             transition:scale={{
                 duration: 250,
                 easing: quintOut,
