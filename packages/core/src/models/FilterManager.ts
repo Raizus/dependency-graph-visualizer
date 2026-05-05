@@ -12,11 +12,7 @@ export class FilterManager {
     }
 
     addFilter(filter: FilterI, at_front: boolean = false) {
-        const new_filters = at_front
-            ? [filter, ...this.filters]
-            : [...this.filters, filter];
-
-        this.filters = new_filters;
+        at_front ? this.unshiftFilter(filter) : this.pushFilter(filter);
     }
 
     getFilter(idx: number): FilterI | undefined {
@@ -60,7 +56,12 @@ export class FilterManager {
 
     copy(): FilterManager {
         const fm_copy = new FilterManager();
-        fm_copy.setFilters([...this.filters]);
+        for (const filter of fm_copy.getFilters()) {
+            const filter_cp: FilterI = {
+                ...filter
+            } 
+            fm_copy.pushFilter(filter_cp)
+        }
         return fm_copy;
     }
 }
