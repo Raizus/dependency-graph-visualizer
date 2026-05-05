@@ -31,6 +31,16 @@
         return results;
     }
 
+    function getNodeFullPath(graph: Graph | null, n_id: string): string {
+        const res = graph?.getNodeAttribute(n_id, 'full_path') || n_id;
+        return res;
+    }
+
+    function getNodeLabel(graph: Graph | null, n_id: string): string {
+        const res = graph?.getNodeAttribute(n_id, 'label') || n_id;
+        return res;
+    }
+
     $: unclustered_nodes = getUnclusteredNodes(graph, clusters);
     $: filtered_unclustered = searchGraphForNodes(graph, query);
 </script>
@@ -63,8 +73,8 @@
         {:else}
             {#each filtered_unclustered as id (id)}
                 <!-- title={attrs.full_path || id} -->
-                <div class="node-row">
-                    <span class="node-id">{id}</span>
+                <div class="node-row" title={getNodeFullPath(graph, id)}>
+                    <span class="node-id">{getNodeLabel(graph, id)}</span>
                     <!-- <span class="node-label">{attrs.label}</span>
                     <span class="node-type-badge">{attrs.type}</span> -->
                 </div>
