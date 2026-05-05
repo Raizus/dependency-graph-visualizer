@@ -25,6 +25,7 @@
         "build": "turbo run build",
         "test": "turbo run test",
         "lint": "turbo run lint",
-        "clean": "turbo run clean && rm -rf node_modules packages/*/node_modules"
+        "clean": "turbo run clean && rm -rf node_modules packages/*/node_modules",
+        "deploy": "turbo run deploy --filter=@dep-graph-vis/standalone"
     }
 }
