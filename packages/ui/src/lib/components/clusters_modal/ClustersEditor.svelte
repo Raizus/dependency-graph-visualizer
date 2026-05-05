@@ -12,13 +12,13 @@
 
     $: graph = $graph_store;
     $: clusters = $view_store.clusters;
-    $: graph2 = $filtered_clustered_graph_store;
+    $: clustered_graph = $filtered_clustered_graph_store;
 </script>
 
 <div class="clusters-editor">
     <LeftPane {graph} {clusters} />
     <div class="divider"></div>
-    <RightPane graph={graph2} {clusters}/>
+    <RightPane base_graph={graph} {clustered_graph} {clusters}/>
 </div>
 
 <style lang="scss">

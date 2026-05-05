@@ -8,13 +8,14 @@
     import { buildTree, type TreeNode } from "./tree";
 
     export let clusters: ClustersI;
-    export let graph: Graph | null;
+    export let base_graph: Graph | null;
+    export let clustered_graph: Graph | null;
 
     let query: string = "";
     let localExpanded: Record<string, boolean> = {};
 
-    $: rootTree = graph
-        ? buildTree(graph, clusters, undefined)
+    $: rootTree = base_graph && clustered_graph
+        ? buildTree(base_graph, clustered_graph, clusters, undefined)
         : ([] as TreeNode[]);
 
     function matchesFilter(node: TreeNode, q: string): boolean {
@@ -85,7 +86,7 @@
             <ClusterTreeNode
                 treeNode={node}
                 {clusters}
-                {graph}
+                graph={base_graph}
                 depth={0}
                 bind:localExpanded
                 filterQuery={query.trim().toLowerCase()}

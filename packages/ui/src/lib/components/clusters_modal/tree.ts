@@ -9,20 +9,26 @@ export type TreeNode =
     | { kind: "cluster"; cluster: ClusterI; children: TreeNode[] }
     | { kind: "node"; id: string; attrs: NodeAttributesI };
 
-function getMemberNodes(graph: Graph, cluster: ClusterI): TreeNode[] {
-    const memberNodes: TreeNode[] = cluster.nodes.map((nid): TreeNode => {
-        const attrs: NodeAttributesI = graph?.hasNode(nid)
-            ? graph.getNodeAttributes(nid)
-            : {
-                  key: nid,
-                  label: nid,
-                  full_path: nid,
-                  type: "unknown",
-              };
-        return { kind: "node", id: nid, attrs };
-    });
+function getMemberNodes(
+    base_graph: Graph,
+    cluster: ClusterI,
+): TreeNode[] {
+    const member_nodes: TreeNode[] = [];
 
-    return memberNodes;
+    for (const nid of cluster.nodes) {
+        if (!base_graph.hasNode(nid)) continue;
+
+        const attrs = base_graph.getNodeAttributes(nid);
+        const node: TreeNode = {
+            kind: "node",
+            id: nid,
+            attrs,
+        };
+
+        member_nodes.push(node);
+    }
+
+    return member_nodes;
 }
 
 function getUsedClusters(graph: Graph, clusters: ClustersI): Set<string> {
@@ -56,7 +62,8 @@ function getUsedClusters(graph: Graph, clusters: ClustersI): Set<string> {
 }
 
 export function buildTree(
-    graph: Graph,
+    base_graph: Graph,
+    clustered_graph: Graph,
     clusters: ClustersI,
     parentId?: string,
 ): TreeNode[] {
@@ -64,7 +71,10 @@ export function buildTree(
     // will also be in the tree
 
     // construct a list of the actual clusters that are in the graph
-    const used_clusters: Set<string> = getUsedClusters(graph, clusters);
+    const used_clusters: Set<string> = getUsedClusters(
+        clustered_graph,
+        clusters,
+    );
 
     function _buildTree(parentId?: string): TreeNode[] {
         const childClusterIds = clusters.getDirectSubclusters(parentId);
@@ -76,7 +86,7 @@ export function buildTree(
                 const cluster = clusters.getCluster(c_id);
                 if (!cluster) return null;
 
-                const memberNodes = getMemberNodes(graph, cluster);
+                const memberNodes = getMemberNodes(base_graph, cluster);
 
                 const subClusters = _buildTree(c_id);
                 return {
@@ -86,7 +96,7 @@ export function buildTree(
                 };
             })
             .filter(Boolean) as TreeNode[];
-        
+
         return result;
     }
 
