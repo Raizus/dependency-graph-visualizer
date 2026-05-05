@@ -24,7 +24,7 @@
         if (treeNode.kind !== "cluster") return;
         localExpanded = {
             ...localExpanded,
-            [treeNode.cluster.id]: !localExpanded[treeNode.cluster.id],
+            [treeNode.cluster.id]: !isExpanded,
         };
     }
 
