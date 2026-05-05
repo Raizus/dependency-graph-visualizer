@@ -21,6 +21,8 @@
     <RightPane base_graph={graph} {clustered_graph} {clusters}/>
 </div>
 
+// --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+// font-family: var(--font-mono);
 <style lang="scss">
     .clusters-editor {
         --bg: #0f1117;
@@ -31,7 +33,6 @@
         --text-muted: #5a6a8a;
         --text-dim: #3a4a6a;
         --radius: 6px;
-        // --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
         --font-ui: "IBM Plex Sans", "Segoe UI", sans-serif;
 
         display: flex;
@@ -39,7 +40,6 @@
         width: 100%;
         height: 100%;
         color: var(--text);
-        // font-family: var(--font-mono);
         overflow: hidden;
         border: 1px solid none;
     }
