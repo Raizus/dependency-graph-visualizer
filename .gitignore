@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.svelte-kit/
+out/
+
+# Environment
+.env*.local
+
+# Turbo
+.turbo/
+
+# Misc
+.DS_Store
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Other
+prompt.txt
