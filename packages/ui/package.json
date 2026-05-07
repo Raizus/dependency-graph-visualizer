@@ -25,7 +25,25 @@
     "exports": {
         "./App.svelte": "./src/App.svelte",
         "./app.scss": "./src/app.scss",
-        "./GraphCanvas.svelte": "./src/lib/GraphCanvas.svelte"
+        "./GraphCanvas.svelte": "./src/lib/GraphCanvas.svelte",
+        "./StateStore.ts": "./src/lib/StateStore.ts",
+        "./Toolbar.svelte": "./src/lib/components/toolbar/Toolbar.svelte"
+    },
+    "typesVersions": {
+        "*": {
+            "app.scss": [
+                "src/app.scss"
+            ],
+            "src/lib/GraphCanvas.svelte": [
+                "src/lib/GraphCanvas.svelte"
+            ],
+            "StateStore.ts": [
+                "src/lib/StateStore.ts"
+            ],
+            "Toolbar.svelte": [
+                "src/lib/components/toolbar/Toolbar.svelte"
+            ]
+        }
     },
     "dependencies": {
         "@dep-graph-vis/core": "^1.0.0",
