@@ -32,7 +32,7 @@
     }
 
     function getNodeFullPath(graph: Graph | null, n_id: string): string {
-        const res = graph?.getNodeAttribute(n_id, 'full_path') || n_id;
+        const res = n_id;
         return res;
     }
 

@@ -13,7 +13,7 @@
         try {
             await state_store.initialize();
 
-            const state_json = await loadPublicJson(`${import.meta.env.BASE_URL}examples/example1.json`);
+            const state_json = await loadPublicJson(`${import.meta.env.BASE_URL}examples/example1_transf.json`);
             const { graph, views } = loadStateJson(state_json);
 
             state_store.setState(graph, views);

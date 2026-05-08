@@ -59,7 +59,7 @@ export function buildHierarquicalClusters(graph: Graph): Map<string, ClusterI> {
         visited.add(parent_node);
 
         const parent_attr = graph.getNodeAttributes(parent_node);
-        const parent_path = parent_attr.full_path;
+        const parent_path = parent_attr.key;
 
         let new_parent_cluster_id = parent_cluster_id;
         // build cluster?
@@ -81,7 +81,7 @@ export function buildHierarquicalClusters(graph: Graph): Map<string, ClusterI> {
             // node does not belong to this cluster
             if (
                 parent_node !== root &&
-                !nattr.full_path.startsWith(parent_path)
+                !nattr.key.startsWith(parent_path)
             )
                 continue;
 

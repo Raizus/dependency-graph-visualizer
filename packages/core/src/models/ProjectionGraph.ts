@@ -35,7 +35,6 @@ export function createClusteredGraph(graph: Graph, clusters: ClustersI): Graph {
             key: cluster.id,
             label: cluster.label,
             type: "cluster",
-            full_path: "",
             external: false,
         };
         proj_graph.addNode(cluster.id, attr);

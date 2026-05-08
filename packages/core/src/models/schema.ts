@@ -94,7 +94,6 @@ export interface GraphAttributesI {
 export interface NodeAttributesI {
     key: string;
     label: string;
-    full_path: string;
     type: string;
     external?: boolean;
     rank?: number;

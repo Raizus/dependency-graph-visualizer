@@ -125,7 +125,7 @@
     <div
         class="tree-row leaf"
         style="padding-left: {depth * INDENT_PX + 4 + 16}px"
-        title={attrs.full_path || treeNode.id}
+        title={attrs.key || treeNode.id}
         tabindex="0"
         role="treeitem"
     >

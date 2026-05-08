@@ -374,7 +374,7 @@ class GraphvizGraphModelBuilder {
                     sub.node(nodeId, {
                         label: attrs.label || attrs.key,
                         ...baseNodeStyle(attrs),
-                        tooltip: `${nodeId}; path: ${attrs.full_path}`,
+                        tooltip: `${nodeId}; path: ${attrs.key}`,
                     });
                 }
 

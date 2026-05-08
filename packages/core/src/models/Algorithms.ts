@@ -141,8 +141,7 @@ export function nodeMatch(node_attr: NodeAttributesI, query: string): boolean {
     }
     return (
         regex.test(node_attr.key) ||
-        regex.test(node_attr.label) ||
-        regex.test(node_attr.full_path)
+        regex.test(node_attr.label)
     );
 }
 

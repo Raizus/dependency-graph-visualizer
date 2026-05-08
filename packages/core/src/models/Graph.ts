@@ -22,7 +22,6 @@ export function loadDirectedGraphFromJSON(
         graph.addNode(node.key, {
             key: node.key,
             label: node.label,
-            full_path: node.full_path,
             type: node.type,
             external: node.external,
         });
@@ -76,7 +75,7 @@ export function getPathToNodesMap(graph: Graph): Map<string, string[]> {
     const path_to_nodes = new Map<string, string[]>(); // path -> node IDs
     graph.forEachNode((nodeId, attrs) => {
         const type = attrs.type;
-        const path = attrs.full_path;
+        const path = attrs.key;
 
         if (type === "folder") {
             // Folder cluster

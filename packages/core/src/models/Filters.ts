@@ -26,7 +26,7 @@ function get_regex_filter_func(data: RegexFilterParamsI): FilterFunc {
         const filtered = graph.filterNodes((node, attr) => {
             return (
                 regex.test(graph.getNodeAttribute(node, "label")) ||
-                regex.test(graph.getNodeAttribute(node, "full_path"))
+                regex.test(graph.getNodeAttribute(node, "key"))
             );
         });
         return filtered;
