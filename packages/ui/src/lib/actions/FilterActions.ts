@@ -157,3 +157,16 @@ export function filter_reaching_of_selection_action(
     state_store.addFilter(filter, show);
 }
 
+export function filter_nodes_not_reachable_from_outside_action(
+    state_store: StateStore,
+    cluster_id: string | null,
+    show: boolean,
+) {
+    if (!cluster_id) return;
+    const all_nodes = getSubnodesAndSubclusters(state_store, [cluster_id]);
+    const filter_params = reachable_filter_params(all_nodes);
+
+    const label = `Nodes not reachable from outside cluster ${cluster_id}`;
+    const filter = create_filter(label, show, filter_params);
+    state_store.addFilter(filter, show);
+}

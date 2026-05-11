@@ -8,8 +8,15 @@
     "exports": {
         ".": {
             "import": "./dist/index.js",
-            "types": "./dist/index.d.ts"
+            "types": "./dist/index.d.ts",
+            "default": "./src/index.ts"
         }
+    },
+    "imports": {
+        "#*": [
+            "./src/*",
+            "./src/*.ts"
+        ]
     },
     "scripts": {
         "build": "tsc",
@@ -27,7 +34,7 @@
         "ts-graphviz": "^3.0.7"
     },
     "devDependencies": {
-        "@types/node": "^25.3.2",
+        "@types/node": "^25.6.2",
         "eslint": "^10.0.0",
         "typescript": "^5.9.3",
         "vitest": "^4.0.18"
