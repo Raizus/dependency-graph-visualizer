@@ -16,9 +16,9 @@ import {
     View,
     loadDirectedGraphFromJSON,
     ClusterManager,
-    buildHierarquicalClusters,
     assignNodeRanks,
     graphToJSON,
+    buildHierarchicalClusters,
 } from "@dep-graph-vis/core";
 import type { GraphRenderer } from "./visualizer/GraphRenderer";
 
@@ -38,7 +38,7 @@ export function loadStateJson(data: StateJSON): {
 
     const label = "Hierarchical View";
     const view = newBlanckView(label);
-    const cluster_map = buildHierarquicalClusters(graph);
+    const cluster_map = buildHierarchicalClusters(graph);
     view.clusters = new ClusterManager([...cluster_map.values()]);
     const view_map = new ViewMap();
     view_map.set(label, view);

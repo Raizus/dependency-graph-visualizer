@@ -12,37 +12,29 @@ import { getPathToNodesMap } from "./Graph";
 
 type ClustersMap = Map<string, ClusterI>;
 
-export function buildHierarquicalClusters(graph: Graph): Map<string, ClusterI> {
-    const root = graph.findNode(
-        (node) => graph.getNodeAttribute(node, "type") === "root",
-    );
-    if (!root) return new Map();
-
-    let count = 1;
+export function buildHierarchicalClusters(graph: Graph): Map<string, ClusterI> {
     const cluster_map: Map<string, ClusterI> = new Map();
-    const visited: Set<string> = new Set();
+    // Map from node id → cluster id (for nodes that own a cluster)
+    const node_to_cluster: Map<string, string> = new Map();
+    let count = 1;
 
     function create_cluster(
         nattr: NodeAttributesI,
         parent_cluster_id: string | undefined,
     ): ClusterI {
-        const ntype = nattr.type;
-        const cluster_id = `c${count}`;
+        const cluster_id = `c${count++}`;
         const cluster: ClusterI = {
             id: cluster_id,
             nodes: [],
-            expanded: ntype === "folder" ? true : false,
-            // expanded: false,
+            expanded: nattr.type === "folder",
             label: nattr.label,
             parent_id: parent_cluster_id,
         };
-        count += 1;
         cluster_map.set(cluster_id, cluster);
-
         return cluster;
     }
 
-    function is_cluster(ntype: string) {
+    function is_cluster_type(ntype: string): boolean {
         return (
             ntype === "file" ||
             ntype === "folder" ||
@@ -51,56 +43,86 @@ export function buildHierarquicalClusters(graph: Graph): Map<string, ClusterI> {
         );
     }
 
-    function build_clusters(
-        parent_cluster_id: string | undefined,
-        parent_node: string,
-    ) {
-        if (visited.has(parent_node)) return;
-        visited.add(parent_node);
+    // Returns the node id whose cluster should be the direct parent,
+    // by walking up the path segments and ##-split.
+    function find_parent_node(node: string): string | undefined {
+        const key = graph.getNodeAttribute(node, "key");
+        const ntype = graph.getNodeAttribute(node, "type");
 
-        const parent_attr = graph.getNodeAttributes(parent_node);
-        const parent_path = parent_attr.key;
-
-        let new_parent_cluster_id = parent_cluster_id;
-        // build cluster?
-        if (parent_node !== root && is_cluster(parent_attr.type)) {
-            const cluster = create_cluster(parent_attr, parent_cluster_id);
-            cluster.nodes = [parent_node];
-            new_parent_cluster_id = cluster.id;
-        }
-        // add node to parent cluster
-        else if (parent_cluster_id) {
-            const parent_cluster = cluster_map.get(parent_cluster_id);
-            parent_cluster?.nodes.push(parent_node);
+        // For classes/functions inside a file: "path/to/file##Name"
+        // → parent candidate is the file node with key "path/to/file"
+        if (key.includes("##")) {
+            const file_key = key.split("##")[0];
+            // Only use as parent if it's a class and the parent is a file,
+            // or a function whose parent is a file or class.
+            const parent_node = graph.findNode(
+                (n) => graph.getNodeAttribute(n, "key") === file_key,
+            );
+            if (parent_node) return parent_node;
         }
 
-        const outgoing = graph.outNeighbors(parent_node);
-        for (const node of outgoing) {
-            const nattr = graph.getNodeAttributes(node);
-
-            // node does not belong to this cluster
-            if (
-                parent_node !== root &&
-                !nattr.key.startsWith(parent_path)
-            )
-                continue;
-
-            build_clusters(new_parent_cluster_id, node);
+        // For files/folders: walk up path segments
+        if (ntype === "file" || ntype === "folder") {
+            const parts = key.split("/");
+            // Try progressively shorter parent paths
+            for (let i = parts.length - 1; i >= 1; i--) {
+                const parent_key = parts.slice(0, i).join("/");
+                const parent_node = graph.findNode(
+                    (n) => graph.getNodeAttribute(n, "key") === parent_key,
+                );
+                if (parent_node) return parent_node;
+            }
         }
+
+        return undefined;
     }
 
-    // this will only create the file tree and will not create external library clusters
-    build_clusters(undefined, root);
+    // Sort nodes so parents are always processed before children.
+    // Primary: path depth (fewer segments first).
+    // Secondary: ## indicator (file before class/function in that file).
+    function node_depth(node: string): number {
+        const key = graph.getNodeAttribute(node, "key");
+        const [path_part, member_part] = key.split("##");
+        const path_depth = path_part.split("/").length;
+        // Members inside a file sit one level deeper than the file itself
+        return member_part !== undefined ? path_depth + 1 : path_depth;
+    }
 
-    // add clusters for external libraries
-    const filter_data: NodeTypeFilterParamsI = {
-        type: "node_type",
-        node_type: "external_library",
-    };
-    const filter = filterFunctionFactory(filter_data);
-    const external_lib_nodes = filter(graph);
-    for (const node of external_lib_nodes) {
-        build_clusters(undefined, node);
+    const all_nodes = graph.nodes();
+    const sorted_nodes = [...all_nodes].sort(
+        (a, b) => node_depth(a) - node_depth(b),
+    );
+
+    for (const node of sorted_nodes) {
+        const nattr = graph.getNodeAttributes(node);
+
+        if (!is_cluster_type(nattr.type)) {
+            // Non-cluster node: just add it to its nearest ancestor cluster
+            const parent_node = find_parent_node(node);
+            const parent_cluster_id = parent_node
+                ? node_to_cluster.get(parent_node)
+                : undefined;
+            if (parent_cluster_id) {
+                cluster_map.get(parent_cluster_id)?.nodes.push(node);
+            }
+            continue;
+        }
+
+        // Cluster-type node: find its parent cluster via its parent node
+        const parent_node = find_parent_node(node);
+        const parent_cluster_id = parent_node
+            ? node_to_cluster.get(parent_node)
+            : undefined;
+
+        const cluster = create_cluster(nattr, parent_cluster_id);
+        cluster.nodes = [node]; // The node itself is the first member
+        node_to_cluster.set(node, cluster.id);
+
+        // Register this cluster as a child of its parent cluster
+        if (parent_cluster_id) {
+            // parent_cluster.nodes already contains the parent node itself;
+            // sub-clusters are linked via parent_id, not re-added here
+        }
     }
 
     return cluster_map;
