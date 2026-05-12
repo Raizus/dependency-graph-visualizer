@@ -5,8 +5,12 @@
     export let clusters: ClustersI;
 
     let query: string = "";
+    let selected_nodes: Set<string> = new Set();
 
-    function getUnclusteredNodes(graph: Graph | null, clusters: ClustersI): Set<string> {
+    function getUnclusteredNodes(
+        graph: Graph | null,
+        clusters: ClustersI,
+    ): Set<string> {
         if (!graph) return new Set();
         const graph_nodes = new Set(graph.nodes());
         const clustered_nodes = clusters.getAllClusterNodesRecursive();
@@ -37,8 +41,19 @@
     }
 
     function getNodeLabel(graph: Graph | null, n_id: string): string {
-        const res = graph?.getNodeAttribute(n_id, 'label') || n_id;
+        const res = graph?.getNodeAttribute(n_id, "label") || n_id;
         return res;
+    }
+
+    function nodeClickCb(event: MouseEvent, n_id: string) {
+        const ctrlKey = event.ctrlKey;
+        const shiftKey = event.shiftKey;
+        if (ctrlKey || shiftKey) {
+            selected_nodes.add(n_id);
+            selected_nodes = selected_nodes;
+        } else {
+            selected_nodes = new Set([n_id]);
+        }
     }
 
     $: unclustered_nodes = getUnclusteredNodes(graph, clusters);
@@ -73,11 +88,16 @@
         {:else}
             {#each filtered_unclustered as id (id)}
                 <!-- title={attrs.full_path || id} -->
-                <div class="node-row" title={getNodeFullPath(graph, id)}>
+                <button
+                    class="node-row"
+                    class:selected={selected_nodes.has(id)}
+                    title={getNodeFullPath(graph, id)}
+                    on:click={(event) => nodeClickCb(event, id)}
+                >
                     <span class="node-id">{getNodeLabel(graph, id)}</span>
                     <!-- <span class="node-label">{attrs.label}</span>
                     <span class="node-type-badge">{attrs.type}</span> -->
-                </div>
+                </button>
             {/each}
         {/if}
     </div>
@@ -85,7 +105,13 @@
 
 <style>
     /* ── Pane header ── */
- 
+
+    .list-box {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
     .pane-count {
         font-size: 10px;
         color: var(--text);
@@ -94,22 +120,27 @@
         padding: 1px 7px;
         font-family: var(--font-ui);
     }
- 
+
     /* ── Unclustered node rows (left pane) ── */
     .node-row {
+        border-radius: 0;
         display: flex;
         align-items: center;
         gap: 1px;
         padding: 3px 14px;
-        cursor: default;
+        background: none;
         transition: background 0.1s;
         min-width: 0;
 
         &:hover {
             background: var(--surface-hover);
         }
+
+        &.selected {
+            background: hsl(222, 28%, 20%);
+        }
     }
- 
+
     /* .node-icon {
         font-size: 12px;
         flex-shrink: 0;
@@ -138,5 +169,4 @@
         flex-shrink: 0;
         font-family: var(--font-ui);
     } */
-
 </style>
