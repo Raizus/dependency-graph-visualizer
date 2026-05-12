@@ -4,14 +4,14 @@ import { Graph, GraphAttributesI, GraphJSON, NodeAttributesI } from "./schema";
 export function loadDirectedGraphFromJSON(
     data: GraphJSON,
 ): Graph {
-    const graph = new DirectedGraph<NodeAttributesI>();
+    const graph: Graph = new DirectedGraph();
 
     // Set graph attributes
-    if (data.attributes) {
-        for (const [attrKey, attrValue] of Object.entries(data.attributes)) {
-            graph.setAttribute(attrKey, attrValue);
-        }
-    }
+    // if (data.attributes) {
+    //     for (const [attrKey, attrValue] of Object.entries(data.attributes)) {
+    //         graph.setAttribute(attrKey, attrValue);
+    //     }
+    // }
 
     // Add nodes
     for (const node of data.nodes) {
@@ -36,7 +36,10 @@ export function loadDirectedGraphFromJSON(
             throw new Error(`Edge target does not exist: ${edge.target}`);
         }
 
-        graph.addDirectedEdge(edge.source, edge.target);
+        graph.addDirectedEdge(edge.source, edge.target, {
+            label: edge.label,
+            type: edge.type
+        });
     }
 
     return graph;
@@ -50,7 +53,9 @@ export function graphToJSON(graph: Graph): GraphJSON {
 
     const edges: GraphJSON["edges"] = [];
     graph.forEachEdge((edgeKey, attributes, source, target) => {
-        edges.push({ source, target });
+        const label = attributes.label;
+        const type = attributes.type;
+        edges.push({ source, target, label, type });
     });
 
     const attributes: GraphAttributesI = graph.getAttributes();

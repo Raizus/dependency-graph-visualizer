@@ -99,7 +99,12 @@ export interface NodeAttributesI {
     rank?: number;
 }
 
-export interface EdgeJSON {
+export interface EdgeAttributes {
+    label?: string;
+    type?: string;
+}
+
+export interface EdgeJSON extends EdgeAttributes{
     source: string;
     target: string;
 }
@@ -110,7 +115,7 @@ export interface GraphJSON {
     attributes?: GraphAttributesI;
 }
 
-export type Graph = DirectedGraph<NodeAttributesI, Attributes, GraphAttributesI>;
+export type Graph = DirectedGraph<NodeAttributesI, EdgeAttributes, GraphAttributesI>;
 
 export interface ClusterI {
     id: string;
