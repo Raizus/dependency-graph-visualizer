@@ -57,8 +57,9 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        background: var(--bg);
+        background: "none";
         border-radius: var(--radius);
+        gap: 3px;
     }
 
     .clusters-editor :global(.pane-header) {
@@ -138,6 +139,7 @@
         overflow-x: hidden;
         padding: 4px 0;
         scrollbar-width: thin;
+        background: var(--bg);
         scrollbar-color: var(--border) transparent;
 
         &::-webkit-scrollbar {
