@@ -8,7 +8,7 @@
         type ViewI,
     } from "@dep-graph-vis/core";
     import { D3GraphRenderer } from "./visualizer/D3GraphRenderer";
-    import ContextMenuBuilder from "./components/ContextMenu/ContextMenuBuilder.svelte";
+    import ContextMenuBuilder from "./components/ContextMenu/CanvasContextMenuBuilder.svelte";
 
     export let state_store: StateStore;
     let renderer: GraphRenderer = new D3GraphRenderer();
