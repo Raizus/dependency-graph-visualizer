@@ -388,6 +388,12 @@ export class StateStore {
         this.updateClusteredGraph();
     }
 
+    newBlankCluster() {
+        const curr_view = get(this._current_view);
+        curr_view.clusters.addCluster('New Cluster', undefined, [], true);
+        this._current_view.update(() => curr_view);
+    }
+
     /* ------------------------------------------------------------------------------------------- */
     /* ----- View related methods ---------------------------------------------------------------- */
 
