@@ -1,6 +1,11 @@
 import ts from "typescript";
 import * as path from "path";
-import type { ParserPlugin, ParseResult, ParserSettings, Edge } from "./ParserPlugin";
+import type {
+    ParserPlugin,
+    ParseResult,
+    ParserSettings,
+    Edge,
+} from "./ParserPlugin";
 import { NodeAttributesI } from "../models";
 
 function addClassDeclaration(
@@ -203,6 +208,15 @@ export class TypescriptParser implements ParserPlugin {
             const key = `${fileKey}##${node.name.text}`;
             addClassDeclaration(node.name.text, fileKey, nodes, edges);
 
+            // Check for type references in implements and extends clauses
+            this.collectTypeReferences(
+                node,
+                key,
+                fileKey,
+                importedSymbols,
+                edges,
+            );
+
             for (const member of node.members) {
                 if (
                     (ts.isMethodDeclaration(member) ||
@@ -219,6 +233,59 @@ export class TypescriptParser implements ParserPlugin {
                     );
                 }
             }
+            return;
+        }
+
+        // interface declaration
+        if (ts.isInterfaceDeclaration(node) && node.name) {
+            const key = `${fileKey}##${node.name.text}`;
+            nodes.push({ key, label: node.name.text, type: "interface" });
+            edges.push({ source: fileKey, target: key, type: "contains" });
+
+            // Check for type references in extends clauses
+            this.collectTypeReferences(
+                node,
+                key,
+                fileKey,
+                importedSymbols,
+                edges,
+            );
+
+            // Also walk interface members for type references
+            for (const member of node.members) {
+                this.collectTypeReferences(
+                    member,
+                    key,
+                    fileKey,
+                    importedSymbols,
+                    edges,
+                );
+            }
+            return;
+        }
+
+        // type alias declaration
+        if (ts.isTypeAliasDeclaration(node) && node.name) {
+            const key = `${fileKey}##${node.name.text}`;
+            nodes.push({ key, label: node.name.text, type: "type" });
+            edges.push({ source: fileKey, target: key, type: "contains" });
+
+            // Check for type references in the type definition
+            this.collectTypeReferences(
+                node,
+                key,
+                fileKey,
+                importedSymbols,
+                edges,
+            );
+            return;
+        }
+
+        // enum declaration
+        if (ts.isEnumDeclaration(node) && node.name) {
+            const key = `${fileKey}##${node.name.text}`;
+            nodes.push({ key, label: node.name.text, type: "enum" });
+            edges.push({ source: fileKey, target: key, type: "contains" });
             return;
         }
 
@@ -265,6 +332,217 @@ export class TypescriptParser implements ParserPlugin {
     }
 
     /**
+     * Collects type reference edges from a node (for interfaces, types, and class inheritance).
+     */
+    private collectTypeReferences(
+        node: ts.Node,
+        scope: string,
+        fileKey: string,
+        importedSymbols: Map<string, string>,
+        edges: Edge[],
+    ): void {
+        // Handle heritage clauses (extends/implements)
+        if (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) {
+            const heritageClauses = node.heritageClauses;
+            if (heritageClauses) {
+                for (const clause of heritageClauses) {
+                    const edgeType =
+                        clause.token === ts.SyntaxKind.ExtendsKeyword
+                            ? "extends"
+                            : "implements";
+
+                    for (const type of clause.types) {
+                        const target = this.resolveTypeReference(
+                            type.expression,
+                            fileKey,
+                            importedSymbols,
+                        );
+                        if (target) {
+                            edges.push({
+                                source: scope,
+                                target,
+                                type: edgeType,
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        // Handle type references in type aliases
+        if (ts.isTypeAliasDeclaration(node)) {
+            this.walkTypeReference(
+                node.type,
+                scope,
+                fileKey,
+                importedSymbols,
+                edges,
+            );
+        }
+
+        // Handle type references in property signatures (interface members)
+        if (ts.isPropertySignature(node) || ts.isMethodSignature(node)) {
+            if (node.type) {
+                this.walkTypeReference(
+                    node.type,
+                    scope,
+                    fileKey,
+                    importedSymbols,
+                    edges,
+                );
+            }
+
+            // Check parameters for type references
+            if (ts.isMethodSignature(node)) {
+                for (const param of node.parameters) {
+                    if (param.type) {
+                        this.walkTypeReference(
+                            param.type,
+                            scope,
+                            fileKey,
+                            importedSymbols,
+                            edges,
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Recursively walks a type node to find type references.
+     */
+    private walkTypeReference(
+        typeNode: ts.TypeNode,
+        scope: string,
+        fileKey: string,
+        importedSymbols: Map<string, string>,
+        edges: Edge[],
+    ): void {
+        if (ts.isTypeReferenceNode(typeNode)) {
+            const target = this.resolveTypeReference(
+                typeNode.typeName,
+                fileKey,
+                importedSymbols,
+            );
+            if (target) {
+                edges.push({ source: scope, target, type: "uses_type" });
+            }
+
+            // Handle generic type arguments
+            if (typeNode.typeArguments) {
+                for (const typeArg of typeNode.typeArguments) {
+                    this.walkTypeReference(
+                        typeArg,
+                        scope,
+                        fileKey,
+                        importedSymbols,
+                        edges,
+                    );
+                }
+            }
+        } else if (
+            ts.isUnionTypeNode(typeNode) ||
+            ts.isIntersectionTypeNode(typeNode)
+        ) {
+            for (const subType of typeNode.types) {
+                this.walkTypeReference(
+                    subType,
+                    scope,
+                    fileKey,
+                    importedSymbols,
+                    edges,
+                );
+            }
+        } else if (ts.isArrayTypeNode(typeNode)) {
+            this.walkTypeReference(
+                typeNode.elementType,
+                scope,
+                fileKey,
+                importedSymbols,
+                edges,
+            );
+        } else if (ts.isTypeLiteralNode(typeNode)) {
+            for (const member of typeNode.members) {
+                this.collectTypeReferences(
+                    member,
+                    scope,
+                    fileKey,
+                    importedSymbols,
+                    edges,
+                );
+            }
+        } else if (ts.isMappedTypeNode(typeNode)) {
+            if (typeNode.type) {
+                this.walkTypeReference(
+                    typeNode.type,
+                    scope,
+                    fileKey,
+                    importedSymbols,
+                    edges,
+                );
+            }
+        } else if (ts.isConditionalTypeNode(typeNode)) {
+            this.walkTypeReference(
+                typeNode.checkType,
+                scope,
+                fileKey,
+                importedSymbols,
+                edges,
+            );
+            this.walkTypeReference(
+                typeNode.extendsType,
+                scope,
+                fileKey,
+                importedSymbols,
+                edges,
+            );
+            this.walkTypeReference(
+                typeNode.trueType,
+                scope,
+                fileKey,
+                importedSymbols,
+                edges,
+            );
+            this.walkTypeReference(
+                typeNode.falseType,
+                scope,
+                fileKey,
+                importedSymbols,
+                edges,
+            );
+        }
+    }
+
+    /**
+     * Resolves a type reference to a node key.
+     */
+    private resolveTypeReference(
+        typeName: ts.EntityName | ts.Expression,
+        fileKey: string,
+        importedSymbols: Map<string, string>,
+    ): string | null {
+        if (ts.isIdentifier(typeName)) {
+            const name = typeName.text;
+            if (importedSymbols.has(name)) {
+                return importedSymbols.get(name)!;
+            }
+            return `${fileKey}##${name}`;
+        }
+
+        if (ts.isQualifiedName(typeName)) {
+            if (ts.isIdentifier(typeName.left)) {
+                const objName = typeName.left.text;
+                if (importedSymbols.has(objName)) {
+                    return `${importedSymbols.get(objName)}##${typeName.right.text}`;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Recursively walks a node's subtree looking for identifiers that match
      * imported symbols or locally defined symbols, and creates "calls" edges.
      *
@@ -303,6 +581,19 @@ export class TypescriptParser implements ParserPlugin {
                     edges.push({ source: scope, target, type: "instantiates" });
                 }
             }
+
+            // Handle type annotations and references in function bodies
+            if (ts.isTypeReferenceNode(n)) {
+                const target = this.resolveTypeReference(
+                    n.typeName,
+                    fileKey,
+                    importedSymbols,
+                );
+                if (target && target !== scope) {
+                    edges.push({ source: scope, target, type: "uses_type" });
+                }
+            }
+
             ts.forEachChild(n, visit);
         };
         ts.forEachChild(node, visit);
