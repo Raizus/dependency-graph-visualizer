@@ -6,7 +6,7 @@
 </script>
 
 <button on:click={() => (basicOpen = true)}> Edit Clusters </button>
-<Modal bind:open={basicOpen} title="Edit Clusters" size="lg">
+<Modal bind:open={basicOpen} title="Edit Clusters" size="xl">
     <ClustersEditor />
 </Modal>
 
