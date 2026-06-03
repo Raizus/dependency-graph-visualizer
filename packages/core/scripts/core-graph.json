@@ -1,0 +1,2129 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "key": "index.ts",
+        "label": "index.ts",
+        "type": "file"
+      },
+      {
+        "key": "models",
+        "label": "models",
+        "type": "folder"
+      },
+      {
+        "key": "models/Algorithms.ts",
+        "label": "Algorithms.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/Algorithms.ts##findNodesInCyles",
+        "label": "findNodesInCyles",
+        "type": "function"
+      },
+      {
+        "key": "models/Algorithms.ts##findReachableNodes",
+        "label": "findReachableNodes",
+        "type": "function"
+      },
+      {
+        "key": "models/Algorithms.ts##findReachingNodes",
+        "label": "findReachingNodes",
+        "type": "function"
+      },
+      {
+        "key": "models/Algorithms.ts##tracePath",
+        "label": "tracePath",
+        "type": "function"
+      },
+      {
+        "key": "models/Algorithms.ts##nodeMatch",
+        "label": "nodeMatch",
+        "type": "function"
+      },
+      {
+        "key": "models/Algorithms.ts##searchGraphForNodes",
+        "label": "searchGraphForNodes",
+        "type": "function"
+      },
+      {
+        "key": "models/Algorithms.ts##topNodesByInDegree",
+        "label": "topNodesByInDegree",
+        "type": "function"
+      },
+      {
+        "key": "models/Algorithms.ts##topNodesByOutDegree",
+        "label": "topNodesByOutDegree",
+        "type": "function"
+      },
+      {
+        "key": "models/Clusters.ts",
+        "label": "Clusters.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/Clusters.ts##ClustersMap",
+        "label": "ClustersMap",
+        "type": "type"
+      },
+      {
+        "key": "models/Clusters.ts##buildHierarchicalClusters",
+        "label": "buildHierarchicalClusters",
+        "type": "function"
+      },
+      {
+        "key": "models/Clusters.ts##getCollapsedClusters",
+        "label": "getCollapsedClusters",
+        "type": "function"
+      },
+      {
+        "key": "models/Clusters.ts##getExpandedClusters",
+        "label": "getExpandedClusters",
+        "type": "function"
+      },
+      {
+        "key": "models/Clusters.ts##getAllClusterNodes",
+        "label": "getAllClusterNodes",
+        "type": "function"
+      },
+      {
+        "key": "models/Clusters.ts##expandAllClusters",
+        "label": "expandAllClusters",
+        "type": "function"
+      },
+      {
+        "key": "models/Clusters.ts##collapseAllClusters",
+        "label": "collapseAllClusters",
+        "type": "function"
+      },
+      {
+        "key": "models/Clusters.ts##ClusterTreeNodeAttributes",
+        "label": "ClusterTreeNodeAttributes",
+        "type": "interface"
+      },
+      {
+        "key": "models/Clusters.ts##ClusterManager",
+        "label": "ClusterManager",
+        "type": "class"
+      },
+      {
+        "key": "models/Clusters.ts##generateClusterBoxes",
+        "label": "generateClusterBoxes",
+        "type": "function"
+      },
+      {
+        "key": "models/Clusters.ts##createAutomaticClusters",
+        "label": "createAutomaticClusters",
+        "type": "function"
+      },
+      {
+        "key": "models/FilterManager.ts",
+        "label": "FilterManager.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/FilterManager.ts##FilterManager",
+        "label": "FilterManager",
+        "type": "class"
+      },
+      {
+        "key": "models/Filters.ts",
+        "label": "Filters.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/Filters.ts##FilterFunc",
+        "label": "FilterFunc",
+        "type": "type"
+      },
+      {
+        "key": "models/Filters.ts##get_regex_filter_func",
+        "label": "get_regex_filter_func",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_node_type_filter",
+        "label": "get_node_type_filter",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_outgoing_node_filter_func",
+        "label": "get_outgoing_node_filter_func",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_incoming_node_filter_func",
+        "label": "get_incoming_node_filter_func",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_node_neighbours_filter_func",
+        "label": "get_node_neighbours_filter_func",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_node_siblings_filter_func",
+        "label": "get_node_siblings_filter_func",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_node_selection_filter_func",
+        "label": "get_node_selection_filter_func",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_inverse_selection_node_filter_func",
+        "label": "get_inverse_selection_node_filter_func",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_reachable_nodes_filter_func",
+        "label": "get_reachable_nodes_filter_func",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_reaching_nodes_filter_func",
+        "label": "get_reaching_nodes_filter_func",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_no_outgoing_nodes_filter_func",
+        "label": "get_no_outgoing_nodes_filter_func",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##filterFunctionFactory",
+        "label": "filterFunctionFactory",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##apply_filters",
+        "label": "apply_filters",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##filtered_subgraph",
+        "label": "filtered_subgraph",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_file_nodes",
+        "label": "get_file_nodes",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##get_folder_nodes",
+        "label": "get_folder_nodes",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##regex_filter_params",
+        "label": "regex_filter_params",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##node_type_filter_params",
+        "label": "node_type_filter_params",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##node_selection_filter_params",
+        "label": "node_selection_filter_params",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##inverse_node_selection_filter_params",
+        "label": "inverse_node_selection_filter_params",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##outgoing_node_filter_params",
+        "label": "outgoing_node_filter_params",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##incoming_node_filter_params",
+        "label": "incoming_node_filter_params",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##node_siblings_filter_params",
+        "label": "node_siblings_filter_params",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##node_neighbours_filter_params",
+        "label": "node_neighbours_filter_params",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##reachable_filter_params",
+        "label": "reachable_filter_params",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##reaching_filter_params",
+        "label": "reaching_filter_params",
+        "type": "function"
+      },
+      {
+        "key": "models/Filters.ts##create_filter",
+        "label": "create_filter",
+        "type": "function"
+      },
+      {
+        "key": "models/Graph.ts",
+        "label": "Graph.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/Graph.ts##loadDirectedGraphFromJSON",
+        "label": "loadDirectedGraphFromJSON",
+        "type": "function"
+      },
+      {
+        "key": "models/Graph.ts##graphToJSON",
+        "label": "graphToJSON",
+        "type": "function"
+      },
+      {
+        "key": "models/Graph.ts##getPathRank",
+        "label": "getPathRank",
+        "type": "function"
+      },
+      {
+        "key": "models/Graph.ts##getPathToNodesMap",
+        "label": "getPathToNodesMap",
+        "type": "function"
+      },
+      {
+        "key": "models/Graph.ts##assignNodeRanks",
+        "label": "assignNodeRanks",
+        "type": "function"
+      },
+      {
+        "key": "models/Graph.ts##buildNodeRankMap",
+        "label": "buildNodeRankMap",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphPipeline.ts",
+        "label": "GraphPipeline.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/GraphPipeline.ts##GraphPipelineResult",
+        "label": "GraphPipelineResult",
+        "type": "interface"
+      },
+      {
+        "key": "models/GraphPipeline.ts##getClusterColor",
+        "label": "getClusterColor",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts",
+        "label": "GraphvizLayoutEngine.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##LayoutPosition",
+        "label": "LayoutPosition",
+        "type": "interface"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##LayoutResult",
+        "label": "LayoutResult",
+        "type": "interface"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##clusterNodeStyle",
+        "label": "clusterNodeStyle",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##clusterBoxStyle",
+        "label": "clusterBoxStyle",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##getNodeShape",
+        "label": "getNodeShape",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##getNodeColor",
+        "label": "getNodeColor",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##baseNodeStyle",
+        "label": "baseNodeStyle",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##getEdgeStyle",
+        "label": "getEdgeStyle",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##GraphOptions",
+        "label": "GraphOptions",
+        "type": "interface"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##getExportGraphOptions",
+        "label": "getExportGraphOptions",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##layoutToDotOptions",
+        "label": "layoutToDotOptions",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##layoutToExportDotOptions",
+        "label": "layoutToExportDotOptions",
+        "type": "function"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##GraphvizGraphModelBuilder",
+        "label": "GraphvizGraphModelBuilder",
+        "type": "class"
+      },
+      {
+        "key": "models/GraphvizLayoutEngine.ts##GraphvizLayoutEngine",
+        "label": "GraphvizLayoutEngine",
+        "type": "class"
+      },
+      {
+        "key": "models/Layout.ts",
+        "label": "Layout.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/ProjectionGraph.ts",
+        "label": "ProjectionGraph.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/ProjectionGraph.ts##createClusteredGraph",
+        "label": "createClusteredGraph",
+        "type": "function"
+      },
+      {
+        "key": "models/Views.ts",
+        "label": "Views.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/Views.ts##View",
+        "label": "View",
+        "type": "class"
+      },
+      {
+        "key": "models/Views.ts##ViewMap",
+        "label": "ViewMap",
+        "type": "class"
+      },
+      {
+        "key": "models/Views.ts##newBlanckView",
+        "label": "newBlanckView",
+        "type": "function"
+      },
+      {
+        "key": "models/Views.ts##newViewMap",
+        "label": "newViewMap",
+        "type": "function"
+      },
+      {
+        "key": "models/index.ts",
+        "label": "index.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/schema.ts",
+        "label": "schema.ts",
+        "type": "file"
+      },
+      {
+        "key": "models/schema.ts##RegexFilterParamsI",
+        "label": "RegexFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##NodeTypeFilterParamsI",
+        "label": "NodeTypeFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##OutgoingNodeFilterParamsI",
+        "label": "OutgoingNodeFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##IncomingNodeFilterParamsI",
+        "label": "IncomingNodeFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##NodeSiblingsFilterParamsI",
+        "label": "NodeSiblingsFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##NodeNeighboursFilterParamsI",
+        "label": "NodeNeighboursFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##NodeSelectionFilterParamsI",
+        "label": "NodeSelectionFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##InverseNodeSelectionFilterParamsI",
+        "label": "InverseNodeSelectionFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##ReachableFilterParamsI",
+        "label": "ReachableFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##ReachingFilterParamsI",
+        "label": "ReachingFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##PathsBetweenFilterParamsI",
+        "label": "PathsBetweenFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##PathsFromFilterParamsI",
+        "label": "PathsFromFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##PathsToFilterParamsI",
+        "label": "PathsToFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##NoOutgoingFilterParamsI",
+        "label": "NoOutgoingFilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##FilterParamsI",
+        "label": "FilterParamsI",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##FilterI",
+        "label": "FilterI",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##NodeGroupI",
+        "label": "NodeGroupI",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##LayoutType",
+        "label": "LayoutType",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##LayoutI",
+        "label": "LayoutI",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##GraphAttributesI",
+        "label": "GraphAttributesI",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##NodeAttributesI",
+        "label": "NodeAttributesI",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##EdgeAttributes",
+        "label": "EdgeAttributes",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##EdgeJSON",
+        "label": "EdgeJSON",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##GraphJSON",
+        "label": "GraphJSON",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##Graph",
+        "label": "Graph",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##ClusterI",
+        "label": "ClusterI",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##ClusterBox",
+        "label": "ClusterBox",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##ClustersI",
+        "label": "ClustersI",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##ViewI",
+        "label": "ViewI",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##ViewJSON",
+        "label": "ViewJSON",
+        "type": "interface"
+      },
+      {
+        "key": "models/schema.ts##ViewsJSON",
+        "label": "ViewsJSON",
+        "type": "type"
+      },
+      {
+        "key": "models/schema.ts##StateJSON",
+        "label": "StateJSON",
+        "type": "interface"
+      },
+      {
+        "key": "parsers",
+        "label": "parsers",
+        "type": "folder"
+      },
+      {
+        "key": "parsers/ParserPlugin.ts",
+        "label": "ParserPlugin.ts",
+        "type": "file"
+      },
+      {
+        "key": "parsers/ParserPlugin.ts##ParserSettings",
+        "label": "ParserSettings",
+        "type": "interface"
+      },
+      {
+        "key": "parsers/ParserPlugin.ts##ParseResult",
+        "label": "ParseResult",
+        "type": "interface"
+      },
+      {
+        "key": "parsers/ParserPlugin.ts##Edge",
+        "label": "Edge",
+        "type": "interface"
+      },
+      {
+        "key": "parsers/ParserPlugin.ts##ParserPlugin",
+        "label": "ParserPlugin",
+        "type": "interface"
+      },
+      {
+        "key": "parsers/TypescriptParser.ts",
+        "label": "TypescriptParser.ts",
+        "type": "file"
+      },
+      {
+        "key": "parsers/TypescriptParser.ts##addClassDeclaration",
+        "label": "addClassDeclaration",
+        "type": "function"
+      },
+      {
+        "key": "parsers/TypescriptParser.ts##addVariableStatement",
+        "label": "addVariableStatement",
+        "type": "function"
+      },
+      {
+        "key": "parsers/TypescriptParser.ts##TypescriptParser",
+        "label": "TypescriptParser",
+        "type": "class"
+      },
+      {
+        "key": "parsers/buildGraph.ts",
+        "label": "buildGraph.ts",
+        "type": "file"
+      },
+      {
+        "key": "parsers/buildGraph.ts##isIgnored",
+        "label": "isIgnored",
+        "type": "function"
+      },
+      {
+        "key": "parsers/buildGraph.ts##collectFiles",
+        "label": "collectFiles",
+        "type": "function"
+      },
+      {
+        "key": "parsers/buildGraph.ts##addFolderNodes",
+        "label": "addFolderNodes",
+        "type": "function"
+      },
+      {
+        "key": "parsers/buildGraph.ts##addFileNode",
+        "label": "addFileNode",
+        "type": "function"
+      },
+      {
+        "key": "parsers/buildGraph.ts##buildGraph",
+        "label": "buildGraph",
+        "type": "function"
+      },
+      {
+        "key": "parsers/buildGraph.ts##stubNode",
+        "label": "stubNode",
+        "type": "function"
+      },
+      {
+        "key": "parsers/index.ts",
+        "label": "index.ts",
+        "type": "file"
+      },
+      {
+        "key": "utils.ts",
+        "label": "utils.ts",
+        "type": "file"
+      }
+    ],
+    "edges": [
+      {
+        "source": "models",
+        "target": "models/Algorithms.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/Clusters.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/FilterManager.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/Filters.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/Graph.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/GraphPipeline.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/GraphvizLayoutEngine.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/Layout.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/ProjectionGraph.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/Views.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/index.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models",
+        "target": "models/schema.ts",
+        "type": "contains"
+      },
+      {
+        "source": "parsers",
+        "target": "parsers/ParserPlugin.ts",
+        "type": "contains"
+      },
+      {
+        "source": "parsers",
+        "target": "parsers/TypescriptParser.ts",
+        "type": "contains"
+      },
+      {
+        "source": "parsers",
+        "target": "parsers/buildGraph.ts",
+        "type": "contains"
+      },
+      {
+        "source": "parsers",
+        "target": "parsers/index.ts",
+        "type": "contains"
+      },
+      {
+        "source": "models/Algorithms.ts",
+        "target": "models/schema.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/Algorithms.ts",
+        "target": "models/Algorithms.ts##findNodesInCyles",
+        "type": "contains"
+      },
+      {
+        "source": "models/Algorithms.ts",
+        "target": "models/Algorithms.ts##findReachableNodes",
+        "type": "contains"
+      },
+      {
+        "source": "models/Algorithms.ts",
+        "target": "models/Algorithms.ts##findReachingNodes",
+        "type": "contains"
+      },
+      {
+        "source": "models/Algorithms.ts",
+        "target": "models/Algorithms.ts##tracePath",
+        "type": "contains"
+      },
+      {
+        "source": "models/Algorithms.ts##tracePath",
+        "target": "models/Algorithms.ts##findReachableNodes",
+        "type": "calls"
+      },
+      {
+        "source": "models/Algorithms.ts##tracePath",
+        "target": "models/Algorithms.ts##findReachingNodes",
+        "type": "calls"
+      },
+      {
+        "source": "models/Algorithms.ts",
+        "target": "models/Algorithms.ts##nodeMatch",
+        "type": "contains"
+      },
+      {
+        "source": "models/Algorithms.ts",
+        "target": "models/Algorithms.ts##searchGraphForNodes",
+        "type": "contains"
+      },
+      {
+        "source": "models/Algorithms.ts##searchGraphForNodes",
+        "target": "models/Algorithms.ts##nodeMatch",
+        "type": "calls"
+      },
+      {
+        "source": "models/Algorithms.ts",
+        "target": "models/Algorithms.ts##topNodesByInDegree",
+        "type": "contains"
+      },
+      {
+        "source": "models/Algorithms.ts",
+        "target": "models/Algorithms.ts##topNodesByOutDegree",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/schema.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Filters.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Graph.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##ClustersMap",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts##ClustersMap",
+        "target": "models/schema.ts##ClusterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##buildHierarchicalClusters",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts##buildHierarchicalClusters",
+        "target": "models/schema.ts##ClusterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Clusters.ts##buildHierarchicalClusters",
+        "target": "models/schema.ts##NodeAttributesI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##getCollapsedClusters",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##getExpandedClusters",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##getAllClusterNodes",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##expandAllClusters",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##collapseAllClusters",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##ClusterTreeNodeAttributes",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts##ClusterTreeNodeAttributes",
+        "target": "models/schema.ts##ClusterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##ClusterManager",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts##ClusterManager",
+        "target": "models/schema.ts##ClustersI",
+        "type": "implements"
+      },
+      {
+        "source": "models/Clusters.ts##ClusterManager",
+        "target": "models/schema.ts##ClusterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Clusters.ts##ClusterManager",
+        "target": "models/Clusters.ts##getExpandedClusters",
+        "type": "calls"
+      },
+      {
+        "source": "models/Clusters.ts##ClusterManager",
+        "target": "models/Clusters.ts##getCollapsedClusters",
+        "type": "calls"
+      },
+      {
+        "source": "models/Clusters.ts##ClusterManager",
+        "target": "models/Clusters.ts##collapseAllClusters",
+        "type": "calls"
+      },
+      {
+        "source": "models/Clusters.ts##ClusterManager",
+        "target": "models/Clusters.ts##expandAllClusters",
+        "type": "calls"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##generateClusterBoxes",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts##generateClusterBoxes",
+        "target": "models/schema.ts##ClusterBox",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Clusters.ts",
+        "target": "models/Clusters.ts##createAutomaticClusters",
+        "type": "contains"
+      },
+      {
+        "source": "models/Clusters.ts##createAutomaticClusters",
+        "target": "models/schema.ts##ClusterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Clusters.ts##createAutomaticClusters",
+        "target": "models/Graph.ts##getPathToNodesMap",
+        "type": "calls"
+      },
+      {
+        "source": "models/FilterManager.ts",
+        "target": "models/schema.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/FilterManager.ts",
+        "target": "models/FilterManager.ts##FilterManager",
+        "type": "contains"
+      },
+      {
+        "source": "models/FilterManager.ts##FilterManager",
+        "target": "models/schema.ts##FilterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/schema.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Algorithms.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "utils.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_regex_filter_func",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_regex_filter_func",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_node_type_filter",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_node_type_filter",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_outgoing_node_filter_func",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_outgoing_node_filter_func",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_incoming_node_filter_func",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_incoming_node_filter_func",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_node_neighbours_filter_func",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_node_neighbours_filter_func",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_node_siblings_filter_func",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_node_siblings_filter_func",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_node_selection_filter_func",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_node_selection_filter_func",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_inverse_selection_node_filter_func",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_inverse_selection_node_filter_func",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_reachable_nodes_filter_func",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_reachable_nodes_filter_func",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts##get_reachable_nodes_filter_func",
+        "target": "models/Algorithms.ts##findReachableNodes",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_reaching_nodes_filter_func",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_reaching_nodes_filter_func",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts##get_reaching_nodes_filter_func",
+        "target": "models/Algorithms.ts##findReachingNodes",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_no_outgoing_nodes_filter_func",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_no_outgoing_nodes_filter_func",
+        "target": "models/Filters.ts##FilterFunc",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##filterFunctionFactory",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_regex_filter_func",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_outgoing_node_filter_func",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_incoming_node_filter_func",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_node_siblings_filter_func",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_node_neighbours_filter_func",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_node_selection_filter_func",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_inverse_selection_node_filter_func",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_reachable_nodes_filter_func",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_reaching_nodes_filter_func",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_no_outgoing_nodes_filter_func",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts##filterFunctionFactory",
+        "target": "models/Filters.ts##get_node_type_filter",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##apply_filters",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##apply_filters",
+        "target": "models/Filters.ts##filterFunctionFactory",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##filtered_subgraph",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_file_nodes",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_file_nodes",
+        "target": "models/Filters.ts##filterFunctionFactory",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##get_folder_nodes",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##get_folder_nodes",
+        "target": "models/Filters.ts##filterFunctionFactory",
+        "type": "calls"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##regex_filter_params",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##regex_filter_params",
+        "target": "models/schema.ts##RegexFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##node_type_filter_params",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##node_type_filter_params",
+        "target": "models/schema.ts##NodeTypeFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##node_selection_filter_params",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##node_selection_filter_params",
+        "target": "models/schema.ts##NodeSelectionFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##inverse_node_selection_filter_params",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##inverse_node_selection_filter_params",
+        "target": "models/schema.ts##InverseNodeSelectionFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##outgoing_node_filter_params",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##outgoing_node_filter_params",
+        "target": "models/schema.ts##OutgoingNodeFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##incoming_node_filter_params",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##incoming_node_filter_params",
+        "target": "models/schema.ts##IncomingNodeFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##node_siblings_filter_params",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##node_siblings_filter_params",
+        "target": "models/schema.ts##NodeSiblingsFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##node_neighbours_filter_params",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##node_neighbours_filter_params",
+        "target": "models/schema.ts##NodeNeighboursFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##reachable_filter_params",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##reachable_filter_params",
+        "target": "models/schema.ts##ReachableFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##reaching_filter_params",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##reaching_filter_params",
+        "target": "models/schema.ts##ReachingFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Filters.ts",
+        "target": "models/Filters.ts##create_filter",
+        "type": "contains"
+      },
+      {
+        "source": "models/Filters.ts##create_filter",
+        "target": "models/schema.ts##FilterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Graph.ts",
+        "target": "models/schema.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/Graph.ts",
+        "target": "models/Graph.ts##loadDirectedGraphFromJSON",
+        "type": "contains"
+      },
+      {
+        "source": "models/Graph.ts##loadDirectedGraphFromJSON",
+        "target": "models/schema.ts##Graph",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Graph.ts",
+        "target": "models/Graph.ts##graphToJSON",
+        "type": "contains"
+      },
+      {
+        "source": "models/Graph.ts##graphToJSON",
+        "target": "models/schema.ts##NodeAttributesI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Graph.ts##graphToJSON",
+        "target": "models/schema.ts##GraphJSON",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Graph.ts##graphToJSON",
+        "target": "models/schema.ts##GraphAttributesI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Graph.ts",
+        "target": "models/Graph.ts##getPathRank",
+        "type": "contains"
+      },
+      {
+        "source": "models/Graph.ts",
+        "target": "models/Graph.ts##getPathToNodesMap",
+        "type": "contains"
+      },
+      {
+        "source": "models/Graph.ts",
+        "target": "models/Graph.ts##assignNodeRanks",
+        "type": "contains"
+      },
+      {
+        "source": "models/Graph.ts##assignNodeRanks",
+        "target": "models/Graph.ts##getPathToNodesMap",
+        "type": "calls"
+      },
+      {
+        "source": "models/Graph.ts",
+        "target": "models/Graph.ts##buildNodeRankMap",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphPipeline.ts",
+        "target": "models/schema.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/GraphPipeline.ts",
+        "target": "models/GraphPipeline.ts##GraphPipelineResult",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphPipeline.ts##GraphPipelineResult",
+        "target": "models/schema.ts##Graph",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/GraphPipeline.ts",
+        "target": "models/GraphPipeline.ts##getClusterColor",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/schema.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/Graph.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##LayoutPosition",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##LayoutResult",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##LayoutResult",
+        "target": "models/GraphvizLayoutEngine.ts##LayoutPosition",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##clusterNodeStyle",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##clusterBoxStyle",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##getNodeShape",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##getNodeColor",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##baseNodeStyle",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##baseNodeStyle",
+        "target": "models/GraphvizLayoutEngine.ts##getNodeShape",
+        "type": "calls"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##baseNodeStyle",
+        "target": "models/GraphvizLayoutEngine.ts##getNodeColor",
+        "type": "calls"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##getEdgeStyle",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##GraphOptions",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##getExportGraphOptions",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##getExportGraphOptions",
+        "target": "models/GraphvizLayoutEngine.ts##GraphOptions",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##layoutToDotOptions",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##layoutToExportDotOptions",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##layoutToExportDotOptions",
+        "target": "models/GraphvizLayoutEngine.ts##getExportGraphOptions",
+        "type": "calls"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##layoutToExportDotOptions",
+        "target": "models/GraphvizLayoutEngine.ts##layoutToDotOptions",
+        "type": "calls"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##GraphvizGraphModelBuilder",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##GraphvizGraphModelBuilder",
+        "target": "models/Graph.ts##buildNodeRankMap",
+        "type": "calls"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##GraphvizGraphModelBuilder",
+        "target": "models/GraphvizLayoutEngine.ts##clusterBoxStyle",
+        "type": "calls"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##GraphvizGraphModelBuilder",
+        "target": "models/GraphvizLayoutEngine.ts##clusterNodeStyle",
+        "type": "calls"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##GraphvizGraphModelBuilder",
+        "target": "models/GraphvizLayoutEngine.ts##baseNodeStyle",
+        "type": "calls"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##GraphvizGraphModelBuilder",
+        "target": "models/GraphvizLayoutEngine.ts##getEdgeStyle",
+        "type": "calls"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts",
+        "target": "models/GraphvizLayoutEngine.ts##GraphvizLayoutEngine",
+        "type": "contains"
+      },
+      {
+        "source": "models/GraphvizLayoutEngine.ts##GraphvizLayoutEngine",
+        "target": "models/GraphvizLayoutEngine.ts##LayoutPosition",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/ProjectionGraph.ts",
+        "target": "models/schema.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/ProjectionGraph.ts",
+        "target": "models/ProjectionGraph.ts##createClusteredGraph",
+        "type": "contains"
+      },
+      {
+        "source": "models/ProjectionGraph.ts##createClusteredGraph",
+        "target": "models/schema.ts##NodeAttributesI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Views.ts",
+        "target": "models/Clusters.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/Views.ts",
+        "target": "models/schema.ts",
+        "type": "imports"
+      },
+      {
+        "source": "models/Views.ts",
+        "target": "models/Views.ts##View",
+        "type": "contains"
+      },
+      {
+        "source": "models/Views.ts##View",
+        "target": "models/schema.ts##ViewI",
+        "type": "implements"
+      },
+      {
+        "source": "models/Views.ts",
+        "target": "models/Views.ts##ViewMap",
+        "type": "contains"
+      },
+      {
+        "source": "models/Views.ts##ViewMap",
+        "target": "models/Views.ts##View",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Views.ts##ViewMap",
+        "target": "models/schema.ts##ViewsJSON",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Views.ts",
+        "target": "models/Views.ts##newBlanckView",
+        "type": "contains"
+      },
+      {
+        "source": "models/Views.ts##newBlanckView",
+        "target": "models/Views.ts##View",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/Views.ts##newBlanckView",
+        "target": "models/Clusters.ts##ClusterManager",
+        "type": "instantiates"
+      },
+      {
+        "source": "models/Views.ts",
+        "target": "models/Views.ts##newViewMap",
+        "type": "contains"
+      },
+      {
+        "source": "models/Views.ts##newViewMap",
+        "target": "models/Views.ts##ViewMap",
+        "type": "instantiates"
+      },
+      {
+        "source": "models/Views.ts##newViewMap",
+        "target": "models/Views.ts##newBlanckView",
+        "type": "calls"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##RegexFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##NodeTypeFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##OutgoingNodeFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##IncomingNodeFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##NodeSiblingsFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##NodeNeighboursFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##NodeSelectionFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##InverseNodeSelectionFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##ReachableFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##ReachingFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##PathsBetweenFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##PathsFromFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##PathsToFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##NoOutgoingFilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##FilterParamsI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##RegexFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##NodeTypeFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##OutgoingNodeFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##IncomingNodeFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##NodeSiblingsFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##NodeNeighboursFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##NodeSelectionFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##InverseNodeSelectionFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##ReachableFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##ReachingFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##PathsBetweenFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##PathsFromFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##PathsToFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##FilterParamsI",
+        "target": "models/schema.ts##NoOutgoingFilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##FilterI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##FilterI",
+        "target": "models/schema.ts##FilterParamsI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##NodeGroupI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##NodeGroupI",
+        "target": "models/schema.ts##FilterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##LayoutType",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##LayoutI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##LayoutI",
+        "target": "models/schema.ts##LayoutType",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##GraphAttributesI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##NodeAttributesI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##EdgeAttributes",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##EdgeJSON",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##EdgeJSON",
+        "target": "models/schema.ts##EdgeAttributes",
+        "type": "extends"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##GraphJSON",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##GraphJSON",
+        "target": "models/schema.ts##NodeAttributesI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##GraphJSON",
+        "target": "models/schema.ts##EdgeJSON",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##GraphJSON",
+        "target": "models/schema.ts##GraphAttributesI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##Graph",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##Graph",
+        "target": "models/schema.ts##NodeAttributesI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##Graph",
+        "target": "models/schema.ts##EdgeAttributes",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##Graph",
+        "target": "models/schema.ts##GraphAttributesI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##ClusterI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##ClusterBox",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##ClustersI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##ClustersI",
+        "target": "models/schema.ts##ClusterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##ClustersI",
+        "target": "models/schema.ts##Graph",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##ViewI",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##ViewI",
+        "target": "models/schema.ts##FilterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##ViewI",
+        "target": "models/schema.ts##ClustersI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##ViewI",
+        "target": "models/schema.ts##LayoutI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##ViewJSON",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##ViewJSON",
+        "target": "models/schema.ts##FilterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##ViewJSON",
+        "target": "models/schema.ts##ClusterI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##ViewJSON",
+        "target": "models/schema.ts##LayoutI",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##ViewsJSON",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##ViewsJSON",
+        "target": "models/schema.ts##ViewJSON",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts",
+        "target": "models/schema.ts##StateJSON",
+        "type": "contains"
+      },
+      {
+        "source": "models/schema.ts##StateJSON",
+        "target": "models/schema.ts##GraphJSON",
+        "type": "uses_type"
+      },
+      {
+        "source": "models/schema.ts##StateJSON",
+        "target": "models/schema.ts##ViewsJSON",
+        "type": "uses_type"
+      },
+      {
+        "source": "parsers/ParserPlugin.ts",
+        "target": "parsers/ParserPlugin.ts##ParserSettings",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/ParserPlugin.ts",
+        "target": "parsers/ParserPlugin.ts##ParseResult",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/ParserPlugin.ts##ParseResult",
+        "target": "parsers/ParserPlugin.ts##Edge",
+        "type": "uses_type"
+      },
+      {
+        "source": "parsers/ParserPlugin.ts",
+        "target": "parsers/ParserPlugin.ts##Edge",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/ParserPlugin.ts",
+        "target": "parsers/ParserPlugin.ts##ParserPlugin",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/ParserPlugin.ts##ParserPlugin",
+        "target": "parsers/ParserPlugin.ts##ParseResult",
+        "type": "uses_type"
+      },
+      {
+        "source": "parsers/ParserPlugin.ts##ParserPlugin",
+        "target": "parsers/ParserPlugin.ts##ParserSettings",
+        "type": "uses_type"
+      },
+      {
+        "source": "parsers/TypescriptParser.ts",
+        "target": "parsers/ParserPlugin.ts",
+        "type": "imports"
+      },
+      {
+        "source": "parsers/TypescriptParser.ts",
+        "target": "models/index.ts",
+        "type": "imports"
+      },
+      {
+        "source": "parsers/TypescriptParser.ts",
+        "target": "parsers/TypescriptParser.ts##addClassDeclaration",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/TypescriptParser.ts",
+        "target": "parsers/TypescriptParser.ts##addVariableStatement",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/TypescriptParser.ts",
+        "target": "parsers/TypescriptParser.ts##TypescriptParser",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/TypescriptParser.ts##TypescriptParser",
+        "target": "parsers/ParserPlugin.ts##ParserPlugin",
+        "type": "implements"
+      },
+      {
+        "source": "parsers/TypescriptParser.ts##TypescriptParser",
+        "target": "parsers/ParserPlugin.ts##Edge",
+        "type": "uses_type"
+      },
+      {
+        "source": "parsers/TypescriptParser.ts##TypescriptParser",
+        "target": "parsers/TypescriptParser.ts##addClassDeclaration",
+        "type": "calls"
+      },
+      {
+        "source": "parsers/TypescriptParser.ts##TypescriptParser",
+        "target": "parsers/TypescriptParser.ts##addVariableStatement",
+        "type": "calls"
+      },
+      {
+        "source": "parsers/buildGraph.ts",
+        "target": "parsers/ParserPlugin.ts",
+        "type": "imports"
+      },
+      {
+        "source": "parsers/buildGraph.ts",
+        "target": "parsers/buildGraph.ts##isIgnored",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/buildGraph.ts",
+        "target": "parsers/buildGraph.ts##collectFiles",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/buildGraph.ts##collectFiles",
+        "target": "parsers/buildGraph.ts##isIgnored",
+        "type": "calls"
+      },
+      {
+        "source": "parsers/buildGraph.ts",
+        "target": "parsers/buildGraph.ts##addFolderNodes",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/buildGraph.ts",
+        "target": "parsers/buildGraph.ts##addFileNode",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/buildGraph.ts",
+        "target": "parsers/buildGraph.ts##buildGraph",
+        "type": "contains"
+      },
+      {
+        "source": "parsers/buildGraph.ts##buildGraph",
+        "target": "parsers/ParserPlugin.ts##Edge",
+        "type": "uses_type"
+      },
+      {
+        "source": "parsers/buildGraph.ts##buildGraph",
+        "target": "parsers/ParserPlugin.ts##ParserPlugin",
+        "type": "uses_type"
+      },
+      {
+        "source": "parsers/buildGraph.ts##buildGraph",
+        "target": "parsers/buildGraph.ts##collectFiles",
+        "type": "calls"
+      },
+      {
+        "source": "parsers/buildGraph.ts##buildGraph",
+        "target": "parsers/buildGraph.ts##addFolderNodes",
+        "type": "calls"
+      },
+      {
+        "source": "parsers/buildGraph.ts##buildGraph",
+        "target": "parsers/buildGraph.ts##addFileNode",
+        "type": "calls"
+      },
+      {
+        "source": "parsers/buildGraph.ts##buildGraph",
+        "target": "parsers/buildGraph.ts##stubNode",
+        "type": "calls"
+      },
+      {
+        "source": "parsers/buildGraph.ts",
+        "target": "parsers/buildGraph.ts##stubNode",
+        "type": "contains"
+      }
+    ],
+    "attributes": {}
+  }
+}
