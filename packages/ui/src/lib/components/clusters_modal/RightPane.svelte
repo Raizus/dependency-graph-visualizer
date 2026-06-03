@@ -2,7 +2,6 @@
     import type {
         ClustersI,
         Graph,
-        NodeAttributesI,
     } from "@dep-graph-vis/core";
     import ClusterTreeNode from "./ClusterTreeNode.svelte";
     import { buildTree, type TreeNode } from "./tree";
